@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   Users,
   Camera,
@@ -37,6 +37,14 @@ import {
   CATEGORY_CONFIGS,
   CheckInRecord
 } from '@/lib/inventorySync';
+import {
+  fetchCategories,
+  postCheckin,
+  postCorrection,
+  Category,
+  CorrectionItem
+} from '@/lib/api';
+import { aggregateDonations, canonicalCategory, countToBand } from '@/lib/inventory';
 
 interface VolunteerDashboardProps {
   activePantry?: Pantry | null;
@@ -120,6 +128,21 @@ export default function VolunteerDashboard({
     setCheckInLogs(getCheckInRecords(currentPantry.id));
   }, [currentPantry.id, familiesServed]);
 
+  // DB food categories (for mapping category names -> ids when persisting).
+  const [categories, setCategories] = useState<Category[]>([]);
+  useEffect(() => {
+    fetchCategories()
+      .then(setCategories)
+      .catch((err) => console.warn('Could not load categories from backend:', err));
+  }, []);
+  const catIdByName = useMemo(() => {
+    const m: Record<string, number> = {};
+    categories.forEach((c) => {
+      m[c.name.toLowerCase()] = c.id;
+    });
+    return m;
+  }, [categories]);
+
   // Handle household checkin tap with real mathematical depletion
   const handleHouseholdTap = (size: number) => {
     setFamiliesServed((prev) => prev + 1);
@@ -148,16 +171,10 @@ export default function VolunteerDashboard({
     setLastCheckinToast(`Household of ${size} checked in! ${deductionsSummary}`);
     setTimeout(() => setLastCheckinToast(null), 3500);
 
-    // Attempt background sync to FastAPI backend if active
-    fetch('http://localhost:8000/api/inventory/checkin', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        pantry_id: currentPantry.id.includes('-') ? currentPantry.id : 'c1000000-0000-0000-0000-000000000001',
-        household_size: size,
-      }),
-    }).catch(() => {
-      // Backend not running is expected in static demo mode; client sync handles it
+    // Persist the check-in to the FastAPI backend. Screen already updated above,
+    // so a network/FK failure just logs (static demo mode still works client-side).
+    postCheckin(currentPantry.id, size).catch((err) => {
+      console.warn('Check-in not persisted to backend:', err);
     });
   };
 
@@ -196,6 +213,15 @@ export default function VolunteerDashboard({
     }
     if (onUpdateInventory) {
       onUpdateInventory(cat, newBand);
+    }
+
+    // Persist this single-category correction to the backend.
+    const canon = canonicalCategory(cat);
+    const categoryId = canon ? catIdByName[canon.toLowerCase()] : undefined;
+    if (categoryId) {
+      postCorrection(currentPantry.id, [{ category_id: categoryId, band: newBand }]).catch(
+        (err) => console.warn(`Run-out for ${cat} not persisted:`, err)
+      );
     }
 
     setLastCheckinToast(
@@ -240,41 +266,59 @@ export default function VolunteerDashboard({
     }
   };
 
-  // Apply scanned donations to shelves
-  const handleApplyDonations = () => {
+  // Apply scanned donations to shelves + persist to the backend.
+  const handleApplyDonations = async () => {
     setDonationsAddedNotice(true);
 
-    const categoriesToAdd = new Set(
-      Object.values(donationCounts).map((c) => c.category)
-    );
+    // Aggregate raw scan counts into totals per canonical DB category.
+    // `skipped` holds any category strings that don't map to a DB category.
+    const { totals, skipped } = aggregateDonations(donationCounts);
+    const bandByCategory: Record<string, 'plenty' | 'low' | 'out'> = {};
+    Object.entries(totals).forEach(([name, total]) => {
+      bandByCategory[name] = countToBand(total);
+    });
 
+    // Optimistic on-screen update (works even when the backend is down).
     const updatedItems = (currentPantry.shelf_items || []).map((it) => {
-      if (categoriesToAdd.has(it.category_name)) {
+      const band = bandByCategory[it.category_name];
+      if (band) {
         const config = CATEGORY_CONFIGS[it.category_name] || { capacity: 60 };
         const currentQty = typeof it.estimated_qty === 'number' ? it.estimated_qty : 20;
         const newQty = Math.min(config.capacity, currentQty + 30);
-        return {
-          ...it,
-          band: 'plenty' as const,
-          estimated_qty: newQty,
-          confidence: 0.95,
-          minutes_ago: 0,
-        };
+        return { ...it, band, estimated_qty: newQty, confidence: 0.95, minutes_ago: 0 };
       }
       return it;
     });
 
-    const updatedPantry: Pantry = {
-      ...currentPantry,
-      shelf_items: updatedItems,
-    };
-
+    const updatedPantry: Pantry = { ...currentPantry, shelf_items: updatedItems };
     setCurrentPantry(updatedPantry);
     if (onUpdateFullPantry) {
       onUpdateFullPantry(updatedPantry);
     }
+    Object.entries(bandByCategory).forEach(([name, band]) => {
+      if (onUpdateInventory) onUpdateInventory(name, band);
+    });
 
-    setLastCheckinToast('✓ Donated items categorized and restocked to PLENTY on neighbor map!');
+    // Persist as a volunteer correction. Screen already updated, so a failure
+    // (backend down, or FK error for an unseeded pantry) just logs.
+    try {
+      const corrections: CorrectionItem[] = [];
+      Object.entries(bandByCategory).forEach(([name, band]) => {
+        const id = catIdByName[name.toLowerCase()];
+        if (id) corrections.push({ category_id: id, band });
+      });
+      if (corrections.length > 0) {
+        await postCorrection(currentPantry.id, corrections);
+      }
+    } catch (err) {
+      console.warn('Donations not persisted to backend (screen still updated):', err);
+    }
+
+    setLastCheckinToast(
+      skipped.length > 0
+        ? `✓ Donations restocked. Skipped unmapped: ${skipped.join(', ')}`
+        : '✓ Donated items categorized and restocked on neighbor map!'
+    );
     setTimeout(() => {
       setDonationsAddedNotice(false);
       setLastCheckinToast(null);

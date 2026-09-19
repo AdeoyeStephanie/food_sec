@@ -1,6 +1,6 @@
 services:
   db:
-    image: timescale/timescaledb-ha:pg16-latest
+    image: postgis/postgis:16-3.4
     container_name: pantrypulse-db
     environment:
       POSTGRES_DB: pantrypulse

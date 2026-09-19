@@ -9,6 +9,7 @@ import PantryLoginModal from '@/components/PantryLoginModal';
 import HotlineModal from '@/components/HotlineModal';
 import { Language, TRANSLATIONS } from '@/lib/translations';
 import { getStoredPantries, saveAndBroadcastPantries } from '@/lib/inventorySync';
+import { fetchPantries } from '@/lib/api';
 import {
   Search,
   Mic,
@@ -62,6 +63,18 @@ export default function Home() {
     // Initial load from localStorage if available
     const stored = getStoredPantries(BALTIMORE_PANTRIES);
     setPantriesList(stored);
+
+    // Prefer the backend as source of truth so pantry IDs are real DB UUIDs
+    // (required for check-ins / corrections to persist). Falls back to the
+    // stored/mock list above if the API is unreachable.
+    fetchPantries()
+      .then((list) => {
+        if (list.length > 0) {
+          setPantriesList(list);
+          saveAndBroadcastPantries(list);
+        }
+      })
+      .catch((err) => console.warn('Backend pantries unavailable, using local data:', err));
 
     const handleSync = (e: any) => {
       if (e.detail && Array.isArray(e.detail)) {
