@@ -323,15 +323,17 @@ export default function Home() {
             <span className="text-xs text-slate-500 font-semibold">{t.presetTitle}</span>
             <div className="flex flex-wrap gap-2">
               {[
-                { label: t.presets.formula, q: language === 'es' ? 'formula para bebe' : 'baby formula near me' },
-                { label: t.presets.tonight, q: language === 'es' ? 'abierto esta noche' : 'open tonight after 6pm' },
-                { label: t.presets.noId, q: language === 'es' ? 'sin identificacion' : 'pantries with no ID needed' },
-                { label: t.presets.produce, q: language === 'es' ? 'frutas y verduras' : 'fresh produce available' },
+                { label: '📍 21218 (Central Baltimore)', q: '21218' },
+                { label: '📍 21220 (Middle River)', q: '21220' },
+                { label: t.presets.produce, q: language === 'es' ? 'frutas y verduras' : 'fresh produce' },
+                { label: t.presets.tonight, q: language === 'es' ? 'abierto esta noche' : 'open tonight' },
+                { label: t.presets.noId, q: language === 'es' ? 'sin identificacion' : 'no ID needed' },
+                { label: t.presets.formula, q: language === 'es' ? 'formula para bebe' : 'diapers and formula' },
               ].map((chip) => (
                 <button
                   key={chip.label}
                   onClick={() => handleExecuteSearch(chip.q)}
-                  className="bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-500 text-slate-800 text-xs font-medium px-4 py-2.5 rounded-full transition shadow-xs active:scale-95 cursor-pointer"
+                  className="bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-500 text-slate-800 text-xs font-medium px-3.5 py-2 rounded-full transition shadow-xs active:scale-95 cursor-pointer"
                 >
                   {chip.label}
                 </button>
@@ -374,11 +376,37 @@ export default function Home() {
                 <input
                   type="text"
                   value={query}
+                  placeholder={t.searchPlaceholder}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleExecuteSearch(query)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2 px-3 text-xs font-medium text-slate-800 outline-none focus:border-emerald-700"
                 />
               </div>
+            </div>
+
+            {/* Quick Filter Bar */}
+            <div className="px-4 py-2 bg-slate-50 border-b border-slate-100 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+              {[
+                { id: 'all', label: language === 'es' ? 'Todos' : 'All' },
+                { id: 'tonight', label: language === 'es' ? 'Abierto esta noche' : 'Open Tonight' },
+                { id: 'no_id', label: language === 'es' ? 'Sin ID' : 'No ID Needed' },
+                { id: 'produce', label: language === 'es' ? 'Verduras frescas' : 'Fresh Produce' },
+              ].map((filter) => {
+                const isActive = (filter.id === 'all' && !activeFilter) || activeFilter === filter.id;
+                return (
+                  <button
+                    key={filter.id}
+                    onClick={() => setActiveFilter(filter.id === 'all' ? null : filter.id)}
+                    className={`whitespace-nowrap text-[11px] font-semibold px-3 py-1 rounded-full transition cursor-pointer ${
+                      isActive
+                        ? 'bg-[#064e3b] text-white shadow-xs'
+                        : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    {filter.label}
+                  </button>
+                );
+              })}
             </div>
 
             <div className="p-4 flex flex-col gap-4">
