@@ -130,7 +130,7 @@ export default function CameraViewfinder({ onCapture, onClose }: CameraViewfinde
 
       {/* Video Viewfinder */}
       {error ? (
-        <div className="p-8 text-center text-slate-300 flex flex-col items-center gap-3 min-h-[260px] justify-center">
+        <div className="p-8 text-center text-slate-300 flex flex-col items-center gap-3 min-h-65 justify-center">
           <AlertTriangle className="w-8 h-8 text-amber-400" />
           <p className="text-xs max-w-xs">{error}</p>
           <button
@@ -141,7 +141,7 @@ export default function CameraViewfinder({ onCapture, onClose }: CameraViewfinde
           </button>
         </div>
       ) : (
-        <div className="relative w-full aspect-4/3 max-h-[340px] bg-black flex items-center justify-center overflow-hidden">
+        <div className="relative w-full aspect-4/3 max-h-85 bg-black flex items-center justify-center overflow-hidden">
           <video
             ref={videoRef}
             className="w-full h-full object-cover"

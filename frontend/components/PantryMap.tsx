@@ -254,7 +254,7 @@ export default function PantryMap({
 
   return (
     <div 
-      className="relative w-full h-full min-h-[350px] rounded-2xl overflow-hidden border border-emerald-900/10 shadow-inner z-0"
+      className="relative w-full h-full min-h-87.5 rounded-2xl overflow-hidden border border-emerald-900/10 shadow-inner z-0"
       style={{ isolation: 'isolate' }}
     >
       <div ref={mapContainerRef} className="w-full h-full absolute inset-0 z-0" />

@@ -30,7 +30,7 @@ import {
 const PantryMap = dynamic(() => import('@/components/PantryMap'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full min-h-[300px] bg-slate-100 animate-pulse rounded-2xl flex items-center justify-center text-slate-400 text-sm">
+    <div className="w-full h-full min-h-75 bg-slate-100 animate-pulse rounded-2xl flex items-center justify-center text-slate-400 text-sm">
       Loading Baltimore Pantry Map...
     </div>
   ),
@@ -827,7 +827,7 @@ export default function Home() {
           {/* Right Column: Interactive Map & Detail Panel */}
           <div className={`flex-1 relative h-full flex flex-col md:flex-row bg-[#f8faf9] ${mobileTab === 'map' ? 'flex' : 'hidden md:flex'}`}>
             {/* Map Container */}
-            <div className="flex-1 h-full min-h-[350px]">
+            <div className="flex-1 h-full min-h-87.5">
               <PantryMap
                 pantries={filteredPantries}
                 selectedPantry={selectedPantry}
@@ -838,7 +838,7 @@ export default function Home() {
 
             {/* Slide-over Detail Sheet (shown on desktop beside map) */}
             {selectedPantry && (
-              <div className="hidden md:block w-[400px] lg:w-[440px] h-full p-4 shrink-0 overflow-y-auto z-20 border-l border-slate-200">
+              <div className="hidden md:block w-100 lg:w-110 h-full p-4 shrink-0 overflow-y-auto z-20 border-l border-slate-200">
                 <PantryDetailSheet
                   pantry={selectedPantry}
                   language={language}
@@ -878,7 +878,7 @@ export default function Home() {
           {/* Mobile Sheet Modal Overlay when a pantry is selected */}
           {selectedPantry && (
             <div
-              className="md:hidden fixed inset-0 z-[80] bg-black/60 backdrop-blur-xs p-3 flex flex-col justify-end animate-in fade-in duration-200"
+              className="md:hidden fixed inset-0 z-80 bg-black/60 backdrop-blur-xs p-3 flex flex-col justify-end animate-in fade-in duration-200"
               onClick={() => setSelectedPantry(null)}
             >
               <div
