@@ -86,7 +86,7 @@ export default function HotlineModal({ isOpen, language, onClose, onSelectPantry
                 : (language === 'es' ? 'Llamada Conectada' : 'Call Connected')}
             </span>
             <h3 className="text-2xl font-black text-white mt-0.5">
-              (410) 555-FOOD
+              (410) 737-8282
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
               Baltimore Multilingual Voice AI Hotline • No Data Needed

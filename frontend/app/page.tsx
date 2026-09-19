@@ -497,7 +497,7 @@ export default function Home() {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleExecuteSearch(query || t.searchPlaceholder)}
+                onKeyDown={(e) => e.key === 'Enter' && handleExecuteSearch(query)}
                 placeholder={t.searchPlaceholder}
                 className="w-full bg-white text-slate-800 text-base placeholder:text-slate-400 border-2 border-slate-200 focus:border-[#064e3b] rounded-2xl py-4 pl-4 pr-12 outline-none transition shadow-sm"
               />
@@ -516,7 +516,7 @@ export default function Home() {
             </div>
 
             <button
-              onClick={() => handleExecuteSearch(query || t.searchPlaceholder)}
+              onClick={() => handleExecuteSearch(query)}
               className="w-full bg-[#064e3b] hover:bg-[#043d2e] active:scale-[0.99] text-white font-bold text-base py-4 rounded-2xl transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
             >
               <Search className="w-5 h-5" />
@@ -778,7 +778,7 @@ export default function Home() {
                         className="flex items-center justify-center gap-2 bg-emerald-800 hover:bg-emerald-900 text-white py-2.5 px-3 rounded-xl text-xs font-bold shadow-sm transition cursor-pointer"
                       >
                         <PhoneCall className="w-3.5 h-3.5 text-emerald-300" />
-                        <span>(410) 555-FOOD</span>
+                        <span>(410) 737-8282</span>
                       </button>
                     </div>
 

@@ -28,7 +28,7 @@ export default function PantryLoginModal({ isOpen, pantries, onClose, onSuccess,
   const [regAddress, setRegAddress] = useState('');
   const [regNeighborhood, setRegNeighborhood] = useState('Central Baltimore');
   const [regHours, setRegHours] = useState('Open Monday - Friday 10am to 2pm');
-  const [regPhone, setRegPhone] = useState('(410) 555-FOOD');
+  const [regPhone, setRegPhone] = useState('(410) 737-8282');
   const [regPin, setRegPin] = useState('');
   const [regRequiresId, setRegRequiresId] = useState(false);
   const [regModel, setRegModel] = useState<'client_choice' | 'pre_packed'>('client_choice');
