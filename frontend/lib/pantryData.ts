@@ -4046,7 +4046,7 @@ export const BALTIMORE_PANTRIES: Pantry[] = [
         "confidence": 0.89
       }
     ]
-  }
+  },
   {
     "id": "c1000000-0000-0000-0000-000000000051",
     "name": "Middle River Emergency Food Pantry (Hope Center)",
