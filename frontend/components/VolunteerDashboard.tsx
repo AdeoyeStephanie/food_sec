@@ -458,7 +458,8 @@ export default function VolunteerDashboard({
   // Manager PIN Verification
   const handleManagerPinSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (managerPinInput === '9999' || managerPinInput === '4827' || managerPinInput === '1234') {
+    const validManagerPins = ['2026', '9999', '1234', '4827'];
+    if (validManagerPins.includes(managerPinInput)) {
       setIsManagerUnlocked(true);
       setShowManagerPinModal(false);
       setManagerPinError(null);
