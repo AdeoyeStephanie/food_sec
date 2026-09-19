@@ -4,9 +4,11 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import VolunteerDashboard from '@/components/VolunteerDashboard';
 import { BALTIMORE_PANTRIES, Pantry } from '@/lib/pantryData';
+import { getStoredPantries, saveAndBroadcastPantries } from '@/lib/inventorySync';
 import { Lock, ArrowLeft, ShieldCheck, Building2, KeyRound, AlertCircle } from 'lucide-react';
 
 export default function VolunteerPage() {
+  const [pantriesList, setPantriesList] = useState<Pantry[]>(BALTIMORE_PANTRIES);
   const [selectedPantryId, setSelectedPantryId] = useState<string>(BALTIMORE_PANTRIES[0].id);
   const [authenticatedPantry, setAuthenticatedPantry] = useState<Pantry | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -14,7 +16,20 @@ export default function VolunteerPage() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const currentPantry = BALTIMORE_PANTRIES.find((p) => p.id === selectedPantryId) || BALTIMORE_PANTRIES[0];
+  React.useEffect(() => {
+    setPantriesList(getStoredPantries(BALTIMORE_PANTRIES));
+  }, []);
+
+  const currentPantry = pantriesList.find((p) => p.id === selectedPantryId) || pantriesList[0];
+
+  const handleUpdateFullPantry = (updatedPantry: Pantry) => {
+    setPantriesList((prev) => {
+      const nextList = prev.map((p) => (p.id === updatedPantry.id ? updatedPantry : p));
+      saveAndBroadcastPantries(nextList);
+      return nextList;
+    });
+    setAuthenticatedPantry(updatedPantry);
+  };
 
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,6 +57,7 @@ export default function VolunteerPage() {
             setAuthenticatedPantry(null);
             setPin('');
           }}
+          onUpdateFullPantry={handleUpdateFullPantry}
         />
       </main>
     );

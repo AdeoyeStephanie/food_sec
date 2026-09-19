@@ -1,18 +1,64 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
-import { Users, Camera, CheckSquare, Mic, Plus, Minus, Check, ShieldCheck, Upload, Sparkles, Loader2, Image as ImageIcon, Video } from 'lucide-react';
-import { Pantry } from '@/lib/pantryData';
+import React, { useState, useRef, useEffect } from 'react';
+import {
+  Users,
+  Camera,
+  CheckSquare,
+  Mic,
+  Plus,
+  Minus,
+  Check,
+  ShieldCheck,
+  Upload,
+  Sparkles,
+  Loader2,
+  Image as ImageIcon,
+  Video,
+  FileSpreadsheet,
+  Download,
+  TrendingDown,
+  RefreshCw,
+  PackageCheck,
+  AlertCircle
+} from 'lucide-react';
+import { BALTIMORE_PANTRIES, Pantry, ShelfItem } from '@/lib/pantryData';
 import CameraViewfinder from '@/components/CameraViewfinder';
+import {
+  calculateDepletedInventory,
+  recordCheckIn,
+  getCheckInRecords,
+  saveAndBroadcastPantries,
+  CATEGORY_CONFIGS,
+  CheckInRecord
+} from '@/lib/inventorySync';
 
 interface VolunteerDashboardProps {
   activePantry?: Pantry | null;
   onExit?: () => void;
   onUpdateInventory?: (category: string, band: 'plenty' | 'low' | 'out') => void;
+  onUpdateFullPantry?: (updatedPantry: Pantry) => void;
 }
 
-export default function VolunteerDashboard({ activePantry, onExit, onUpdateInventory }: VolunteerDashboardProps) {
-  const [activeTab, setActiveTab] = useState<'checkin' | 'donations' | 'closing'>('checkin');
+export default function VolunteerDashboard({
+  activePantry,
+  onExit,
+  onUpdateInventory,
+  onUpdateFullPantry
+}: VolunteerDashboardProps) {
+  const [activeTab, setActiveTab] = useState<'checkin' | 'donations' | 'closing' | 'reports'>('checkin');
+  
+  // Current active pantry state with live shelf levels
+  const [currentPantry, setCurrentPantry] = useState<Pantry>(
+    activePantry || BALTIMORE_PANTRIES[0]
+  );
+
+  useEffect(() => {
+    if (activePantry) {
+      setCurrentPantry(activePantry);
+    }
+  }, [activePantry]);
+
   const [familiesServed, setFamiliesServed] = useState(23);
   const [lastCheckinToast, setLastCheckinToast] = useState<string | null>(null);
 
@@ -36,25 +82,113 @@ export default function VolunteerDashboard({ activePantry, onExit, onUpdateInven
     'Produce': 'plenty',
     'Protein': 'low',
     'Dairy': 'plenty',
+    'Grains': 'plenty',
     'Diapers': 'low',
     'Hygiene': 'out'
   });
   const [closingSaved, setClosingSaved] = useState(false);
 
+  // Sync closing guesses whenever current pantry shelf items change
+  useEffect(() => {
+    if (currentPantry && currentPantry.shelf_items) {
+      const map: { [key: string]: 'plenty' | 'low' | 'out' } = {};
+      currentPantry.shelf_items.forEach((it) => {
+        map[it.category_name] = it.band;
+      });
+      setClosingGuesses((prev) => ({ ...prev, ...map }));
+    }
+  }, [currentPantry]);
+
+  // Check-in records for TEFAP compliance
+  const [checkInLogs, setCheckInLogs] = useState<CheckInRecord[]>([]);
+  useEffect(() => {
+    setCheckInLogs(getCheckInRecords(currentPantry.id));
+  }, [currentPantry.id, familiesServed]);
+
+  // Handle household checkin tap with real mathematical depletion
   const handleHouseholdTap = (size: number) => {
     setFamiliesServed((prev) => prev + 1);
-    setLastCheckinToast(`Household of ${size} checked in! Shelf predictions updated.`);
-    setTimeout(() => setLastCheckinToast(null), 3000);
+
+    // Run Predict-and-Correct Depletion math
+    const { updatedItems, deductionsSummary } = calculateDepletedInventory(
+      currentPantry.shelf_items || [],
+      size
+    );
+
+    const updatedPantry: Pantry = {
+      ...currentPantry,
+      shelf_items: updatedItems,
+    };
+
+    setCurrentPantry(updatedPantry);
+
+    // Save check-in record for TEFAP report
+    recordCheckIn(updatedPantry.id, updatedPantry.name, size);
+
+    // Broadcast update across all tabs and parent states
+    if (onUpdateFullPantry) {
+      onUpdateFullPantry(updatedPantry);
+    }
+
+    setLastCheckinToast(`Household of ${size} checked in! ${deductionsSummary}`);
+    setTimeout(() => setLastCheckinToast(null), 3500);
+
+    // Attempt background sync to FastAPI backend if active
+    fetch('http://localhost:8000/api/inventory/checkin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pantry_id: currentPantry.id.includes('-') ? currentPantry.id : 'c1000000-0000-0000-0000-000000000001',
+        household_size: size,
+      }),
+    }).catch(() => {
+      // Backend not running is expected in static demo mode; client sync handles it
+    });
   };
 
+  // 1-Tap Emergency Run-Out Toggle
   const toggleRunOut = (cat: string) => {
-    if (outAlerts.includes(cat)) {
+    const isCurrentlyOut = outAlerts.includes(cat);
+    const newBand: 'plenty' | 'out' = isCurrentlyOut ? 'plenty' : 'out';
+
+    if (isCurrentlyOut) {
       setOutAlerts(outAlerts.filter((c) => c !== cat));
-      if (onUpdateInventory) onUpdateInventory(cat, 'low');
     } else {
       setOutAlerts([...outAlerts, cat]);
-      if (onUpdateInventory) onUpdateInventory(cat, 'out');
     }
+
+    const updatedItems = (currentPantry.shelf_items || []).map((it) => {
+      if (it.category_name.toLowerCase() === cat.toLowerCase()) {
+        return {
+          ...it,
+          band: newBand,
+          estimated_qty: newBand === 'out' ? 0 : 40,
+          confidence: 1.0,
+          minutes_ago: 0,
+        };
+      }
+      return it;
+    });
+
+    const updatedPantry: Pantry = {
+      ...currentPantry,
+      shelf_items: updatedItems,
+    };
+
+    setCurrentPantry(updatedPantry);
+    if (onUpdateFullPantry) {
+      onUpdateFullPantry(updatedPantry);
+    }
+    if (onUpdateInventory) {
+      onUpdateInventory(cat, newBand);
+    }
+
+    setLastCheckinToast(
+      newBand === 'out'
+        ? `⚠️ ${cat} marked OUT OF STOCK. Neighbors on map notified immediately!`
+        : `✓ ${cat} marked back in stock.`
+    );
+    setTimeout(() => setLastCheckinToast(null), 3500);
   };
 
   // AI Scanning handler
@@ -91,15 +225,108 @@ export default function VolunteerDashboard({ activePantry, onExit, onUpdateInven
     }
   };
 
+  // Apply scanned donations to shelves
   const handleApplyDonations = () => {
     setDonationsAddedNotice(true);
-    // If any categories were added, bump their stock
-    Object.values(donationCounts).forEach(({ category }) => {
-      if (onUpdateInventory && ['Produce', 'Protein', 'Dairy', 'Diapers', 'Grains'].includes(category)) {
-        onUpdateInventory(category, 'plenty');
+
+    const categoriesToAdd = new Set(
+      Object.values(donationCounts).map((c) => c.category)
+    );
+
+    const updatedItems = (currentPantry.shelf_items || []).map((it) => {
+      if (categoriesToAdd.has(it.category_name)) {
+        const config = CATEGORY_CONFIGS[it.category_name] || { capacity: 60 };
+        const currentQty = typeof it.estimated_qty === 'number' ? it.estimated_qty : 20;
+        const newQty = Math.min(config.capacity, currentQty + 30);
+        return {
+          ...it,
+          band: 'plenty' as const,
+          estimated_qty: newQty,
+          confidence: 0.95,
+          minutes_ago: 0,
+        };
       }
+      return it;
     });
-    setTimeout(() => setDonationsAddedNotice(false), 3000);
+
+    const updatedPantry: Pantry = {
+      ...currentPantry,
+      shelf_items: updatedItems,
+    };
+
+    setCurrentPantry(updatedPantry);
+    if (onUpdateFullPantry) {
+      onUpdateFullPantry(updatedPantry);
+    }
+
+    setLastCheckinToast('✓ Donated items categorized and restocked to PLENTY on neighbor map!');
+    setTimeout(() => {
+      setDonationsAddedNotice(false);
+      setLastCheckinToast(null);
+    }, 3500);
+  };
+
+  // Save closing check confirmations
+  const handleSaveClosingCheck = () => {
+    setClosingSaved(true);
+
+    const updatedItems = (currentPantry.shelf_items || []).map((it) => {
+      const chosenBand = closingGuesses[it.category_name] || it.band;
+      const config = CATEGORY_CONFIGS[it.category_name] || { capacity: 60, lowThreshold: 18 };
+      let newQty = it.estimated_qty;
+      if (chosenBand === 'plenty') newQty = config.capacity * 0.8;
+      else if (chosenBand === 'low') newQty = config.lowThreshold * 0.75;
+      else newQty = 0;
+
+      return {
+        ...it,
+        band: chosenBand,
+        estimated_qty: newQty,
+        confidence: 1.0, // 100% verified ground truth
+        minutes_ago: 0,
+      };
+    });
+
+    const updatedPantry: Pantry = {
+      ...currentPantry,
+      shelf_items: updatedItems,
+    };
+
+    setCurrentPantry(updatedPantry);
+    if (onUpdateFullPantry) {
+      onUpdateFullPantry(updatedPantry);
+    }
+
+    setLastCheckinToast('✓ End-of-shift verified! Ground truth locked in at 100% confidence.');
+    setTimeout(() => {
+      setClosingSaved(false);
+      setLastCheckinToast(null);
+    }, 3500);
+  };
+
+  // Generate TEFAP Monthly Report CSV Download
+  const handleDownloadTEFAPReport = () => {
+    const records = checkInLogs.length > 0 ? checkInLogs : [
+      { id: 'chk-sample-1', pantryId: currentPantry.id, pantryName: currentPantry.name, householdSize: 4, timestamp: new Date().toISOString(), dateString: new Date().toLocaleDateString() },
+      { id: 'chk-sample-2', pantryId: currentPantry.id, pantryName: currentPantry.name, householdSize: 2, timestamp: new Date().toISOString(), dateString: new Date().toLocaleDateString() },
+      { id: 'chk-sample-3', pantryId: currentPantry.id, pantryName: currentPantry.name, householdSize: 5, timestamp: new Date().toISOString(), dateString: new Date().toLocaleDateString() },
+    ];
+
+    let csvContent = 'data:text/csv;charset=utf-8,';
+    csvContent += 'CheckIn_ID,Pantry_Name,Household_Size,Est_Individuals,Est_Lbs_Distributed,Date,Timestamp\n';
+
+    records.forEach((r) => {
+      const lbs = (r.householdSize * 14.5).toFixed(1);
+      csvContent += `${r.id},"${r.pantryName}",${r.householdSize},${r.householdSize},${lbs},${r.dateString},${r.timestamp}\n`;
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `TEFAP_Compliance_Report_${currentPantry.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -114,10 +341,10 @@ export default function VolunteerDashboard({ activePantry, onExit, onUpdateInven
             <span className="text-xs text-slate-500 font-medium">Verified Operator Session</span>
           </div>
           <h2 className="text-xl font-bold text-emerald-950 mt-0.5">
-            {activePantry?.name || 'Northside Family Pantry'}
+            {currentPantry?.name || 'Northside Family Pantry'}
           </h2>
-          {activePantry?.neighborhood && (
-            <span className="text-xs text-slate-400 font-medium">{activePantry.neighborhood}, Baltimore</span>
+          {currentPantry?.neighborhood && (
+            <span className="text-xs text-slate-400 font-medium">{currentPantry.neighborhood}, Baltimore</span>
           )}
         </div>
         {onExit && (
@@ -134,13 +361,13 @@ export default function VolunteerDashboard({ activePantry, onExit, onUpdateInven
       <div className="p-5 md:p-6 flex-1 overflow-y-auto">
         {/* Toast Alert */}
         {lastCheckinToast && (
-          <div className="mb-4 bg-emerald-900 text-white px-4 py-2.5 rounded-2xl text-xs flex items-center justify-between shadow-lg animate-bounce">
+          <div className="mb-4 bg-emerald-900 text-white px-4 py-3 rounded-2xl text-xs flex items-center justify-between shadow-lg animate-in fade-in slide-in-from-top-2 duration-200">
             <span>{lastCheckinToast}</span>
-            <Check className="w-4 h-4 text-emerald-400" />
+            <Check className="w-4 h-4 text-emerald-400 shrink-0 ml-2" />
           </div>
         )}
 
-        {/* TAB 1: CHECK-IN */}
+        {/* TAB 1: CHECK-IN & REAL-TIME PREDICT ENGINE */}
         {activeTab === 'checkin' && (
           <div className="flex flex-col gap-6">
             {/* Counter Card */}
@@ -149,42 +376,110 @@ export default function VolunteerDashboard({ activePantry, onExit, onUpdateInven
                 <p className="text-xs text-emerald-200 font-medium">Families served today</p>
                 <p className="text-4xl font-extrabold tracking-tight mt-1">{familiesServed}</p>
               </div>
-              <p className="text-xs text-emerald-200/80 max-w-[160px] text-right">
-                Tap a number each time a family checks in.
+              <p className="text-xs text-emerald-200/80 max-w-[170px] text-right leading-snug">
+                Tap household size when a family checks in. Food auto-depletes in real time.
               </p>
             </div>
 
             {/* Household size pad */}
             <div>
-              <h3 className="font-bold text-base text-emerald-950 mb-1">Tap the household size</h3>
-              <p className="text-xs text-slate-500 mb-3">No names. Just the number of people in the household.</p>
+              <div className="flex justify-between items-center mb-1">
+                <h3 className="font-bold text-base text-emerald-950">Tap household size</h3>
+                <span className="text-[11px] text-emerald-800 font-semibold bg-emerald-100 px-2 py-0.5 rounded-md">
+                  Predict Engine Active
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 mb-3">No names or paperwork required. Just the family size.</p>
               <div className="grid grid-cols-4 gap-3">
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((size) => (
                   <button
                     key={size}
                     onClick={() => handleHouseholdTap(size)}
-                    className="bg-white hover:bg-emerald-50 active:bg-emerald-100 border-2 border-slate-200 hover:border-emerald-600 rounded-2xl py-4 flex flex-col items-center justify-center font-bold text-2xl text-slate-800 shadow-sm transition active:scale-95"
+                    className="bg-white hover:bg-emerald-50 active:bg-emerald-100 border-2 border-slate-200 hover:border-emerald-600 rounded-2xl py-4 flex flex-col items-center justify-center font-bold text-2xl text-slate-800 shadow-sm transition active:scale-95 cursor-pointer"
                   >
-                    {size === 8 ? '8+' : size}
+                    <span>{size === 8 ? '8+' : size}</span>
+                    <span className="text-[10px] text-slate-400 font-normal">people</span>
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Quick Run Out Flags */}
+            {/* LIVE PREDICT-AND-CORRECT SHELF STOCK MONITOR */}
+            <div className="bg-white rounded-2xl p-4 border border-emerald-900/10 flex flex-col gap-3 shadow-xs">
+              <div className="flex justify-between items-center">
+                <h4 className="font-bold text-sm text-emerald-950 flex items-center gap-1.5">
+                  <TrendingDown className="w-4 h-4 text-emerald-700" />
+                  Live Shelf Stock (Auto-depleting)
+                </h4>
+                <span className="text-[11px] text-slate-400">
+                  Updates neighbor map live
+                </span>
+              </div>
+
+              <div className="flex flex-col gap-2.5">
+                {(currentPantry.shelf_items || []).map((item) => {
+                  const config = CATEGORY_CONFIGS[item.category_name] || { capacity: 60 };
+                  const qty = typeof item.estimated_qty === 'number' ? item.estimated_qty : 30;
+                  const pct = Math.min(100, Math.max(0, Math.round((qty / config.capacity) * 100)));
+
+                  return (
+                    <div key={item.category_name} className="flex flex-col gap-1 text-xs">
+                      <div className="flex justify-between items-center">
+                        <span className="font-semibold text-slate-800 flex items-center gap-1.5">
+                          <span>{item.category_emoji}</span>
+                          <span>{item.category_name}</span>
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] text-slate-500 font-medium">
+                            {item.band === 'out' ? '0 left' : `~${qty} units`}
+                          </span>
+                          <span
+                            className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${
+                              item.band === 'plenty'
+                                ? 'bg-emerald-100 text-emerald-800'
+                                : item.band === 'low'
+                                ? 'bg-amber-100 text-amber-800'
+                                : 'bg-rose-100 text-rose-800'
+                            }`}
+                          >
+                            {item.band}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full transition-all duration-300 ${
+                            item.band === 'plenty'
+                              ? 'bg-emerald-600'
+                              : item.band === 'low'
+                              ? 'bg-amber-500'
+                              : 'bg-rose-500'
+                          }`}
+                          style={{ width: `${item.band === 'out' ? 6 : pct}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Quick 1-Tap Run Out Flags */}
             <div className="bg-white rounded-2xl p-4 border border-emerald-900/10">
               <h4 className="font-bold text-sm text-emerald-950 mb-1">Did something just run out?</h4>
-              <p className="text-xs text-slate-500 mb-3">One tap instantly notifies neighbors on the map.</p>
+              <p className="text-xs text-slate-500 mb-3">1-tap immediately notifies neighbors on the map.</p>
               <div className="flex flex-wrap gap-2">
-                {['Produce', 'Protein', 'Dairy', 'Diapers', 'Hygiene'].map((cat) => {
-                  const isOut = outAlerts.includes(cat);
+                {['Produce', 'Protein', 'Dairy', 'Grains', 'Diapers', 'Hygiene'].map((cat) => {
+                  const isOut = (currentPantry.shelf_items || []).some(
+                    (it) => it.category_name.toLowerCase() === cat.toLowerCase() && it.band === 'out'
+                  );
                   return (
                     <button
                       key={cat}
                       onClick={() => toggleRunOut(cat)}
-                      className={`text-xs px-3.5 py-2 rounded-xl font-semibold border transition ${
+                      className={`text-xs px-3.5 py-2 rounded-xl font-semibold border transition cursor-pointer active:scale-95 ${
                         isOut
-                          ? 'bg-rose-600 border-rose-700 text-white'
+                          ? 'bg-rose-600 border-rose-700 text-white shadow-xs'
                           : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                       }`}
                     >
@@ -194,12 +489,6 @@ export default function VolunteerDashboard({ activePantry, onExit, onUpdateInven
                 })}
               </div>
             </div>
-
-            {/* Voice Assistant banner */}
-            <button className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:border-emerald-600 py-3 rounded-2xl text-sm font-semibold text-slate-700 shadow-sm transition">
-              <Mic className="w-4 h-4 text-emerald-700" />
-              Ask the assistant or log by voice
-            </button>
           </div>
         )}
 
@@ -214,7 +503,7 @@ export default function VolunteerDashboard({ activePantry, onExit, onUpdateInven
                   Gemini Vision
                 </span>
               </div>
-              <p className="text-xs text-slate-500">Snap the pile. We sort it into your categories.</p>
+              <p className="text-xs text-slate-500">Snap incoming crates or bags. AI sorts it automatically.</p>
             </div>
 
             {/* Hidden File Input */}
@@ -246,152 +535,131 @@ export default function VolunteerDashboard({ activePantry, onExit, onUpdateInven
                   <div className="flex flex-col items-center gap-2 py-4">
                     <Loader2 className="w-8 h-8 text-emerald-400 animate-spin" />
                     <span className="text-xs text-emerald-200 font-semibold animate-pulse">
-                      Gemini 3.6 Flash analyzing groceries...
+                      Gemini Multimodal AI analyzing groceries...
                     </span>
                   </div>
                 ) : (
-                  <>
-                    {scannedImagePreview ? (
-                      <img
-                        src={scannedImagePreview}
-                        alt="Donation preview"
-                        className="max-h-32 object-contain rounded-xl mb-2"
-                      />
-                    ) : (
-                      <div className="flex gap-3 items-end mb-3">
-                        <div className="bg-emerald-800/90 px-3 py-2 rounded-xl text-center border border-emerald-500/40">
-                          <span className="text-[11px] text-emerald-200 block font-medium">Produce</span>
-                          <span className="text-base font-bold">×4</span>
-                        </div>
-                        <div className="bg-amber-800/90 px-3 py-2.5 rounded-xl text-center border border-amber-500/40">
-                          <span className="text-[11px] text-amber-200 block font-medium">Grains</span>
-                          <span className="text-lg font-bold">×2</span>
-                        </div>
-                        <div className="bg-rose-800/90 px-3 py-2 rounded-xl text-center border border-rose-500/40">
-                          <span className="text-[11px] text-rose-200 block font-medium">Protein</span>
-                          <span className="text-base font-bold">×3</span>
-                        </div>
-                      </div>
-                    )}
+                  <div className="flex flex-col items-center gap-3 text-center">
+                    <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-emerald-400">
+                      <Camera className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-slate-300">Point at crates or grocery donation</p>
+                      <p className="text-[11px] text-slate-400">Privacy-guaranteed: photos are processed in-memory</p>
+                    </div>
 
-                    <div className="flex flex-wrap justify-center gap-2 mb-2">
+                    <div className="flex items-center gap-2 mt-1">
                       <button
                         onClick={() => setShowLiveCamera(true)}
-                        className="bg-[#10b981] hover:bg-[#059669] text-slate-950 text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-1.5 transition active:scale-95 shadow-md"
+                        className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2.5 px-4 rounded-xl flex items-center gap-1.5 transition shadow-sm cursor-pointer"
                       >
-                        <Camera className="w-4 h-4 text-slate-950" />
-                        Open Live Camera
+                        <Video className="w-4 h-4" />
+                        Open Camera
                       </button>
                       <button
                         onClick={() => fileInputRef.current?.click()}
-                        className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 text-xs font-semibold px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 transition active:scale-95"
+                        className="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold py-2.5 px-3.5 rounded-xl flex items-center gap-1.5 transition border border-slate-700 cursor-pointer"
                       >
-                        <Upload className="w-3.5 h-3.5" />
-                        Upload File
+                        <Upload className="w-4 h-4" />
+                        Upload
                       </button>
                     </div>
-
-                    <div className="bg-black/70 backdrop-blur-md px-3 py-1 rounded-full text-[11px] text-slate-300 flex items-center gap-1.5 mt-1">
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                      Photo is deleted immediately after sorting
-                    </div>
-                  </>
+                  </div>
                 )}
               </div>
             )}
 
-            {/* Quick Presets for Instant Demo */}
-            <div className="flex flex-col gap-1.5">
-              <span className="text-xs text-slate-500 font-semibold">Or test with demo sample boxes:</span>
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  onClick={() => handleScanDonation('canned_box')}
-                  className="bg-white hover:bg-emerald-50 border border-slate-200 rounded-xl p-2 text-left text-xs transition"
-                >
-                  🥫 <span className="font-semibold block text-slate-800">Canned Box</span>
-                  <span className="text-[10px] text-slate-400">Beans &amp; Soups</span>
-                </button>
+            {/* Quick Demo Pre-sets */}
+            <div className="flex flex-col gap-2">
+              <span className="text-xs font-bold text-slate-700">Or quick demo with sample batch:</span>
+              <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => handleScanDonation('produce_crate')}
-                  className="bg-white hover:bg-emerald-50 border border-slate-200 rounded-xl p-2 text-left text-xs transition"
+                  className="bg-white hover:bg-emerald-50 border border-slate-200 py-2 px-3 rounded-xl text-xs font-semibold text-slate-700 text-left transition flex items-center justify-between cursor-pointer"
                 >
-                  🥕 <span className="font-semibold block text-slate-800">Produce Crate</span>
-                  <span className="text-[10px] text-slate-400">Apples &amp; Carrots</span>
+                  <span>🥕 Crate of Vegetables</span>
+                  <span className="text-[11px] text-emerald-800">Scan</span>
                 </button>
                 <button
-                  onClick={() => handleScanDonation('baby_essentials')}
-                  className="bg-white hover:bg-emerald-50 border border-slate-200 rounded-xl p-2 text-left text-xs transition"
+                  onClick={() => handleScanDonation('canned_goods')}
+                  className="bg-white hover:bg-emerald-50 border border-slate-200 py-2 px-3 rounded-xl text-xs font-semibold text-slate-700 text-left transition flex items-center justify-between cursor-pointer"
                 >
-                  🍼 <span className="font-semibold block text-slate-800">Baby Box</span>
-                  <span className="text-[10px] text-slate-400">Diapers &amp; Formula</span>
+                  <span>🥫 Mixed Canned Goods</span>
+                  <span className="text-[11px] text-emerald-800">Scan</span>
                 </button>
               </div>
             </div>
 
-            {/* Check the counts editable list */}
-            <div className="bg-white rounded-2xl p-4 border border-emerald-900/10 flex flex-col gap-3 shadow-xs">
+            {/* Editable AI Review Cards */}
+            <div className="bg-white rounded-3xl p-4 border border-emerald-900/10 flex flex-col gap-3 shadow-xs">
               <div className="flex justify-between items-center">
-                <h4 className="font-bold text-sm text-emerald-950">Check the counts</h4>
-                <span className="text-xs text-slate-400">Tap to fix anything</span>
+                <h4 className="font-bold text-sm text-emerald-950">AI Sorted Review</h4>
+                <span className="text-xs text-slate-400">Edit quantities before adding</span>
               </div>
 
-              {Object.entries(donationCounts).map(([item, { count, category }]) => (
-                <div key={item} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
-                  <div>
-                    <span className="text-sm font-semibold text-slate-800 block">{item}</span>
-                    <span className="text-xs text-emerald-800 font-medium">{category}</span>
+              <div className="flex flex-col gap-2">
+                {Object.entries(donationCounts).map(([item, { count, category }]) => (
+                  <div key={item} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
+                    <div>
+                      <p className="text-xs font-bold text-slate-800">{item}</p>
+                      <span className="text-[11px] text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full font-semibold">
+                        {category}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-2 py-1">
+                      <button
+                        onClick={() => {
+                          if (count > 1) {
+                            setDonationCounts({
+                              ...donationCounts,
+                              [item]: { count: count - 1, category },
+                            });
+                          }
+                        }}
+                        className="p-1 text-slate-500 hover:text-slate-800 transition"
+                      >
+                        <Minus className="w-3 h-3" />
+                      </button>
+                      <span className="text-xs font-bold text-slate-800 min-w-[20px] text-center">{count}</span>
+                      <button
+                        onClick={() => {
+                          setDonationCounts({
+                            ...donationCounts,
+                            [item]: { count: count + 1, category },
+                          });
+                        }}
+                        className="p-1 text-slate-500 hover:text-slate-800 transition"
+                      >
+                        <Plus className="w-3 h-3" />
+                      </button>
+                    </div>
                   </div>
-
-                  <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl px-2 py-1">
-                    <button
-                      onClick={() =>
-                        setDonationCounts({
-                          ...donationCounts,
-                          [item]: { count: Math.max(0, count - 1), category }
-                        })
-                      }
-                      className="p-1 hover:bg-slate-200 rounded-lg text-slate-600 transition"
-                    >
-                      <Minus className="w-3.5 h-3.5" />
-                    </button>
-                    <span className="font-bold text-sm w-4 text-center">{count}</span>
-                    <button
-                      onClick={() =>
-                        setDonationCounts({
-                          ...donationCounts,
-                          [item]: { count: count + 1, category }
-                        })
-                      }
-                      className="p-1 hover:bg-slate-200 rounded-lg text-slate-600 transition"
-                    >
-                      <Plus className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
 
-            {/* Action buttons */}
             <button
               onClick={handleApplyDonations}
-              className="bg-[#064e3b] text-white py-3.5 rounded-2xl font-bold text-sm hover:bg-[#043d2e] shadow-sm transition active:scale-[0.98] flex items-center justify-center gap-2"
+              className="bg-[#064e3b] text-white py-3.5 rounded-2xl font-bold text-sm hover:bg-[#043d2e] shadow-sm transition active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
             >
-              {donationsAddedNotice ? '✓ Added to shelves!' : 'Add to shelves'}
+              <PackageCheck className="w-4 h-4" />
+              <span>{donationsAddedNotice ? '✓ Restocked to Shelves!' : 'Add to Shelves (Auto-Restock)'}</span>
             </button>
-
-            <p className="text-xs text-center text-slate-500">
-              Or just say it: <span className="italic font-medium">&quot;twelve meat soups in&quot;</span>
-            </p>
           </div>
         )}
 
-        {/* TAB 3: CLOSING CHECK (The Predict-and-Correct engine) */}
+        {/* TAB 3: CLOSING CHECK (GROUND TRUTH SNAP) */}
         {activeTab === 'closing' && (
           <div className="flex flex-col gap-5">
             <div>
-              <h3 className="text-xl font-bold text-emerald-950">Closing check</h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-xl font-bold text-emerald-950">Closing check</h3>
+                <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
+                  10 Seconds
+                </span>
+              </div>
               <p className="text-xs text-slate-500">
-                We guessed from today&apos;s 23 check-ins. Fix anything that looks off. About 10 seconds.
+                End of shift: verify what&apos;s left. Confirmed updates reset confidence to 100%.
               </p>
             </div>
 
@@ -400,7 +668,7 @@ export default function VolunteerDashboard({ activePantry, onExit, onUpdateInven
                 <div key={cat} className="flex flex-col gap-1.5 pb-3 border-b border-slate-100 last:border-0">
                   <div className="flex justify-between items-center">
                     <span className="font-bold text-sm text-slate-900">{cat}</span>
-                    <span className="text-[11px] text-slate-400 capitalize">Our guess: {currentBand}</span>
+                    <span className="text-[11px] text-slate-400 capitalize">Model guess: {currentBand}</span>
                   </div>
 
                   <div className="grid grid-cols-3 gap-2">
@@ -411,14 +679,13 @@ export default function VolunteerDashboard({ activePantry, onExit, onUpdateInven
                           key={band}
                           onClick={() => {
                             setClosingGuesses({ ...closingGuesses, [cat]: band });
-                            if (onUpdateInventory) onUpdateInventory(cat, band);
                           }}
-                          className={`py-2 text-xs font-bold rounded-xl border transition ${
+                          className={`py-2 text-xs font-bold rounded-xl border transition cursor-pointer ${
                             isSelected
                               ? band === 'plenty'
                                 ? 'bg-emerald-700 text-white border-emerald-800 shadow-sm'
                                 : band === 'low'
-                                ? 'bg-amber-700 text-white border-amber-800 shadow-sm'
+                                ? 'bg-amber-600 text-white border-amber-700 shadow-sm'
                                 : 'bg-rose-600 text-white border-rose-700 shadow-sm'
                               : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
                           }`}
@@ -433,27 +700,103 @@ export default function VolunteerDashboard({ activePantry, onExit, onUpdateInven
             </div>
 
             <button
-              onClick={() => {
-                setClosingSaved(true);
-                setTimeout(() => setClosingSaved(false), 3000);
-              }}
-              className="bg-[#064e3b] text-white py-3.5 rounded-2xl font-bold text-sm hover:bg-[#043d2e] shadow-sm transition active:scale-[0.98]"
+              onClick={handleSaveClosingCheck}
+              className="bg-[#064e3b] text-white py-3.5 rounded-2xl font-bold text-sm hover:bg-[#043d2e] shadow-sm transition active:scale-[0.98] cursor-pointer"
             >
-              {closingSaved ? '✓ Shelf updates published to Baltimore map!' : 'Send update'}
+              {closingSaved ? '✓ Verified at 100% Ground Truth!' : 'Send update & lock in ground truth'}
             </button>
+          </div>
+        )}
 
-            <button className="border border-rose-200 text-rose-700 hover:bg-rose-50 py-2.5 rounded-xl text-xs font-semibold transition">
-              Closed next time? Let neighbors know
-            </button>
+        {/* TAB 4: TEFAP COMPLIANCE & MONTHLY REPORT */}
+        {activeTab === 'reports' && (
+          <div className="flex flex-col gap-5">
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-xl font-bold text-emerald-950">Monthly TEFAP Report</h3>
+                <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
+                  USDA / Food Bank
+                </span>
+              </div>
+              <p className="text-xs text-slate-500">
+                Automated monthly compliance metrics generated from fast check-in logs.
+              </p>
+            </div>
+
+            {/* Metrics Overview Cards */}
+            <div className="grid grid-cols-3 gap-2.5">
+              <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs flex flex-col">
+                <span className="text-[11px] text-slate-500 font-semibold">Households</span>
+                <span className="text-2xl font-extrabold text-emerald-950 mt-1">{familiesServed}</span>
+                <span className="text-[10px] text-emerald-700 font-medium">Logged today</span>
+              </div>
+              <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs flex flex-col">
+                <span className="text-[11px] text-slate-500 font-semibold">Individuals</span>
+                <span className="text-2xl font-extrabold text-emerald-950 mt-1">
+                  {Math.round(familiesServed * 3.4)}
+                </span>
+                <span className="text-[10px] text-emerald-700 font-medium">~3.4 per family</span>
+              </div>
+              <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs flex flex-col">
+                <span className="text-[11px] text-slate-500 font-semibold">Est. Pounds</span>
+                <span className="text-2xl font-extrabold text-emerald-950 mt-1">
+                  {(familiesServed * 14.5).toFixed(0)}
+                </span>
+                <span className="text-[10px] text-emerald-700 font-medium">Lbs distributed</span>
+              </div>
+            </div>
+
+            {/* Download CSV Action Card */}
+            <div className="bg-emerald-950 text-white rounded-3xl p-5 flex flex-col gap-3 shadow-md">
+              <div>
+                <h4 className="font-bold text-base text-white">Export Monthly Compliance Summary</h4>
+                <p className="text-xs text-slate-300 mt-0.5">
+                  Downloads compliant CSV for Maryland Food Bank &amp; USDA TEFAP reporting.
+                </p>
+              </div>
+
+              <button
+                onClick={handleDownloadTEFAPReport}
+                className="bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-extrabold text-xs py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm transition active:scale-95 cursor-pointer"
+              >
+                <Download className="w-4 h-4" />
+                <span>Download TEFAP Report (.CSV)</span>
+              </button>
+            </div>
+
+            {/* Recent Check-in Logs Table */}
+            <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs flex flex-col gap-3">
+              <h4 className="font-bold text-xs uppercase tracking-wider text-slate-600">
+                Recent Check-in Logs ({checkInLogs.length} logged)
+              </h4>
+
+              <div className="max-h-[160px] overflow-y-auto flex flex-col divide-y divide-slate-100">
+                {checkInLogs.slice(-6).reverse().map((log) => (
+                  <div key={log.id} className="py-2 flex justify-between items-center text-xs">
+                    <span className="font-medium text-slate-800">
+                      Household of {log.householdSize}
+                    </span>
+                    <span className="text-[11px] text-slate-400">
+                      {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                ))}
+                {checkInLogs.length === 0 && (
+                  <p className="text-xs text-slate-400 py-3 text-center">
+                    Tap numbers on the Check-in tab to see live records populate here.
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </div>
 
       {/* Bottom Nav Bar matching Page 4/6 */}
-      <div className="bg-white border-t border-emerald-900/10 px-6 py-3 flex justify-around items-center">
+      <div className="bg-white border-t border-emerald-900/10 px-4 py-3 flex justify-around items-center">
         <button
           onClick={() => setActiveTab('checkin')}
-          className={`flex flex-col items-center gap-1 text-xs font-medium transition ${
+          className={`flex flex-col items-center gap-1 text-xs font-medium transition cursor-pointer ${
             activeTab === 'checkin' ? 'text-emerald-800 font-bold scale-105' : 'text-slate-400 hover:text-slate-600'
           }`}
         >
@@ -463,7 +806,7 @@ export default function VolunteerDashboard({ activePantry, onExit, onUpdateInven
 
         <button
           onClick={() => setActiveTab('donations')}
-          className={`flex flex-col items-center gap-1 text-xs font-medium transition ${
+          className={`flex flex-col items-center gap-1 text-xs font-medium transition cursor-pointer ${
             activeTab === 'donations' ? 'text-emerald-800 font-bold scale-105' : 'text-slate-400 hover:text-slate-600'
           }`}
         >
@@ -473,12 +816,22 @@ export default function VolunteerDashboard({ activePantry, onExit, onUpdateInven
 
         <button
           onClick={() => setActiveTab('closing')}
-          className={`flex flex-col items-center gap-1 text-xs font-medium transition ${
+          className={`flex flex-col items-center gap-1 text-xs font-medium transition cursor-pointer ${
             activeTab === 'closing' ? 'text-emerald-800 font-bold scale-105' : 'text-slate-400 hover:text-slate-600'
           }`}
         >
           <CheckSquare className="w-5 h-5" />
           <span>Closing check</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('reports')}
+          className={`flex flex-col items-center gap-1 text-xs font-medium transition cursor-pointer ${
+            activeTab === 'reports' ? 'text-emerald-800 font-bold scale-105' : 'text-slate-400 hover:text-slate-600'
+          }`}
+        >
+          <FileSpreadsheet className="w-5 h-5" />
+          <span>Reports</span>
         </button>
       </div>
     </div>

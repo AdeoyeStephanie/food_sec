@@ -4,6 +4,8 @@ export interface ShelfItem {
   band: 'plenty' | 'low' | 'out';
   minutes_ago: number;
   confidence: number;
+  estimated_qty?: number;
+  capacity?: number;
 }
 
 export interface Pantry {

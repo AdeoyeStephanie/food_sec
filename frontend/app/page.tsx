@@ -8,6 +8,7 @@ import VolunteerDashboard from '@/components/VolunteerDashboard';
 import PantryLoginModal from '@/components/PantryLoginModal';
 import HotlineModal from '@/components/HotlineModal';
 import { Language, TRANSLATIONS } from '@/lib/translations';
+import { getStoredPantries, saveAndBroadcastPantries } from '@/lib/inventorySync';
 import {
   Search,
   Mic,
@@ -56,15 +57,64 @@ export default function Home() {
   const [showHotlineModal, setShowHotlineModal] = useState(false);
   const [mobileTab, setMobileTab] = useState<'list' | 'map'>('list');
 
+  // Listen for real-time inventory updates across any open tab or window
+  React.useEffect(() => {
+    // Initial load from localStorage if available
+    const stored = getStoredPantries(BALTIMORE_PANTRIES);
+    setPantriesList(stored);
+
+    const handleSync = (e: any) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setPantriesList(e.detail);
+      }
+    };
+
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'BALTIMORE_PANTRIES_DATA_V1' && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (Array.isArray(parsed)) {
+            setPantriesList(parsed);
+          }
+        } catch {}
+      }
+    };
+
+    window.addEventListener('inventory-sync', handleSync);
+    window.addEventListener('storage', handleStorage);
+    return () => {
+      window.removeEventListener('inventory-sync', handleSync);
+      window.removeEventListener('storage', handleStorage);
+    };
+  }, []);
+
   const handleRegisterNewPantry = (newPantry: Pantry) => {
-    setPantriesList((prev) => [newPantry, ...prev]);
+    setPantriesList((prev) => {
+      const nextList = [newPantry, ...prev];
+      saveAndBroadcastPantries(nextList);
+      return nextList;
+    });
     setSelectedPantry(newPantry);
+  };
+
+  const handleUpdateFullPantry = (updatedPantry: Pantry) => {
+    setPantriesList((prev) => {
+      const nextList = prev.map((p) => (p.id === updatedPantry.id ? updatedPantry : p));
+      saveAndBroadcastPantries(nextList);
+      return nextList;
+    });
+    if (selectedPantry?.id === updatedPantry.id) {
+      setSelectedPantry(updatedPantry);
+    }
+    if (authenticatedPantry?.id === updatedPantry.id) {
+      setAuthenticatedPantry(updatedPantry);
+    }
   };
 
   const handleUpdateInventory = (category: string, band: 'plenty' | 'low' | 'out') => {
     const targetId = authenticatedPantry?.id;
-    setPantriesList((prev) =>
-      prev.map((p) => {
+    setPantriesList((prev) => {
+      const nextList = prev.map((p) => {
         if ((targetId && p.id === targetId) || (!targetId && p.name.includes('Northside'))) {
           const updatedItems = (p.shelf_items || []).map((it) =>
             it.category_name.toLowerCase() === category.toLowerCase()
@@ -81,8 +131,10 @@ export default function Home() {
           return updatedPantry;
         }
         return p;
-      })
-    );
+      });
+      saveAndBroadcastPantries(nextList);
+      return nextList;
+    });
   };
 
   // Speech recognition handler
@@ -344,6 +396,7 @@ export default function Home() {
           activePantry={authenticatedPantry}
           onExit={() => setIsVolunteerMode(false)}
           onUpdateInventory={handleUpdateInventory}
+          onUpdateFullPantry={handleUpdateFullPantry}
         />
       </main>
     );
