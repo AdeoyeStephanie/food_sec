@@ -41,25 +41,30 @@ export async function POST(req: NextRequest) {
         const buffer = Buffer.from(bytes);
         const base64Data = buffer.toString('base64');
 
-        const promptText = `You are an AI assistant for a Baltimore community food pantry helping volunteers quickly catalog food donations.
-Examine this image of donated food or supplies.
-Group what you see into standard food pantry categories:
-- Produce
-- Protein
-- Dairy
-- Grains
-- Canned Goods
-- Diapers
-- Hygiene
-- Halal items
+        const promptText = `You are an expert food pantry inventory vision assistant in Baltimore.
+Your job is to examine this donation photo and accurately count and categorize the food or supplies.
 
-Estimate the count of each specific item.
-Respond ONLY with a valid JSON array of objects with the exact schema:
+Instructions for high accuracy:
+1. Scan the image methodically (left to right, front to back).
+2. Distinguish between individual items (e.g. cans, boxes, cartons, bags, diapers).
+3. Do not guess non-existent items in shadows; only count clearly visible items.
+4. Classify each detected item into one of our exact pantry categories:
+   - "Produce" (fresh fruits, vegetables)
+   - "Protein" (meat, chicken, tuna, canned meats, beans, peanut butter)
+   - "Dairy" (milk, cheese, yogurt, plant milks)
+   - "Grains" (pasta, rice, cereal, bread, oats)
+   - "Canned Goods" (canned soups, canned vegetables, canned fruit, sauces)
+   - "Diapers" (baby diapers, pull-ups)
+   - "Hygiene" (soap, shampoo, toothpaste, wipes)
+   - "Halal items" (halal labeled food)
+
+Output Format:
+Respond strictly with a JSON array conforming to this format:
 [
-  { "name": "Canned vegetables", "category": "Produce", "count": 2 },
+  { "name": "Canned black beans", "category": "Protein", "count": 2 },
   { "name": "Cereal box", "category": "Grains", "count": 1 }
 ]
-Do not include markdown backticks or extra text.`;
+Do not wrap in markdown backticks or commentary. Only return the raw JSON array.`;
 
         // Direct Google Generative Language REST call with gemini-3.6-flash
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
@@ -82,7 +87,7 @@ Do not include markdown backticks or extra text.`;
               }
             ],
             generationConfig: {
-              temperature: 0.1,
+              temperature: 0.0,
               responseMimeType: 'application/json'
             }
           })
