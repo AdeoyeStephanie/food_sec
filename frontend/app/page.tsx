@@ -101,29 +101,37 @@ export default function Home() {
   // Filtered Pantries
   const filteredPantries = useMemo(() => {
     let list = [...pantriesList];
-    const q = query.toLowerCase();
+    const q = query.trim().toLowerCase();
 
-    if (q.includes('hampden') || activeFilter === 'hampden') {
-      list = list.filter((p) => p.neighborhood === 'Hampden' || p.name.includes('Northside'));
-    }
-    if (q.includes('tonight') || activeFilter === 'tonight') {
+    if (!q && !activeFilter) return pantriesList;
+
+    if (activeFilter === 'tonight') {
       list = list.filter((p) => p.open_tonight);
-    }
-    if (q.includes('no id') || activeFilter === 'no_id') {
+    } else if (activeFilter === 'no_id') {
       list = list.filter((p) => !p.requires_id);
-    }
-    if (q.includes('formula') || q.includes('diaper')) {
+    } else if (activeFilter === 'produce') {
       list = list.filter((p) =>
-        p.shelf_items.some((item) => item.category_name.toLowerCase().includes('diaper') && item.band !== 'out')
-      );
-    }
-    if (q.includes('produce') || activeFilter === 'produce') {
-      list = list.filter((p) =>
-        p.shelf_items.some((item) => item.category_name === 'Produce' && item.band === 'plenty')
+        p.shelf_items?.some((item) => item.category_name.toLowerCase().includes('produce') && item.band === 'plenty')
       );
     }
 
-    return list.length > 0 ? list : pantriesList;
+    if (q) {
+      list = list.filter((p) => {
+        const nameMatch = p.name.toLowerCase().includes(q);
+        const neighborhoodMatch = p.neighborhood.toLowerCase().includes(q);
+        const addressMatch = p.address.toLowerCase().includes(q);
+        const notesMatch = p.notes.toLowerCase().includes(q);
+        const categoryMatch = p.shelf_items?.some((item) => 
+          item.category_name.toLowerCase().includes(q)
+        );
+        const toniteMatch = (q.includes('tonight') || q.includes('tonite') || q.includes('open')) && p.open_tonight;
+        const noIdMatch = (q.includes('no id') || q.includes('without id')) && !p.requires_id;
+
+        return nameMatch || neighborhoodMatch || addressMatch || notesMatch || categoryMatch || toniteMatch || noIdMatch;
+      });
+    }
+
+    return list.length > 0 ? list : pantriesList.slice(0, 10);
   }, [query, activeFilter, pantriesList]);
 
   // Conversational response synthesis

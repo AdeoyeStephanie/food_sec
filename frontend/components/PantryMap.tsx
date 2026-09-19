@@ -18,12 +18,14 @@ export default function PantryMap({ pantries, selectedPantry, onSelectPantry }: 
     if (!mapContainerRef.current || typeof window === 'undefined') return;
 
     let L: any;
+    let isCancelled = false;
+
     // Dynamically import Leaflet
     import('leaflet').then((leaflet) => {
+      if (isCancelled || !mapContainerRef.current) return;
       L = leaflet.default || leaflet;
 
-      if (!mapInstanceRef.current && mapContainerRef.current) {
-        // Center around Baltimore Hampden / Northside by default
+      if (!mapInstanceRef.current) {
         const initialLat = selectedPantry ? selectedPantry.lat : 39.3150;
         const initialLng = selectedPantry ? selectedPantry.lng : -76.6200;
 
@@ -33,15 +35,19 @@ export default function PantryMap({ pantries, selectedPantry, onSelectPantry }: 
           zoomControl: false,
         });
 
-        // Clean light/soft tile layer (CartoDB Positron is clean and distraction-free)
+        // Clean light/soft tile layer
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
           attribution: '&copy; OpenStreetMap contributors, CartoDB',
           maxZoom: 19,
         }).addTo(map);
 
         L.control.zoom({ position: 'bottomright' }).addTo(map);
-
         mapInstanceRef.current = map;
+
+        // Invalidate size shortly after render to guarantee full tile display
+        setTimeout(() => {
+          map.invalidateSize();
+        }, 200);
       }
 
       const map = mapInstanceRef.current;
@@ -53,8 +59,7 @@ export default function PantryMap({ pantries, selectedPantry, onSelectPantry }: 
 
       // Add pins for pantries
       pantries.forEach((pantry, idx) => {
-        // Check top 3 items stock bands
-        const barColors = pantry.shelf_items.slice(0, 3).map((item) => {
+        const barColors = (pantry.shelf_items || []).slice(0, 3).map((item) => {
           if (item.band === 'plenty') return '#16a34a'; // green
           if (item.band === 'low') return '#d97706';    // amber
           return '#dc2626';                             // red
@@ -62,13 +67,12 @@ export default function PantryMap({ pantries, selectedPantry, onSelectPantry }: 
 
         const isSelected = selectedPantry?.id === pantry.id;
 
-        // Custom HTML marker matching Page 3 mockup pin style
         const iconHtml = `
           <div style="
             display: flex;
             align-items: center;
             background: white;
-            padding: 4px 7px;
+            padding: 4px 8px;
             border-radius: 9999px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.18);
             border: 2px solid ${isSelected ? '#064e3b' : '#ffffff'};
@@ -79,7 +83,7 @@ export default function PantryMap({ pantries, selectedPantry, onSelectPantry }: 
           ">
             <span style="
               font-weight: 700;
-              font-size: 13px;
+              font-size: 12px;
               color: #1f2937;
               line-height: 1;
             ">${idx + 1}</span>
@@ -111,23 +115,32 @@ export default function PantryMap({ pantries, selectedPantry, onSelectPantry }: 
 
         markersRef.current.push(marker);
       });
+
+      // Fit map bounds to show matching pantries smoothly
+      if (pantries.length > 0) {
+        const bounds = L.latLngBounds(pantries.map((p) => [p.lat, p.lng]));
+        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 });
+      }
+
+      map.invalidateSize();
     });
 
     return () => {
-      // Cleanup on unmount if needed
+      isCancelled = true;
     };
-  }, [pantries, selectedPantry, onSelectPantry]);
+  }, [pantries, onSelectPantry]);
 
-  // If selectedPantry changes, pan map to it
+  // If selectedPantry changes, center map
   useEffect(() => {
     if (mapInstanceRef.current && selectedPantry) {
       mapInstanceRef.current.setView([selectedPantry.lat, selectedPantry.lng], 14, { animate: true });
+      mapInstanceRef.current.invalidateSize();
     }
   }, [selectedPantry]);
 
   return (
-    <div className="relative w-full h-full min-h-[300px] rounded-2xl overflow-hidden border border-emerald-900/10 shadow-inner">
-      <div ref={mapContainerRef} className="w-full h-full" style={{ minHeight: '100%' }} />
+    <div className="relative w-full h-full min-h-[350px] rounded-2xl overflow-hidden border border-emerald-900/10 shadow-inner">
+      <div ref={mapContainerRef} className="w-full h-full absolute inset-0" />
     </div>
   );
 }
