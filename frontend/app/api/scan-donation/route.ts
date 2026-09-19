@@ -145,8 +145,11 @@ Do not wrap in markdown backticks or commentary. Only return the raw JSON array.
           const errorDetails = await geminiRes.text();
           console.warn('Gemini API returned error status:', errorDetails);
         }
-      } catch (geminiError: any) {
-        console.warn('Gemini processing exception:', geminiError.message);
+      } catch (geminiError) {
+        console.warn(
+          'Gemini processing exception:',
+          geminiError instanceof Error ? geminiError.message : geminiError
+        );
       }
     }
 
@@ -162,9 +165,9 @@ Do not wrap in markdown backticks or commentary. Only return the raw JSON array.
       privacyGuarantee: 'Photo processed in-memory and discarded. No image data was persisted.'
     });
 
-  } catch (err: any) {
+  } catch (err) {
     return NextResponse.json(
-      { error: 'Failed to process intake', details: err.message },
+      { error: 'Failed to process intake', details: err instanceof Error ? err.message : String(err) },
       { status: 500 }
     );
   }

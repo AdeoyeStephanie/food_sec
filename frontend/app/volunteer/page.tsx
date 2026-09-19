@@ -18,8 +18,10 @@ export default function VolunteerPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   React.useEffect(() => {
+    // One-time hydration-safe read of the local store on mount (not derived state).
     const stored = getStoredPantries([]);
     if (stored.length > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPantriesList(stored);
       setSelectedPantryId(stored[0]?.id || '');
     }

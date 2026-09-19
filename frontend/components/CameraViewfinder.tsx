@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
-import { Camera, X, RefreshCw, Sparkles, AlertTriangle } from 'lucide-react';
+import { Camera, X, RefreshCw, AlertTriangle } from 'lucide-react';
 
 interface CameraViewfinderProps {
   onCapture: (file: File) => void;
@@ -42,7 +42,7 @@ export default function CameraViewfinder({ onCapture, onClose }: CameraViewfinde
           videoRef.current.srcObject = mediaStream;
           videoRef.current.play();
         }
-      } catch (err: any) {
+      } catch (err) {
         console.warn('Camera access issue:', err);
         // Try fallback with simple constraints
         try {
@@ -53,7 +53,7 @@ export default function CameraViewfinder({ onCapture, onClose }: CameraViewfinde
             videoRef.current.srcObject = fallbackStream;
             videoRef.current.play();
           }
-        } catch (fallbackErr: any) {
+        } catch {
           setError(
             'Unable to access camera. Please allow camera permissions in your browser or use File Upload.'
           );

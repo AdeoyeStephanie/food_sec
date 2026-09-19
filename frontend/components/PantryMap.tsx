@@ -1,5 +1,11 @@
 'use client';
 
+/*
+ * Leaflet is imported dynamically at runtime (see the import('leaflet') below),
+ * so its map/layer/marker objects are handled untyped in this thin wrapper.
+ */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import React, { useEffect, useRef, useState } from 'react';
 import { Pantry } from '@/lib/pantryData';
 
@@ -77,7 +83,11 @@ export default function PantryMap({
   const prevPantriesKeyRef = useRef<string>('');
   const initialFitDoneRef = useRef<boolean>(false);
   const onSelectPantryRef = useRef(onSelectPantry);
-  onSelectPantryRef.current = onSelectPantry;
+  // Keep the latest callback in a ref (updated in an effect, not during render)
+  // so marker click handlers always call the current onSelectPantry.
+  useEffect(() => {
+    onSelectPantryRef.current = onSelectPantry;
+  }, [onSelectPantry]);
 
   const [mapReady, setMapReady] = useState(false);
 
@@ -87,6 +97,8 @@ export default function PantryMap({
 
     let isMounted = true;
     let resizeObserver: ResizeObserver | null = null;
+    // Capture the markers map for the cleanup closure (ref identity is stable).
+    const markersMap = markersMapRef.current;
 
     import('leaflet').then((leaflet) => {
       if (!isMounted || !mapContainerRef.current) return;
@@ -147,10 +159,13 @@ export default function PantryMap({
       }
       leafletRef.current = null;
       markersGroupRef.current = null;
-      markersMapRef.current.clear();
+      markersMap.clear();
       setMapReady(false);
     };
-  }, []); // Run ONCE on mount
+    // Runs ONCE on mount; selectedPantry is only read to pick an initial center,
+    // so it's intentionally excluded to avoid re-initializing the whole map.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // 2. Synchronize markers when pantries list changes
   useEffect(() => {
@@ -196,6 +211,9 @@ export default function PantryMap({
         initialFitDoneRef.current = true;
       }
     }
+    // Rebuilds markers only when the pantry set changes. Selection/hover styling
+    // is handled by effect 3 without rebuilding, so those are excluded here.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapReady, pantries]);
 
   // 3. Highlight markers on hover or selection change without recreating markers or touching viewport
@@ -229,6 +247,9 @@ export default function PantryMap({
     } else {
       map.panTo([selectedPantry.lat, selectedPantry.lng], { animate: true, duration: 0.4 });
     }
+    // Pans when the selected pantry's id changes; lat/lng are read from that same
+    // selection, so depending on the full object would only cause redundant pans.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapReady, selectedPantry?.id]);
 
   return (

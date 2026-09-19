@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { PhoneCall, PhoneOff, Mic, Sparkles, X, Volume2, ShieldCheck, MapPin } from 'lucide-react';
+import { PhoneCall, PhoneOff, Mic, X, Volume2 } from 'lucide-react';
 import { Language } from '@/lib/translations';
 
 interface HotlineModalProps {
@@ -19,6 +19,8 @@ export default function HotlineModal({ isOpen, language, onClose, onSelectPantry
 
   useEffect(() => {
     if (!isOpen) {
+      // Reset the simulated call whenever the modal closes (prop-driven reset).
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCallState('ringing');
       setStep(0);
       setTranscript([]);

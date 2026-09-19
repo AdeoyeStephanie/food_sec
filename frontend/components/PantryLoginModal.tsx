@@ -29,9 +29,9 @@ export default function PantryLoginModal({ isOpen, pantries = [], onClose, onSuc
   const [regAddress, setRegAddress] = useState('');
   const [regNeighborhood, setRegNeighborhood] = useState('Central Baltimore');
   const [regHours, setRegHours] = useState('Open Monday - Friday 10am to 2pm');
-  const [regPhone, setRegPhone] = useState('(410) 737-8282');
+  const [regPhone] = useState('(410) 737-8282');
   const [regPin, setRegPin] = useState('');
-  const [regRequiresId, setRegRequiresId] = useState(false);
+  const [regRequiresId] = useState(false);
   const [regModel, setRegModel] = useState<'client_choice' | 'pre_packed'>('client_choice');
 
   if (!isOpen) return null;
@@ -364,7 +364,7 @@ export default function PantryLoginModal({ isOpen, pantries = [], onClose, onSuc
                   </label>
                   <select
                     value={regModel}
-                    onChange={(e) => setRegModel(e.target.value as any)}
+                    onChange={(e) => setRegModel(e.target.value as 'client_choice' | 'pre_packed')}
                     className="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl px-3 py-2 font-medium focus:ring-2 focus:ring-emerald-700 outline-none"
                   >
                     <option value="client_choice">Client Choice (Walk aisles)</option>

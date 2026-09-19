@@ -1,6 +1,6 @@
 // Thin typed client for the FastAPI backend.
 // Base URL comes from NEXT_PUBLIC_API_BASE (see .env.local); defaults to local dev.
-import { Pantry, ShelfItem } from './pantryData';
+import { Pantry } from './pantryData';
 
 export const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8000';

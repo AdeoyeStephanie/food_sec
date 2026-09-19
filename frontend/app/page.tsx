@@ -19,12 +19,7 @@ import {
   Sparkles,
   Navigation,
   ArrowLeft,
-  ChevronRight,
-  ShieldCheck,
-  Languages,
-  SlidersHorizontal,
   Clock,
-  HeartHandshake,
   Lock,
   RotateCcw,
   Map as MapIcon,
@@ -65,9 +60,12 @@ export default function Home() {
 
   // Listen for real-time inventory updates across any open tab or window
   React.useEffect(() => {
-    // Initial load from localStorage if previously fetched
+    // Initial load from localStorage if previously fetched. This is a one-time
+    // hydration-safe read of an external store on mount (not derived state), so
+    // the synchronous setState here is intentional.
     const stored = getStoredPantries([]);
     if (stored.length > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPantriesList(stored);
       setIsLoading(false);
     }
@@ -83,9 +81,10 @@ export default function Home() {
       .catch((err) => console.warn('Backend pantries fetch notice:', err))
       .finally(() => setIsLoading(false));
 
-    const handleSync = (e: any) => {
-      if (e.detail && Array.isArray(e.detail)) {
-        setPantriesList(e.detail);
+    const handleSync = (e: Event) => {
+      const detail = (e as CustomEvent<Pantry[]>).detail;
+      if (detail && Array.isArray(detail)) {
+        setPantriesList(detail);
       }
     };
 
@@ -161,6 +160,8 @@ export default function Home() {
   // Speech recognition handler
   const handleVoiceSearch = () => {
     if (typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      // Web Speech API is a vendor-prefixed browser API with no stable TS types.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       const recognition = new SpeechRecognition();
       recognition.lang = language === 'es' ? 'es-ES' : 'en-US';
@@ -169,6 +170,7 @@ export default function Home() {
       recognition.onstart = () => setIsListening(true);
       recognition.onend = () => setIsListening(false);
       recognition.onerror = () => setIsListening(false);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       recognition.onresult = (event: any) => {
         const transcript = event.results[0][0].transcript;
         setQuery(transcript);
@@ -348,14 +350,16 @@ export default function Home() {
     return filterPantriesIntelligently(pantriesList, query, activeFilter);
   }, [query, activeFilter, pantriesList]);
 
-  // Ensure first matching pantry is selected on results view
+  // Ensure first matching pantry is selected on results view. Syncs the current
+  // selection to the available options; the guard prevents a re-render loop.
   React.useEffect(() => {
     if (hasSearched && filteredPantries.length > 0) {
       if (!selectedPantry || !filteredPantries.some((p) => p.id === selectedPantry.id)) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSelectedPantry(filteredPantries[0]);
       }
     }
-  }, [filteredPantries, hasSearched]);
+  }, [filteredPantries, hasSearched, selectedPantry]);
 
   // Conversational response synthesis
   const conversationalSummary = useMemo(() => {

@@ -5,36 +5,30 @@ import {
   Users,
   Camera,
   CheckSquare,
-  Mic,
   Plus,
   Minus,
   Check,
-  ShieldCheck,
   Upload,
   Sparkles,
   Loader2,
-  Image as ImageIcon,
   Video,
   FileSpreadsheet,
   Download,
   TrendingDown,
-  RefreshCw,
   PackageCheck,
-  AlertCircle,
   SlidersHorizontal,
   Lock,
   Unlock,
   X,
   Tablet
 } from 'lucide-react';
-import { BALTIMORE_PANTRIES, Pantry, ShelfItem } from '@/lib/pantryData';
+import { BALTIMORE_PANTRIES, Pantry } from '@/lib/pantryData';
 import CameraViewfinder from '@/components/CameraViewfinder';
 import BrandLogo from '@/components/BrandLogo';
 import {
   calculateDepletedInventory,
   recordCheckIn,
   getCheckInRecords,
-  saveAndBroadcastPantries,
   blendClosingCheck,
   BlendedCorrectionMetric,
   CATEGORY_CONFIGS,
@@ -81,8 +75,10 @@ export default function VolunteerDashboard({
     activePantry || BALTIMORE_PANTRIES[0]
   );
 
+  // Sync the working copy when the selected pantry prop changes (external input).
   useEffect(() => {
     if (activePantry) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCurrentPantry(activePantry);
     }
   }, [activePantry]);
@@ -97,7 +93,7 @@ export default function VolunteerDashboard({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showLiveCamera, setShowLiveCamera] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
-  const [scannedImagePreview, setScannedImagePreview] = useState<string | null>(null);
+  const [, setScannedImagePreview] = useState<string | null>(null);
   const [donationCounts, setDonationCounts] = useState<{ [key: string]: { count: number; category: string } }>({
     'Canned green beans': { count: 4, category: 'Produce' },
     'Cereal box': { count: 2, category: 'Grains' },
@@ -124,13 +120,15 @@ export default function VolunteerDashboard({
       currentPantry.shelf_items.forEach((it) => {
         map[it.category_name] = it.band;
       });
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setClosingGuesses((prev) => ({ ...prev, ...map }));
     }
   }, [currentPantry]);
 
-  // Check-in records for TEFAP compliance
+  // Check-in records for TEFAP compliance (read from the local records store).
   const [checkInLogs, setCheckInLogs] = useState<CheckInRecord[]>([]);
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCheckInLogs(getCheckInRecords(currentPantry.id));
   }, [currentPantry.id, familiesServed]);
 
@@ -271,7 +269,7 @@ export default function VolunteerDashboard({
       const data = await res.json();
       if (data.items && Array.isArray(data.items)) {
         const newCounts: { [key: string]: { count: number; category: string } } = {};
-        data.items.forEach((it: any) => {
+        (data.items as Array<{ name: string; count?: number; category?: string }>).forEach((it) => {
           newCounts[it.name] = { count: it.count || 1, category: it.category || 'General' };
         });
         setDonationCounts(newCounts);
@@ -410,7 +408,7 @@ export default function VolunteerDashboard({
       onUpdateFullPantry(updatedPantry);
     }
 
-    setLastCheckinToast(`✓ Blended via Kalman Gain! Posterior confidence ~94%, updated category consumption multipliers.`);
+    setLastCheckinToast(`✓ ${summary}`);
     setTimeout(() => {
       setClosingSaved(false);
       setLastCheckinToast(null);
@@ -1235,17 +1233,17 @@ export default function VolunteerDashboard({
               </div>
 
               <div className="grid grid-cols-1 gap-2">
-                {[
+                {([
                   { id: 'client_choice', label: 'Client Choice (Shop Shelves)', desc: 'Neighbors pick items like a small grocery store (Predict math active)' },
                   { id: 'pre_packed', label: 'Pre-Packed Family Boxes', desc: 'Volunteers assemble standard boxes (1 box deducted per check-in)' },
                   { id: 'list', label: 'Order from a List', desc: 'Neighbors check items off a menu sheet at intake' },
-                ].map((m) => {
+                ] as const).map((m) => {
                   const isSelected = currentPantry.distribution_model === m.id;
                   return (
                     <button
                       key={m.id}
                       type="button"
-                      onClick={() => handleChangeDistributionModel(m.id as any)}
+                      onClick={() => handleChangeDistributionModel(m.id)}
                       className={`p-3 rounded-xl border text-left transition cursor-pointer flex items-center justify-between ${
                         isSelected
                           ? 'bg-emerald-50 border-emerald-600 ring-1 ring-emerald-600'
