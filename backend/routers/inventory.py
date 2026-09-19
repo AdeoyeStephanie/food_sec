@@ -7,6 +7,21 @@ import json
 
 router = APIRouter(prefix="/api/inventory", tags=["inventory"])
 
+
+def _fk_detail(err: asyncpg.exceptions.ForeignKeyViolationError) -> str:
+    """Turn an asyncpg FK error into a client-friendly message.
+
+    Distinguishes an unknown pantry from an unknown category so callers know
+    which id was bad (postgres puts the offending column in err.detail).
+    """
+    detail = getattr(err, "detail", "") or ""
+    if "pantry" in detail.lower():
+        return "Unknown pantry_id — the pantry does not exist."
+    if "categor" in detail.lower():
+        return "Unknown category_id — the category does not exist."
+    return "Referenced pantry_id or category_id does not exist."
+
+
 @router.post("/checkin")
 async def checkin(request: CheckInRequest, conn: asyncpg.Connection = Depends(get_db_conn)):
     """Log a check-in (household_size). Insert into check_ins table."""
@@ -14,7 +29,10 @@ async def checkin(request: CheckInRequest, conn: asyncpg.Connection = Depends(ge
         INSERT INTO check_ins (time, pantry_id, household_size)
         VALUES (NOW(), $1, $2)
     """
-    await conn.execute(query, request.pantry_id, request.household_size)
+    try:
+        await conn.execute(query, request.pantry_id, request.household_size)
+    except asyncpg.exceptions.ForeignKeyViolationError as err:
+        raise HTTPException(status_code=404, detail=_fk_detail(err))
     return {"status": "success"}
 
 @router.post("/correction")
@@ -26,7 +44,10 @@ async def correction(request: CorrectionRequest, conn: asyncpg.Connection = Depe
     """
     # Use executemany for batch inserts
     args = [(request.pantry_id, c.category_id, c.band) for c in request.corrections]
-    await conn.executemany(query, args)
+    try:
+        await conn.executemany(query, args)
+    except asyncpg.exceptions.ForeignKeyViolationError as err:
+        raise HTTPException(status_code=404, detail=_fk_detail(err))
     return {"status": "success"}
 
 @router.post("/intake", response_model=IntakeResult)
@@ -48,7 +69,10 @@ async def intake(
         VALUES (NOW(), $1, $2, $3, 'intake_photo', $4)
     """
     args = [(pantry_id, item["category_id"], item["band"], item["confidence"]) for item in mock_items]
-    await conn.executemany(query, args)
+    try:
+        await conn.executemany(query, args)
+    except asyncpg.exceptions.ForeignKeyViolationError as err:
+        raise HTTPException(status_code=404, detail=_fk_detail(err))
     
     # Return IntakeResult
     # Need to fetch category names and emojis to return ShelfItem
