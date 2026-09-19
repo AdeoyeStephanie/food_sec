@@ -1,11 +1,9 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { BALTIMORE_PANTRIES, Pantry } from '@/lib/pantryData';
 import PantryDetailSheet from '@/components/PantryDetailSheet';
-import VolunteerDashboard from '@/components/VolunteerDashboard';
 import {
   Search,
   Mic,
@@ -17,8 +15,7 @@ import {
   ShieldCheck,
   Languages,
   SlidersHorizontal,
-  Clock,
-  HeartHandshake
+  Clock
 } from 'lucide-react';
 
 // Dynamic import for Leaflet map to prevent SSR issues
@@ -179,15 +176,6 @@ export default function Home() {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Link to Dedicated Volunteer & Pantry Owner App */}
-          <Link
-            href="/volunteer"
-            className="flex items-center gap-1.5 text-xs font-semibold text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/80 px-3 py-1.5 rounded-full transition shadow-xs"
-          >
-            <HeartHandshake className="w-3.5 h-3.5 text-emerald-700" />
-            <span className="hidden sm:inline">Pantry Staff</span> Portal
-          </Link>
-
           {/* Language Switch */}
           <div className="bg-slate-100 p-0.5 rounded-full flex text-xs font-semibold">
             <button
