@@ -280,7 +280,7 @@ export function blendClosingCheck(
 /**
  * Load pantries from localStorage or fallback to defaults
  */
-export function getStoredPantries(fallback: Pantry[]): Pantry[] {
+export function getStoredPantries(fallback: Pantry[] = []): Pantry[] {
   if (typeof window === 'undefined') return fallback;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);

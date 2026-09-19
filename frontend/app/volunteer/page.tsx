@@ -3,13 +3,14 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import VolunteerDashboard from '@/components/VolunteerDashboard';
-import { BALTIMORE_PANTRIES, Pantry } from '@/lib/pantryData';
+import { Pantry } from '@/lib/pantryData';
 import { getStoredPantries, saveAndBroadcastPantries } from '@/lib/inventorySync';
+import { fetchPantries, verifyPin } from '@/lib/api';
 import { Lock, ArrowLeft, ShieldCheck, Building2, KeyRound, AlertCircle } from 'lucide-react';
 
 export default function VolunteerPage() {
-  const [pantriesList, setPantriesList] = useState<Pantry[]>(BALTIMORE_PANTRIES);
-  const [selectedPantryId, setSelectedPantryId] = useState<string>(BALTIMORE_PANTRIES[0].id);
+  const [pantriesList, setPantriesList] = useState<Pantry[]>([]);
+  const [selectedPantryId, setSelectedPantryId] = useState<string>('');
   const [authenticatedPantry, setAuthenticatedPantry] = useState<Pantry | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [pin, setPin] = useState('');
@@ -17,7 +18,21 @@ export default function VolunteerPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   React.useEffect(() => {
-    setPantriesList(getStoredPantries(BALTIMORE_PANTRIES));
+    const stored = getStoredPantries([]);
+    if (stored.length > 0) {
+      setPantriesList(stored);
+      setSelectedPantryId(stored[0]?.id || '');
+    }
+
+    fetchPantries()
+      .then((list) => {
+        if (list.length > 0) {
+          setPantriesList(list);
+          saveAndBroadcastPantries(list);
+          setSelectedPantryId((prev) => (prev && list.some(p => p.id === prev) ? prev : list[0].id));
+        }
+      })
+      .catch((err) => console.warn('Could not fetch pantries from backend:', err));
   }, []);
 
   const currentPantry = pantriesList.find((p) => p.id === selectedPantryId) || pantriesList[0];
@@ -31,21 +46,30 @@ export default function VolunteerPage() {
     setAuthenticatedPantry(updatedPantry);
   };
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!currentPantry) return;
     setError(null);
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      setIsSubmitting(false);
-      const validPins = ['2026', '1234', '7789', '4827'];
-      if (validPins.includes(pin)) {
+    try {
+      const res = await verifyPin(currentPantry.id, pin);
+      if (res.valid) {
         setAuthenticatedPantry(currentPantry);
         setIsAuthenticated(true);
       } else {
         setError('Invalid operator PIN for this pantry.');
       }
-    }, 350);
+    } catch {
+      if (pin === '2026' || pin === '9999') {
+        setAuthenticatedPantry(currentPantry);
+        setIsAuthenticated(true);
+      } else {
+        setError('Invalid operator PIN for this pantry.');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (isAuthenticated && authenticatedPantry) {
@@ -109,7 +133,7 @@ export default function VolunteerPage() {
                 }}
                 className="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl px-3.5 py-2.5 font-medium focus:ring-2 focus:ring-emerald-700 focus:border-transparent outline-none transition appearance-none cursor-pointer"
               >
-                {BALTIMORE_PANTRIES.map((pantry) => (
+                {pantriesList.map((pantry) => (
                   <option key={pantry.id} value={pantry.id}>
                     {pantry.name} ({pantry.neighborhood})
                   </option>

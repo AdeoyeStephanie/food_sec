@@ -1,6 +1,6 @@
 // Thin typed client for the FastAPI backend.
 // Base URL comes from NEXT_PUBLIC_API_BASE (see .env.local); defaults to local dev.
-import { Pantry } from './pantryData';
+import { Pantry, ShelfItem } from './pantryData';
 
 export const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8000';
@@ -13,8 +13,12 @@ export interface Category {
 }
 
 export interface CorrectionItem {
-  category_id: number;
+  category_id?: number;
+  category_name?: string;
   band: 'plenty' | 'low' | 'out';
+  estimated_qty?: number;
+  capacity?: number;
+  confidence?: number;
 }
 
 // ---- Backend response shapes (GET /api/pantries -> PantryWithShelf) ----
@@ -22,28 +26,37 @@ interface BackendShelfItem {
   category_name: string;
   category_emoji: string;
   band: 'plenty' | 'low' | 'out';
-  minutes_ago: number | null;
-  confidence: number | null;
-  source: string | null;
+  minutes_ago?: number | null;
+  confidence?: number | null;
+  estimated_qty?: number | null;
+  capacity?: number | null;
+  source?: string | null;
 }
 
 interface BackendPantry {
   id: string;
   name: string;
   address: string;
-  neighborhood: string | null;
+  neighborhood?: string | null;
   lat: number;
   lng: number;
-  phone: string | null;
-  distribution_model: string | null;
-  hours: Record<string, { open: string; close: string }> | null;
-  requires_id: boolean | null;
-  allows_walkins: boolean | null;
-  languages: string[] | null;
-  notes: string | null;
-  distance_miles: number | null;
-  walk_minutes: number | null;
-  shelf_items: BackendShelfItem[];
+  phone?: string | null;
+  distribution_model?: string | null;
+  hours?: Record<string, { open: string; close: string }> | null;
+  hours_text?: string | null;
+  open_today?: boolean | null;
+  open_tonight?: boolean | null;
+  open_hours_display?: string | null;
+  requires_id?: boolean | null;
+  allows_walkins?: boolean | null;
+  languages?: string[] | null;
+  notes?: string | null;
+  specialty_tags?: string[] | null;
+  volunteer_code?: string | null;
+  is_demo?: boolean | null;
+  distance_miles?: number | null;
+  walk_minutes?: number | null;
+  shelf_items?: BackendShelfItem[] | null;
 }
 
 const DAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
@@ -60,22 +73,24 @@ function to12h(t: string): string {
 }
 
 /**
- * Map a backend pantry onto the frontend Pantry type. The backend does NOT
- * return the UI's derived display fields (open_today, open_tonight, hours_text,
- * open_hours_display), so we compute them here from the raw `hours` JSONB.
+ * Map a backend pantry onto the frontend Pantry type.
  */
 export function normalizePantry(b: BackendPantry): Pantry {
-  const hours = b.hours || {};
-  const todayKey = DAY_KEYS[new Date().getDay()];
-  const today = hours[todayKey];
-  const open_today = !!today;
-  const open_hours_display = today
-    ? `${to12h(today.open)} – ${to12h(today.close)}`
-    : 'Closed today';
-  // "Tonight" heuristic: open today and closes at or after 5pm.
-  const open_tonight =
-    !!today && parseInt(today.close.split(':')[0], 10) >= 17;
-  const hours_text = today ? `Open today ${open_hours_display}` : 'Closed today';
+  let open_today = b.open_today ?? true;
+  let open_tonight = b.open_tonight ?? false;
+  let open_hours_display = b.open_hours_display || '9:00 AM – 5:00 PM';
+  let hours_text = b.hours_text || (open_today ? `Open today ${open_hours_display}` : 'Closed today');
+
+  if (b.hours && typeof b.hours === 'object') {
+    const todayKey = DAY_KEYS[new Date().getDay()];
+    const today = (b.hours as Record<string, { open: string; close: string }>)[todayKey];
+    open_today = !!today;
+    open_hours_display = today
+      ? `${to12h(today.open)} – ${to12h(today.close)}`
+      : 'Closed today';
+    open_tonight = !!today && parseInt(today.close.split(':')[0], 10) >= 17;
+    hours_text = today ? `Open today ${open_hours_display}` : 'Closed today';
+  }
 
   return {
     id: b.id,
@@ -84,25 +99,28 @@ export function normalizePantry(b: BackendPantry): Pantry {
     neighborhood: b.neighborhood || 'Baltimore',
     lat: b.lat,
     lng: b.lng,
-    distance_miles: b.distance_miles ?? 0,
-    walk_minutes: b.walk_minutes ?? 0,
+    distance_miles: b.distance_miles ?? 0.5,
+    walk_minutes: b.walk_minutes ?? 10,
     hours_text,
     open_today,
     open_tonight,
     open_hours_display,
     requires_id: b.requires_id ?? false,
     allows_walkins: b.allows_walkins ?? true,
-    languages: b.languages || ['English'],
+    languages: b.languages && b.languages.length > 0 ? b.languages : ['English'],
     notes: b.notes || '',
     distribution_model:
       (b.distribution_model as Pantry['distribution_model']) || 'client_choice',
-    phone: b.phone || '',
+    phone: b.phone || '(410) 737-8282',
+    specialty_tags: b.specialty_tags || [],
     shelf_items: (b.shelf_items || []).map((s) => ({
       category_name: s.category_name,
-      category_emoji: s.category_emoji,
+      category_emoji: s.category_emoji || '📦',
       band: s.band,
       minutes_ago: s.minutes_ago ?? 0,
-      confidence: s.confidence ?? 1,
+      confidence: s.confidence ?? 0.95,
+      estimated_qty: s.estimated_qty ?? undefined,
+      capacity: s.capacity ?? undefined,
     })),
   };
 }
@@ -114,19 +132,48 @@ export async function fetchCategories(): Promise<Category[]> {
 }
 
 /**
- * Fetch pantries near a point. Defaults to Baltimore center with a wide radius
- * so the whole seeded set comes back with valid DB UUIDs.
+ * Fetch pantries from the backend. If lat/lng given, sorts by distance.
+ * If no coordinates given, returns all pantries in the registry.
  */
 export async function fetchPantries(
-  lat = 39.2904,
-  lng = -76.6122,
-  radiusMiles = 50
+  lat?: number,
+  lng?: number,
+  radiusMiles?: number
 ): Promise<Pantry[]> {
-  const url = `${API_BASE}/api/pantries?lat=${lat}&lng=${lng}&radius_miles=${radiusMiles}`;
+  const query = lat !== undefined && lng !== undefined
+    ? `?lat=${lat}&lng=${lng}&radius_miles=${radiusMiles || 50}`
+    : '';
+  const url = `${API_BASE}/api/pantries${query}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`fetchPantries failed: ${res.status}`);
   const data: BackendPantry[] = await res.json();
   return data.map(normalizePantry);
+}
+
+export async function registerPantry(pantryData: Partial<Pantry>): Promise<Pantry> {
+  const res = await fetch(`${API_BASE}/api/pantries`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(pantryData),
+  });
+  if (!res.ok) {
+    const detail = await res.text().catch(() => '');
+    throw new Error(`registerPantry failed: ${res.status} ${detail}`);
+  }
+  const created: BackendPantry = await res.json();
+  return normalizePantry(created);
+}
+
+export async function verifyPin(pantryId: string, pin: string): Promise<{ valid: boolean; pantry_name?: string }> {
+  const res = await fetch(`${API_BASE}/api/pantries/${pantryId}/verify-pin`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ pin }),
+  });
+  if (!res.ok) {
+    throw new Error(`verifyPin failed: ${res.status}`);
+  }
+  return res.json();
 }
 
 export async function postCorrection(

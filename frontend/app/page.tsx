@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import { BALTIMORE_PANTRIES, Pantry, getUrgencyIndicator } from '@/lib/pantryData';
+import { Pantry, getUrgencyIndicator } from '@/lib/pantryData';
 import PantryDetailSheet from '@/components/PantryDetailSheet';
 import VolunteerDashboard from '@/components/VolunteerDashboard';
 import PantryLoginModal from '@/components/PantryLoginModal';
@@ -43,7 +43,8 @@ const PantryMap = dynamic(() => import('@/components/PantryMap'), {
 
 export default function Home() {
   // Navigation & Search State
-  const [pantriesList, setPantriesList] = useState<Pantry[]>(BALTIMORE_PANTRIES);
+  const [pantriesList, setPantriesList] = useState<Pantry[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [hasSearched, setHasSearched] = useState(false);
   const [query, setQuery] = useState('');
   const [language, setLanguage] = useState<Language>('en');
@@ -64,13 +65,14 @@ export default function Home() {
 
   // Listen for real-time inventory updates across any open tab or window
   React.useEffect(() => {
-    // Initial load from localStorage if available
-    const stored = getStoredPantries(BALTIMORE_PANTRIES);
-    setPantriesList(stored);
+    // Initial load from localStorage if previously fetched
+    const stored = getStoredPantries([]);
+    if (stored.length > 0) {
+      setPantriesList(stored);
+      setIsLoading(false);
+    }
 
-    // Prefer the backend as source of truth so pantry IDs are real DB UUIDs
-    // (required for check-ins / corrections to persist). Falls back to the
-    // stored/mock list above if the API is unreachable.
+    // Dynamic single source of truth: fetch directly from backend API
     fetchPantries()
       .then((list) => {
         if (list.length > 0) {
@@ -78,7 +80,8 @@ export default function Home() {
           saveAndBroadcastPantries(list);
         }
       })
-      .catch((err) => console.warn('Backend pantries unavailable, using local data:', err));
+      .catch((err) => console.warn('Backend pantries fetch notice:', err))
+      .finally(() => setIsLoading(false));
 
     const handleSync = (e: any) => {
       if (e.detail && Array.isArray(e.detail)) {
@@ -129,10 +132,11 @@ export default function Home() {
   };
 
   const handleUpdateInventory = (category: string, band: 'plenty' | 'low' | 'out') => {
-    const targetId = authenticatedPantry?.id;
     setPantriesList((prev) => {
+      const targetId = authenticatedPantry?.id || selectedPantry?.id || prev[0]?.id;
+      if (!targetId) return prev;
       const nextList = prev.map((p) => {
-        if ((targetId && p.id === targetId) || (!targetId && (p.name.includes('Hampden Family Center') || p.id === 'c1000000-0000-0000-0000-000000000001'))) {
+        if (p.id === targetId) {
           const updatedItems = (p.shelf_items || []).map((it) =>
             it.category_name.toLowerCase() === category.toLowerCase()
               ? { ...it, band, minutes_ago: 1 }
@@ -646,8 +650,25 @@ export default function Home() {
               </div>
 
               {/* Pantry Cards matching Mockup */}
-              <div className="flex flex-col gap-3">
-                {filteredPantries.map((pantry, idx) => {
+              {isLoading && pantriesList.length === 0 ? (
+                <div className="flex flex-col gap-3">
+                  {[1, 2, 3, 4].map((n) => (
+                    <div key={n} className="rounded-2xl p-4 border border-emerald-900/10 bg-white animate-pulse flex flex-col gap-3">
+                      <div className="flex justify-between items-start">
+                        <div className="h-4 bg-slate-200 rounded w-2/3"></div>
+                        <div className="h-4 bg-slate-100 rounded w-16"></div>
+                      </div>
+                      <div className="h-3 bg-slate-100 rounded w-1/2"></div>
+                      <div className="flex gap-2 mt-1">
+                        <div className="h-6 w-20 bg-emerald-50 rounded-full"></div>
+                        <div className="h-6 w-20 bg-emerald-50 rounded-full"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {filteredPantries.map((pantry, idx) => {
                   const isSelected = selectedPantry?.id === pantry.id;
                   const isHovered = hoveredPantryId === pantry.id;
                   const urgency = getUrgencyIndicator(pantry);
@@ -759,8 +780,8 @@ export default function Home() {
                       </h4>
                       <p className="text-xs text-slate-600 font-medium mt-1.5 leading-relaxed">
                         {language === 'es'
-                          ? 'No se preocupe: la comida de emergencia siempre está disponible en Baltimore. Llame a la línea directa de alimentos o borre los filtros para ver las 52 despensas comunitarias.'
-                          : 'Don’t worry—emergency food access is always available in Baltimore. Call the direct helpline or clear your filters to view all 52 neighborhood pantries.'}
+                          ? `No se preocupe: la comida de emergencia siempre está disponible en Baltimore. Llame a la línea directa de alimentos o borre los filtros para ver las ${pantriesList.length} despensas comunitarias.`
+                          : `Don’t worry—emergency food access is always available in Baltimore. Call the direct helpline or clear your filters to view all ${pantriesList.length} neighborhood pantries.`}
                       </p>
                     </div>
 
@@ -795,6 +816,7 @@ export default function Home() {
                   </div>
                 )}
               </div>
+              )}
             </div>
           </div>
 
