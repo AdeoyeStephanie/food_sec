@@ -40,6 +40,8 @@ export default function Home() {
   // Navigation & Search State
   const [pantriesList, setPantriesList] = useState<Pantry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [refreshToast, setRefreshToast] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
   const [query, setQuery] = useState('');
   const [language, setLanguage] = useState<Language>('en');
@@ -60,6 +62,14 @@ export default function Home() {
 
   // Listen for real-time inventory updates across any open tab or window
   React.useEffect(() => {
+    // Restore searched/map view state if user previously opened the map
+    if (typeof window !== 'undefined') {
+      const savedSearched = localStorage.getItem('PULSE_HAS_SEARCHED');
+      if (savedSearched === 'true') {
+        setHasSearched(true);
+      }
+    }
+
     // Initial load from localStorage if previously fetched. This is a one-time
     // hydration-safe read of an external store on mount (not derived state), so
     // the synchronous setState here is intentional.
@@ -337,11 +347,34 @@ export default function Home() {
   const handleExecuteSearch = (searchQuery: string) => {
     setQuery(searchQuery);
     setHasSearched(true);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('PULSE_HAS_SEARCHED', 'true');
+    }
     const matches = filterPantriesIntelligently(pantriesList, searchQuery, activeFilter);
     if (matches.length > 0) {
       setSelectedPantry(matches[0]);
     } else {
       setSelectedPantry(null);
+    }
+  };
+
+  const handleRefreshStock = async () => {
+    setIsRefreshing(true);
+    try {
+      const list = await fetchPantries();
+      if (list.length > 0) {
+        setPantriesList(list);
+        saveAndBroadcastPantries(list);
+        setSelectedPantry((prev) => (prev ? list.find((p) => p.id === prev.id) || list[0] : null));
+      }
+      setRefreshToast('✓ Live stock refreshed from network');
+      setTimeout(() => setRefreshToast(null), 2500);
+    } catch (err) {
+      console.warn('Refresh error:', err);
+      setRefreshToast('⚠️ Server connection check');
+      setTimeout(() => setRefreshToast(null), 2500);
+    } finally {
+      setIsRefreshing(false);
     }
   };
 
@@ -434,6 +467,9 @@ export default function Home() {
         <div
           onClick={() => {
             setHasSearched(false);
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem('PULSE_HAS_SEARCHED');
+            }
             setQuery('');
             setSelectedPantry(null);
           }}
@@ -448,7 +484,18 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2">
+          {/* Real-time Refresh Stock Button */}
+          <button
+            onClick={handleRefreshStock}
+            disabled={isRefreshing}
+            className="flex items-center gap-1.5 text-xs font-semibold text-emerald-950 bg-white hover:bg-emerald-50 border border-emerald-950/15 px-3 py-1.5 rounded-full transition shadow-xs cursor-pointer active:scale-95 disabled:opacity-60"
+            title="Refresh live pantry inventory and stock status"
+          >
+            <RotateCcw className={`w-3.5 h-3.5 text-emerald-700 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">{isRefreshing ? 'Syncing...' : 'Refresh Stock'}</span>
+          </button>
+
           {/* Secure Pantry View Access */}
           <button
             onClick={() => setShowLoginModal(true)}
@@ -480,6 +527,13 @@ export default function Home() {
           </div>
         </div>
       </header>
+
+      {/* Floating Refresh Toast */}
+      {refreshToast && (
+        <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 bg-emerald-950 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg border border-emerald-500/30 flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
+          <span>{refreshToast}</span>
+        </div>
+      )}
 
       {/* VIEW 1: LANDING PAGE (Page 1 in Mockups) */}
       {!hasSearched ? (
@@ -594,8 +648,14 @@ export default function Home() {
             {/* Top Query Re-Search Bar */}
             <div className="p-4 border-b border-slate-100 flex items-center gap-2 sticky top-0 bg-white z-10">
               <button
-                onClick={() => setHasSearched(false)}
+                onClick={() => {
+                  setHasSearched(false);
+                  if (typeof window !== 'undefined') {
+                    localStorage.removeItem('PULSE_HAS_SEARCHED');
+                  }
+                }}
                 className="p-2 text-slate-500 hover:text-emerald-950 hover:bg-slate-100 rounded-xl transition"
+                title="Back to search screen"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
@@ -624,10 +684,10 @@ export default function Home() {
                   <button
                     key={filter.id}
                     onClick={() => setActiveFilter(filter.id === 'all' ? null : filter.id)}
-                    className={`whitespace-nowrap text-[11px] font-semibold px-3 py-1 rounded-full transition cursor-pointer ${
+                    className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer ${
                       isActive
-                        ? 'bg-[#064e3b] text-white shadow-xs'
-                        : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+                        ? 'bg-emerald-800 text-white shadow-xs'
+                        : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
                     }`}
                   >
                     {filter.label}
@@ -636,6 +696,7 @@ export default function Home() {
               })}
             </div>
 
+            {/* Scrollable Results List */}
             <div className="p-4 flex flex-col gap-4">
               {/* AI Conversational Summary Bubble matching Page 3 */}
               <div className="bg-[#f0fdf4] border border-emerald-300/60 rounded-2xl p-3.5 text-xs text-emerald-900 flex items-start gap-2.5 shadow-xs">
@@ -643,11 +704,21 @@ export default function Home() {
                 <div>{conversationalSummary}</div>
               </div>
 
-              {/* Header with Result Count */}
+              {/* Header with Result Count & Refresh */}
               <div className="flex justify-between items-center">
-                <h3 className="font-bold text-sm text-emerald-950">
-                  {filteredPantries.length} {t.matchesOpenToday}
-                </h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-bold text-sm text-emerald-950">
+                    {filteredPantries.length} {t.matchesOpenToday}
+                  </h3>
+                  <button
+                    onClick={handleRefreshStock}
+                    disabled={isRefreshing}
+                    className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-emerald-800 transition cursor-pointer"
+                    title="Refresh live stock"
+                  >
+                    <RotateCcw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-emerald-700' : ''}`} />
+                  </button>
+                </div>
                 <span className="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-semibold">
                   {t.sampleDataBadge}
                 </span>

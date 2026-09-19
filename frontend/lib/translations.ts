@@ -54,7 +54,7 @@ export interface TranslationDict {
 
 export const TRANSLATIONS: Record<Language, TranslationDict> = {
   en: {
-    appName: 'Pantry Pulse',
+    appName: 'Pantree',
     appSubtitle: 'Baltimore',
     pantryView: 'Pantry View',
     heroTitle: 'What do you need today?',
@@ -103,7 +103,7 @@ export const TRANSLATIONS: Record<Language, TranslationDict> = {
     out: 'Out',
   },
   es: {
-    appName: 'Pantry Pulse',
+    appName: 'Pantree',
     appSubtitle: 'Baltimore',
     pantryView: 'Vista de Despensa',
     heroTitle: '¿Qué necesita el día de hoy?',

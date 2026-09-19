@@ -135,6 +135,9 @@ export default function VolunteerPage() {
                 }}
                 className="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl px-3.5 py-2.5 font-medium focus:ring-2 focus:ring-emerald-700 focus:border-transparent outline-none transition appearance-none cursor-pointer"
               >
+                {pantriesList.length === 0 && (
+                  <option value="">Loading verified pantries...</option>
+                )}
                 {pantriesList.map((pantry) => (
                   <option key={pantry.id} value={pantry.id}>
                     {pantry.name} ({pantry.neighborhood})
@@ -148,7 +151,7 @@ export default function VolunteerPage() {
               </div>
             </div>
             <p className="text-[11px] text-slate-400 mt-1 truncate">
-              {currentPantry.address}
+              {currentPantry?.address || (pantriesList.length === 0 ? 'Connecting to live registry...' : '')}
             </p>
           </div>
 
@@ -198,7 +201,7 @@ export default function VolunteerPage() {
         <div className="border-t border-slate-100 pt-3 flex items-center justify-between text-xs text-slate-500">
           <span>Active Location:</span>
           <span className="font-semibold text-emerald-950 truncate max-w-[200px]">
-            {currentPantry.name}
+            {currentPantry?.name || (pantriesList.length === 0 ? 'Loading...' : 'Select Location')}
           </span>
         </div>
       </div>
@@ -206,7 +209,7 @@ export default function VolunteerPage() {
       {/* Footer */}
       <div className="text-center text-xs text-slate-400 py-4 flex items-center justify-center gap-1.5">
         <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-        <span>PantryPulse Operating Network • Baltimore City</span>
+        <span>Pantree Operating Network • Baltimore City</span>
       </div>
     </main>
   );

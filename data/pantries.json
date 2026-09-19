@@ -1,17 +1,17 @@
 [
   {
     "id": "demo-hub-0001",
-    "name": "Pantry Pulse Demo Hub (Hackathon HQ)",
+    "name": "Pantree Demo Hub (Hackathon HQ)",
     "address": "100 Light St, Baltimore, MD 21202",
     "neighborhood": "Downtown / Inner Harbor",
     "lat": 39.2865,
     "lng": -76.6134,
     "distance_miles": 0.1,
     "walk_minutes": 2,
-    "hours_text": "Open today 9:00 AM – 6:00 PM",
+    "hours_text": "Open today 9:00 AM \u2013 6:00 PM",
     "open_today": true,
     "open_tonight": true,
-    "open_hours_display": "9:00 AM – 6:00 PM",
+    "open_hours_display": "9:00 AM \u2013 6:00 PM",
     "requires_id": false,
     "allows_walkins": true,
     "languages": [
@@ -31,43 +31,43 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "plenty",
-        "minutes_ago": 5,
+        "minutes_ago": 0,
         "confidence": 0.95,
         "estimated_qty": 90,
         "capacity": 100
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "plenty",
-        "minutes_ago": 5,
+        "minutes_ago": 0,
         "confidence": 0.95,
         "estimated_qty": 65,
         "capacity": 75
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
-        "band": "low",
-        "minutes_ago": 12,
+        "category_emoji": "\ud83e\udd5b",
+        "band": "plenty",
+        "minutes_ago": 0,
         "confidence": 0.9,
         "estimated_qty": 15,
         "capacity": 50
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "plenty",
-        "minutes_ago": 8,
+        "minutes_ago": 0,
         "confidence": 0.95,
         "estimated_qty": 70,
         "capacity": 80
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "plenty",
         "minutes_ago": 15,
         "confidence": 0.95,
@@ -76,7 +76,7 @@
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "👶",
+        "category_emoji": "\ud83d\udc76",
         "band": "low",
         "minutes_ago": 20,
         "confidence": 0.88,
@@ -85,16 +85,16 @@
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧼",
-        "band": "plenty",
-        "minutes_ago": 25,
+        "category_emoji": "\ud83e\uddfc",
+        "band": "out",
+        "minutes_ago": 0,
         "confidence": 0.92,
         "estimated_qty": 35,
         "capacity": 40
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "plenty",
         "minutes_ago": 10,
         "confidence": 0.94,
@@ -115,7 +115,7 @@
     "hours_text": "Open Mon to Thu 9am to 4pm, Fri 9am to 3pm",
     "open_today": true,
     "open_tonight": false,
-    "open_hours_display": "Mon–Thu 9:00 AM – 4:00 PM, Fri 9:00 AM – 3:00 PM",
+    "open_hours_display": "Mon\u2013Thu 9:00 AM \u2013 4:00 PM, Fri 9:00 AM \u2013 3:00 PM",
     "requires_id": false,
     "allows_walkins": true,
     "languages": [
@@ -128,56 +128,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
-        "band": "low",
-        "minutes_ago": 10,
+        "category_emoji": "\ud83e\udd55",
+        "band": "plenty",
+        "minutes_ago": 0,
         "confidence": 0.85
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "low",
         "minutes_ago": 10,
         "confidence": 0.85
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "out",
         "minutes_ago": 10,
         "confidence": 0.85
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
-        "band": "plenty",
-        "minutes_ago": 10,
+        "category_emoji": "\ud83c\udf5e",
+        "band": "low",
+        "minutes_ago": 0,
         "confidence": 0.85
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "plenty",
         "minutes_ago": 10,
         "confidence": 0.85
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "low",
         "minutes_ago": 10,
         "confidence": 0.85
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "low",
         "minutes_ago": 10,
         "confidence": 0.85
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "out",
         "minutes_ago": 10,
         "confidence": 0.85
@@ -210,56 +210,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 17,
         "confidence": 0.86
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "out",
         "minutes_ago": 17,
         "confidence": 0.86
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "plenty",
         "minutes_ago": 17,
         "confidence": 0.86
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 17,
         "confidence": 0.86
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 17,
         "confidence": 0.86
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "out",
         "minutes_ago": 17,
         "confidence": 0.86
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "out",
         "minutes_ago": 17,
         "confidence": 0.86
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "plenty",
         "minutes_ago": 17,
         "confidence": 0.86
@@ -293,56 +293,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "plenty",
         "minutes_ago": 24,
         "confidence": 0.87
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "plenty",
         "minutes_ago": 24,
         "confidence": 0.87
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "low",
         "minutes_ago": 24,
         "confidence": 0.87
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 24,
         "confidence": 0.87
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 24,
         "confidence": 0.87
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "plenty",
         "minutes_ago": 24,
         "confidence": 0.87
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "plenty",
         "minutes_ago": 24,
         "confidence": 0.87
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "low",
         "minutes_ago": 24,
         "confidence": 0.87
@@ -375,56 +375,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 31,
         "confidence": 0.88
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "low",
         "minutes_ago": 31,
         "confidence": 0.88
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "out",
         "minutes_ago": 31,
         "confidence": 0.88
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "plenty",
         "minutes_ago": 31,
         "confidence": 0.88
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "plenty",
         "minutes_ago": 31,
         "confidence": 0.88
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "low",
         "minutes_ago": 31,
         "confidence": 0.88
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "low",
         "minutes_ago": 31,
         "confidence": 0.88
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "out",
         "minutes_ago": 31,
         "confidence": 0.88
@@ -458,56 +458,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 38,
         "confidence": 0.89
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "out",
         "minutes_ago": 38,
         "confidence": 0.89
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "plenty",
         "minutes_ago": 38,
         "confidence": 0.89
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 38,
         "confidence": 0.89
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 38,
         "confidence": 0.89
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "out",
         "minutes_ago": 38,
         "confidence": 0.89
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "out",
         "minutes_ago": 38,
         "confidence": 0.89
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "plenty",
         "minutes_ago": 38,
         "confidence": 0.89
@@ -541,56 +541,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "plenty",
         "minutes_ago": 45,
         "confidence": 0.9
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "plenty",
         "minutes_ago": 45,
         "confidence": 0.9
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "low",
         "minutes_ago": 45,
         "confidence": 0.9
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 45,
         "confidence": 0.9
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 45,
         "confidence": 0.9
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "plenty",
         "minutes_ago": 45,
         "confidence": 0.9
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "plenty",
         "minutes_ago": 45,
         "confidence": 0.9
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "low",
         "minutes_ago": 45,
         "confidence": 0.9
@@ -623,56 +623,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 52,
         "confidence": 0.9099999999999999
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "low",
         "minutes_ago": 52,
         "confidence": 0.9099999999999999
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "out",
         "minutes_ago": 52,
         "confidence": 0.9099999999999999
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "plenty",
         "minutes_ago": 52,
         "confidence": 0.9099999999999999
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "plenty",
         "minutes_ago": 52,
         "confidence": 0.9099999999999999
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "low",
         "minutes_ago": 52,
         "confidence": 0.9099999999999999
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "low",
         "minutes_ago": 52,
         "confidence": 0.9099999999999999
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "out",
         "minutes_ago": 52,
         "confidence": 0.9099999999999999
@@ -705,56 +705,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 59,
         "confidence": 0.9199999999999999
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "out",
         "minutes_ago": 59,
         "confidence": 0.9199999999999999
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "plenty",
         "minutes_ago": 59,
         "confidence": 0.9199999999999999
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 59,
         "confidence": 0.9199999999999999
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 59,
         "confidence": 0.9199999999999999
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "out",
         "minutes_ago": 59,
         "confidence": 0.9199999999999999
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "out",
         "minutes_ago": 59,
         "confidence": 0.9199999999999999
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "plenty",
         "minutes_ago": 59,
         "confidence": 0.9199999999999999
@@ -787,56 +787,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "plenty",
         "minutes_ago": 16,
         "confidence": 0.9299999999999999
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "plenty",
         "minutes_ago": 16,
         "confidence": 0.9299999999999999
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "low",
         "minutes_ago": 16,
         "confidence": 0.9299999999999999
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 16,
         "confidence": 0.9299999999999999
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 16,
         "confidence": 0.9299999999999999
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "plenty",
         "minutes_ago": 16,
         "confidence": 0.9299999999999999
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "plenty",
         "minutes_ago": 16,
         "confidence": 0.9299999999999999
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "low",
         "minutes_ago": 16,
         "confidence": 0.9299999999999999
@@ -870,56 +870,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 23,
         "confidence": 0.94
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "low",
         "minutes_ago": 23,
         "confidence": 0.94
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "out",
         "minutes_ago": 23,
         "confidence": 0.94
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "plenty",
         "minutes_ago": 23,
         "confidence": 0.94
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "plenty",
         "minutes_ago": 23,
         "confidence": 0.94
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "low",
         "minutes_ago": 23,
         "confidence": 0.94
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "low",
         "minutes_ago": 23,
         "confidence": 0.94
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "out",
         "minutes_ago": 23,
         "confidence": 0.94
@@ -953,56 +953,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 30,
         "confidence": 0.95
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "out",
         "minutes_ago": 30,
         "confidence": 0.95
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "plenty",
         "minutes_ago": 30,
         "confidence": 0.95
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 30,
         "confidence": 0.95
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 30,
         "confidence": 0.95
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "out",
         "minutes_ago": 30,
         "confidence": 0.95
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "out",
         "minutes_ago": 30,
         "confidence": 0.95
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "plenty",
         "minutes_ago": 30,
         "confidence": 0.95
@@ -1035,56 +1035,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "plenty",
         "minutes_ago": 37,
         "confidence": 0.96
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "plenty",
         "minutes_ago": 37,
         "confidence": 0.96
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "low",
         "minutes_ago": 37,
         "confidence": 0.96
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 37,
         "confidence": 0.96
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 37,
         "confidence": 0.96
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "plenty",
         "minutes_ago": 37,
         "confidence": 0.96
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "plenty",
         "minutes_ago": 37,
         "confidence": 0.96
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "low",
         "minutes_ago": 37,
         "confidence": 0.96
@@ -1118,56 +1118,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 44,
         "confidence": 0.97
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "low",
         "minutes_ago": 44,
         "confidence": 0.97
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "out",
         "minutes_ago": 44,
         "confidence": 0.97
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "plenty",
         "minutes_ago": 44,
         "confidence": 0.97
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "plenty",
         "minutes_ago": 44,
         "confidence": 0.97
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "low",
         "minutes_ago": 44,
         "confidence": 0.97
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "low",
         "minutes_ago": 44,
         "confidence": 0.97
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "out",
         "minutes_ago": 44,
         "confidence": 0.97
@@ -1200,56 +1200,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 51,
         "confidence": 0.98
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "out",
         "minutes_ago": 51,
         "confidence": 0.98
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "plenty",
         "minutes_ago": 51,
         "confidence": 0.98
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 51,
         "confidence": 0.98
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 51,
         "confidence": 0.98
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "out",
         "minutes_ago": 51,
         "confidence": 0.98
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "out",
         "minutes_ago": 51,
         "confidence": 0.98
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "plenty",
         "minutes_ago": 51,
         "confidence": 0.98
@@ -1283,56 +1283,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "plenty",
         "minutes_ago": 58,
         "confidence": 0.99
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "plenty",
         "minutes_ago": 58,
         "confidence": 0.99
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "low",
         "minutes_ago": 58,
         "confidence": 0.99
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 58,
         "confidence": 0.99
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 58,
         "confidence": 0.99
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "plenty",
         "minutes_ago": 58,
         "confidence": 0.99
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "plenty",
         "minutes_ago": 58,
         "confidence": 0.99
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "low",
         "minutes_ago": 58,
         "confidence": 0.99
@@ -1365,56 +1365,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 15,
         "confidence": 0.85
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "low",
         "minutes_ago": 15,
         "confidence": 0.85
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "out",
         "minutes_ago": 15,
         "confidence": 0.85
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "plenty",
         "minutes_ago": 15,
         "confidence": 0.85
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "plenty",
         "minutes_ago": 15,
         "confidence": 0.85
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "low",
         "minutes_ago": 15,
         "confidence": 0.85
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "low",
         "minutes_ago": 15,
         "confidence": 0.85
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "out",
         "minutes_ago": 15,
         "confidence": 0.85
@@ -1448,56 +1448,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 22,
         "confidence": 0.86
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "out",
         "minutes_ago": 22,
         "confidence": 0.86
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "plenty",
         "minutes_ago": 22,
         "confidence": 0.86
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 22,
         "confidence": 0.86
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 22,
         "confidence": 0.86
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "out",
         "minutes_ago": 22,
         "confidence": 0.86
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "out",
         "minutes_ago": 22,
         "confidence": 0.86
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "plenty",
         "minutes_ago": 22,
         "confidence": 0.86
@@ -1530,56 +1530,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "plenty",
         "minutes_ago": 29,
         "confidence": 0.87
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "plenty",
         "minutes_ago": 29,
         "confidence": 0.87
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "low",
         "minutes_ago": 29,
         "confidence": 0.87
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 29,
         "confidence": 0.87
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 29,
         "confidence": 0.87
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "plenty",
         "minutes_ago": 29,
         "confidence": 0.87
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "plenty",
         "minutes_ago": 29,
         "confidence": 0.87
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "low",
         "minutes_ago": 29,
         "confidence": 0.87
@@ -1613,56 +1613,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 36,
         "confidence": 0.88
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "low",
         "minutes_ago": 36,
         "confidence": 0.88
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "out",
         "minutes_ago": 36,
         "confidence": 0.88
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "plenty",
         "minutes_ago": 36,
         "confidence": 0.88
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "plenty",
         "minutes_ago": 36,
         "confidence": 0.88
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "low",
         "minutes_ago": 36,
         "confidence": 0.88
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "low",
         "minutes_ago": 36,
         "confidence": 0.88
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "out",
         "minutes_ago": 36,
         "confidence": 0.88
@@ -1695,56 +1695,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 43,
         "confidence": 0.89
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "out",
         "minutes_ago": 43,
         "confidence": 0.89
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "plenty",
         "minutes_ago": 43,
         "confidence": 0.89
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 43,
         "confidence": 0.89
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 43,
         "confidence": 0.89
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "out",
         "minutes_ago": 43,
         "confidence": 0.89
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "out",
         "minutes_ago": 43,
         "confidence": 0.89
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "plenty",
         "minutes_ago": 43,
         "confidence": 0.89
@@ -1777,56 +1777,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "plenty",
         "minutes_ago": 50,
         "confidence": 0.9
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "plenty",
         "minutes_ago": 50,
         "confidence": 0.9
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "low",
         "minutes_ago": 50,
         "confidence": 0.9
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 50,
         "confidence": 0.9
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 50,
         "confidence": 0.9
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "plenty",
         "minutes_ago": 50,
         "confidence": 0.9
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "plenty",
         "minutes_ago": 50,
         "confidence": 0.9
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "low",
         "minutes_ago": 50,
         "confidence": 0.9
@@ -1859,56 +1859,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 57,
         "confidence": 0.9099999999999999
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "low",
         "minutes_ago": 57,
         "confidence": 0.9099999999999999
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "out",
         "minutes_ago": 57,
         "confidence": 0.9099999999999999
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "plenty",
         "minutes_ago": 57,
         "confidence": 0.9099999999999999
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "plenty",
         "minutes_ago": 57,
         "confidence": 0.9099999999999999
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "low",
         "minutes_ago": 57,
         "confidence": 0.9099999999999999
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "low",
         "minutes_ago": 57,
         "confidence": 0.9099999999999999
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "out",
         "minutes_ago": 57,
         "confidence": 0.9099999999999999
@@ -1941,56 +1941,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 14,
         "confidence": 0.9199999999999999
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "out",
         "minutes_ago": 14,
         "confidence": 0.9199999999999999
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "plenty",
         "minutes_ago": 14,
         "confidence": 0.9199999999999999
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 14,
         "confidence": 0.9199999999999999
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 14,
         "confidence": 0.9199999999999999
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "out",
         "minutes_ago": 14,
         "confidence": 0.9199999999999999
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "out",
         "minutes_ago": 14,
         "confidence": 0.9199999999999999
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "plenty",
         "minutes_ago": 14,
         "confidence": 0.9199999999999999
@@ -2023,56 +2023,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "plenty",
         "minutes_ago": 21,
         "confidence": 0.9299999999999999
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "plenty",
         "minutes_ago": 21,
         "confidence": 0.9299999999999999
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "low",
         "minutes_ago": 21,
         "confidence": 0.9299999999999999
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 21,
         "confidence": 0.9299999999999999
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 21,
         "confidence": 0.9299999999999999
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "plenty",
         "minutes_ago": 21,
         "confidence": 0.9299999999999999
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "plenty",
         "minutes_ago": 21,
         "confidence": 0.9299999999999999
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "low",
         "minutes_ago": 21,
         "confidence": 0.9299999999999999
@@ -2105,56 +2105,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 28,
         "confidence": 0.94
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "low",
         "minutes_ago": 28,
         "confidence": 0.94
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "out",
         "minutes_ago": 28,
         "confidence": 0.94
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "plenty",
         "minutes_ago": 28,
         "confidence": 0.94
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "plenty",
         "minutes_ago": 28,
         "confidence": 0.94
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "low",
         "minutes_ago": 28,
         "confidence": 0.94
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "low",
         "minutes_ago": 28,
         "confidence": 0.94
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "out",
         "minutes_ago": 28,
         "confidence": 0.94
@@ -2187,56 +2187,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 35,
         "confidence": 0.95
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "out",
         "minutes_ago": 35,
         "confidence": 0.95
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "plenty",
         "minutes_ago": 35,
         "confidence": 0.95
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 35,
         "confidence": 0.95
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 35,
         "confidence": 0.95
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "out",
         "minutes_ago": 35,
         "confidence": 0.95
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "out",
         "minutes_ago": 35,
         "confidence": 0.95
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "plenty",
         "minutes_ago": 35,
         "confidence": 0.95
@@ -2270,56 +2270,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "plenty",
         "minutes_ago": 42,
         "confidence": 0.96
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "plenty",
         "minutes_ago": 42,
         "confidence": 0.96
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "low",
         "minutes_ago": 42,
         "confidence": 0.96
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 42,
         "confidence": 0.96
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 42,
         "confidence": 0.96
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "plenty",
         "minutes_ago": 42,
         "confidence": 0.96
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "plenty",
         "minutes_ago": 42,
         "confidence": 0.96
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "low",
         "minutes_ago": 42,
         "confidence": 0.96
@@ -2352,56 +2352,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 49,
         "confidence": 0.97
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "low",
         "minutes_ago": 49,
         "confidence": 0.97
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "out",
         "minutes_ago": 49,
         "confidence": 0.97
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "plenty",
         "minutes_ago": 49,
         "confidence": 0.97
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "plenty",
         "minutes_ago": 49,
         "confidence": 0.97
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "low",
         "minutes_ago": 49,
         "confidence": 0.97
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "low",
         "minutes_ago": 49,
         "confidence": 0.97
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "out",
         "minutes_ago": 49,
         "confidence": 0.97
@@ -2434,56 +2434,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 56,
         "confidence": 0.98
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "out",
         "minutes_ago": 56,
         "confidence": 0.98
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "plenty",
         "minutes_ago": 56,
         "confidence": 0.98
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 56,
         "confidence": 0.98
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 56,
         "confidence": 0.98
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "out",
         "minutes_ago": 56,
         "confidence": 0.98
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "out",
         "minutes_ago": 56,
         "confidence": 0.98
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "plenty",
         "minutes_ago": 56,
         "confidence": 0.98
@@ -2516,56 +2516,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "plenty",
         "minutes_ago": 13,
         "confidence": 0.99
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "plenty",
         "minutes_ago": 13,
         "confidence": 0.99
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "low",
         "minutes_ago": 13,
         "confidence": 0.99
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 13,
         "confidence": 0.99
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 13,
         "confidence": 0.99
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "plenty",
         "minutes_ago": 13,
         "confidence": 0.99
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "plenty",
         "minutes_ago": 13,
         "confidence": 0.99
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "low",
         "minutes_ago": 13,
         "confidence": 0.99
@@ -2598,56 +2598,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 20,
         "confidence": 0.85
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "low",
         "minutes_ago": 20,
         "confidence": 0.85
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "out",
         "minutes_ago": 20,
         "confidence": 0.85
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "plenty",
         "minutes_ago": 20,
         "confidence": 0.85
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "plenty",
         "minutes_ago": 20,
         "confidence": 0.85
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "low",
         "minutes_ago": 20,
         "confidence": 0.85
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "low",
         "minutes_ago": 20,
         "confidence": 0.85
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "out",
         "minutes_ago": 20,
         "confidence": 0.85
@@ -2681,56 +2681,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 27,
         "confidence": 0.86
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "out",
         "minutes_ago": 27,
         "confidence": 0.86
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "plenty",
         "minutes_ago": 27,
         "confidence": 0.86
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 27,
         "confidence": 0.86
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 27,
         "confidence": 0.86
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "out",
         "minutes_ago": 27,
         "confidence": 0.86
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "out",
         "minutes_ago": 27,
         "confidence": 0.86
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "plenty",
         "minutes_ago": 27,
         "confidence": 0.86
@@ -2763,56 +2763,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "plenty",
         "minutes_ago": 34,
         "confidence": 0.87
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "plenty",
         "minutes_ago": 34,
         "confidence": 0.87
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "low",
         "minutes_ago": 34,
         "confidence": 0.87
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 34,
         "confidence": 0.87
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 34,
         "confidence": 0.87
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "plenty",
         "minutes_ago": 34,
         "confidence": 0.87
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "plenty",
         "minutes_ago": 34,
         "confidence": 0.87
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "low",
         "minutes_ago": 34,
         "confidence": 0.87
@@ -2846,56 +2846,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 41,
         "confidence": 0.88
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "low",
         "minutes_ago": 41,
         "confidence": 0.88
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "out",
         "minutes_ago": 41,
         "confidence": 0.88
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "plenty",
         "minutes_ago": 41,
         "confidence": 0.88
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "plenty",
         "minutes_ago": 41,
         "confidence": 0.88
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "low",
         "minutes_ago": 41,
         "confidence": 0.88
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "low",
         "minutes_ago": 41,
         "confidence": 0.88
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "out",
         "minutes_ago": 41,
         "confidence": 0.88
@@ -2929,56 +2929,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 48,
         "confidence": 0.89
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "out",
         "minutes_ago": 48,
         "confidence": 0.89
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "plenty",
         "minutes_ago": 48,
         "confidence": 0.89
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 48,
         "confidence": 0.89
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 48,
         "confidence": 0.89
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "out",
         "minutes_ago": 48,
         "confidence": 0.89
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "out",
         "minutes_ago": 48,
         "confidence": 0.89
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "plenty",
         "minutes_ago": 48,
         "confidence": 0.89
@@ -3011,56 +3011,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "plenty",
         "minutes_ago": 55,
         "confidence": 0.9
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "plenty",
         "minutes_ago": 55,
         "confidence": 0.9
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "low",
         "minutes_ago": 55,
         "confidence": 0.9
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 55,
         "confidence": 0.9
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 55,
         "confidence": 0.9
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "plenty",
         "minutes_ago": 55,
         "confidence": 0.9
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "plenty",
         "minutes_ago": 55,
         "confidence": 0.9
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "low",
         "minutes_ago": 55,
         "confidence": 0.9
@@ -3094,56 +3094,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 12,
         "confidence": 0.9099999999999999
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "low",
         "minutes_ago": 12,
         "confidence": 0.9099999999999999
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "out",
         "minutes_ago": 12,
         "confidence": 0.9099999999999999
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "plenty",
         "minutes_ago": 12,
         "confidence": 0.9099999999999999
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "plenty",
         "minutes_ago": 12,
         "confidence": 0.9099999999999999
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "low",
         "minutes_ago": 12,
         "confidence": 0.9099999999999999
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "low",
         "minutes_ago": 12,
         "confidence": 0.9099999999999999
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "out",
         "minutes_ago": 12,
         "confidence": 0.9099999999999999
@@ -3177,56 +3177,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 19,
         "confidence": 0.9199999999999999
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "out",
         "minutes_ago": 19,
         "confidence": 0.9199999999999999
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "plenty",
         "minutes_ago": 19,
         "confidence": 0.9199999999999999
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 19,
         "confidence": 0.9199999999999999
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 19,
         "confidence": 0.9199999999999999
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "out",
         "minutes_ago": 19,
         "confidence": 0.9199999999999999
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "out",
         "minutes_ago": 19,
         "confidence": 0.9199999999999999
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "plenty",
         "minutes_ago": 19,
         "confidence": 0.9199999999999999
@@ -3260,56 +3260,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "plenty",
         "minutes_ago": 26,
         "confidence": 0.9299999999999999
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "plenty",
         "minutes_ago": 26,
         "confidence": 0.9299999999999999
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "low",
         "minutes_ago": 26,
         "confidence": 0.9299999999999999
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 26,
         "confidence": 0.9299999999999999
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 26,
         "confidence": 0.9299999999999999
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "plenty",
         "minutes_ago": 26,
         "confidence": 0.9299999999999999
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "plenty",
         "minutes_ago": 26,
         "confidence": 0.9299999999999999
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "low",
         "minutes_ago": 26,
         "confidence": 0.9299999999999999
@@ -3342,56 +3342,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 33,
         "confidence": 0.94
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "low",
         "minutes_ago": 33,
         "confidence": 0.94
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "out",
         "minutes_ago": 33,
         "confidence": 0.94
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "plenty",
         "minutes_ago": 33,
         "confidence": 0.94
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "plenty",
         "minutes_ago": 33,
         "confidence": 0.94
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "low",
         "minutes_ago": 33,
         "confidence": 0.94
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "low",
         "minutes_ago": 33,
         "confidence": 0.94
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "out",
         "minutes_ago": 33,
         "confidence": 0.94
@@ -3424,56 +3424,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 40,
         "confidence": 0.95
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "out",
         "minutes_ago": 40,
         "confidence": 0.95
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "plenty",
         "minutes_ago": 40,
         "confidence": 0.95
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 40,
         "confidence": 0.95
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 40,
         "confidence": 0.95
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "out",
         "minutes_ago": 40,
         "confidence": 0.95
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "out",
         "minutes_ago": 40,
         "confidence": 0.95
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "plenty",
         "minutes_ago": 40,
         "confidence": 0.95
@@ -3506,56 +3506,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "plenty",
         "minutes_ago": 47,
         "confidence": 0.96
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "plenty",
         "minutes_ago": 47,
         "confidence": 0.96
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "low",
         "minutes_ago": 47,
         "confidence": 0.96
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 47,
         "confidence": 0.96
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 47,
         "confidence": 0.96
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "plenty",
         "minutes_ago": 47,
         "confidence": 0.96
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "plenty",
         "minutes_ago": 47,
         "confidence": 0.96
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "low",
         "minutes_ago": 47,
         "confidence": 0.96
@@ -3588,56 +3588,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 54,
         "confidence": 0.97
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "low",
         "minutes_ago": 54,
         "confidence": 0.97
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "out",
         "minutes_ago": 54,
         "confidence": 0.97
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "plenty",
         "minutes_ago": 54,
         "confidence": 0.97
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "plenty",
         "minutes_ago": 54,
         "confidence": 0.97
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "low",
         "minutes_ago": 54,
         "confidence": 0.97
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "low",
         "minutes_ago": 54,
         "confidence": 0.97
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "out",
         "minutes_ago": 54,
         "confidence": 0.97
@@ -3670,56 +3670,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 11,
         "confidence": 0.98
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "out",
         "minutes_ago": 11,
         "confidence": 0.98
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "plenty",
         "minutes_ago": 11,
         "confidence": 0.98
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 11,
         "confidence": 0.98
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 11,
         "confidence": 0.98
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "out",
         "minutes_ago": 11,
         "confidence": 0.98
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "out",
         "minutes_ago": 11,
         "confidence": 0.98
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "plenty",
         "minutes_ago": 11,
         "confidence": 0.98
@@ -3752,56 +3752,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "plenty",
         "minutes_ago": 18,
         "confidence": 0.99
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "plenty",
         "minutes_ago": 18,
         "confidence": 0.99
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "low",
         "minutes_ago": 18,
         "confidence": 0.99
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 18,
         "confidence": 0.99
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 18,
         "confidence": 0.99
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "plenty",
         "minutes_ago": 18,
         "confidence": 0.99
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "plenty",
         "minutes_ago": 18,
         "confidence": 0.99
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "low",
         "minutes_ago": 18,
         "confidence": 0.99
@@ -3834,56 +3834,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 25,
         "confidence": 0.85
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "low",
         "minutes_ago": 25,
         "confidence": 0.85
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "out",
         "minutes_ago": 25,
         "confidence": 0.85
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "plenty",
         "minutes_ago": 25,
         "confidence": 0.85
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "plenty",
         "minutes_ago": 25,
         "confidence": 0.85
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "low",
         "minutes_ago": 25,
         "confidence": 0.85
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "low",
         "minutes_ago": 25,
         "confidence": 0.85
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "out",
         "minutes_ago": 25,
         "confidence": 0.85
@@ -3916,56 +3916,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 32,
         "confidence": 0.86
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "out",
         "minutes_ago": 32,
         "confidence": 0.86
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "plenty",
         "minutes_ago": 32,
         "confidence": 0.86
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 32,
         "confidence": 0.86
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 32,
         "confidence": 0.86
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "out",
         "minutes_ago": 32,
         "confidence": 0.86
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "out",
         "minutes_ago": 32,
         "confidence": 0.86
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "plenty",
         "minutes_ago": 32,
         "confidence": 0.86
@@ -3998,56 +3998,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "plenty",
         "minutes_ago": 39,
         "confidence": 0.87
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "plenty",
         "minutes_ago": 39,
         "confidence": 0.87
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "low",
         "minutes_ago": 39,
         "confidence": 0.87
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 39,
         "confidence": 0.87
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 39,
         "confidence": 0.87
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "plenty",
         "minutes_ago": 39,
         "confidence": 0.87
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "plenty",
         "minutes_ago": 39,
         "confidence": 0.87
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "low",
         "minutes_ago": 39,
         "confidence": 0.87
@@ -4080,56 +4080,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 46,
         "confidence": 0.88
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "low",
         "minutes_ago": 46,
         "confidence": 0.88
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "out",
         "minutes_ago": 46,
         "confidence": 0.88
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "plenty",
         "minutes_ago": 46,
         "confidence": 0.88
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "plenty",
         "minutes_ago": 46,
         "confidence": 0.88
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "low",
         "minutes_ago": 46,
         "confidence": 0.88
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "low",
         "minutes_ago": 46,
         "confidence": 0.88
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "out",
         "minutes_ago": 46,
         "confidence": 0.88
@@ -4162,56 +4162,56 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 53,
         "confidence": 0.89
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "out",
         "minutes_ago": 53,
         "confidence": 0.89
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "plenty",
         "minutes_ago": 53,
         "confidence": 0.89
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "low",
         "minutes_ago": 53,
         "confidence": 0.89
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "low",
         "minutes_ago": 53,
         "confidence": 0.89
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "🧒",
+        "category_emoji": "\ud83e\uddd2",
         "band": "out",
         "minutes_ago": 53,
         "confidence": 0.89
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧴",
+        "category_emoji": "\ud83e\uddf4",
         "band": "out",
         "minutes_ago": 53,
         "confidence": 0.89
       },
       {
         "category_name": "Halal items",
-        "category_emoji": "🌙",
+        "category_emoji": "\ud83c\udf19",
         "band": "plenty",
         "minutes_ago": 53,
         "confidence": 0.89
@@ -4245,49 +4245,49 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "plenty",
         "minutes_ago": 15,
         "confidence": 0.88
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "plenty",
         "minutes_ago": 15,
         "confidence": 0.88
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "low",
         "minutes_ago": 15,
         "confidence": 0.88
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "plenty",
         "minutes_ago": 15,
         "confidence": 0.88
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "plenty",
         "minutes_ago": 15,
         "confidence": 0.88
       },
       {
         "category_name": "Diapers",
-        "category_emoji": "👶",
+        "category_emoji": "\ud83d\udc76",
         "band": "low",
         "minutes_ago": 15,
         "confidence": 0.88
       },
       {
         "category_name": "Hygiene",
-        "category_emoji": "🧼",
+        "category_emoji": "\ud83e\uddfc",
         "band": "low",
         "minutes_ago": 15,
         "confidence": 0.88
@@ -4320,35 +4320,35 @@
     "shelf_items": [
       {
         "category_name": "Produce",
-        "category_emoji": "🥕",
+        "category_emoji": "\ud83e\udd55",
         "band": "low",
         "minutes_ago": 30,
         "confidence": 0.85
       },
       {
         "category_name": "Protein",
-        "category_emoji": "🥩",
+        "category_emoji": "\ud83e\udd69",
         "band": "plenty",
         "minutes_ago": 30,
         "confidence": 0.85
       },
       {
         "category_name": "Dairy",
-        "category_emoji": "🥛",
+        "category_emoji": "\ud83e\udd5b",
         "band": "low",
         "minutes_ago": 30,
         "confidence": 0.85
       },
       {
         "category_name": "Grains",
-        "category_emoji": "🍞",
+        "category_emoji": "\ud83c\udf5e",
         "band": "plenty",
         "minutes_ago": 30,
         "confidence": 0.85
       },
       {
         "category_name": "Canned Goods",
-        "category_emoji": "🥫",
+        "category_emoji": "\ud83e\udd6b",
         "band": "plenty",
         "minutes_ago": 30,
         "confidence": 0.85

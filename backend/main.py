@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from routers import pantries, inventory
 
 app = FastAPI(
-    title="Pantry Pulse Baltimore API",
+    title="Pantree Baltimore API",
     description="Real-Time Food Pantry Inventory & Distribution Intelligence API (JSON store)",
     version="2.0.0",
 )

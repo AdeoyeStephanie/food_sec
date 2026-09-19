@@ -20,9 +20,10 @@ import {
   Lock,
   Unlock,
   X,
-  Tablet
+  Tablet,
+  Trash2
 } from 'lucide-react';
-import { BALTIMORE_PANTRIES, Pantry } from '@/lib/pantryData';
+import { Pantry, ShelfItem } from '@/lib/pantryData';
 import CameraViewfinder from '@/components/CameraViewfinder';
 import BrandLogo from '@/components/BrandLogo';
 import {
@@ -70,9 +71,40 @@ export default function VolunteerDashboard({
   const [isKioskMode, setIsKioskMode] = useState(false);
   const [kioskConfirmed, setKioskConfirmed] = useState<{ size: number; tableNum: number } | null>(null);
 
+  const DEFAULT_PANTRY_FALLBACK: Pantry = {
+    id: 'pantry-demo-hub',
+    name: 'Pantree Hub',
+    address: 'Baltimore, MD',
+    neighborhood: 'Downtown Baltimore',
+    lat: 39.2904,
+    lng: -76.6122,
+    distance_miles: 0.2,
+    walk_minutes: 4,
+    hours_text: 'Mon-Fri: 9:00 AM - 3:00 PM',
+    open_today: true,
+    open_tonight: false,
+    open_hours_display: '9:00 AM - 3:00 PM',
+    requires_id: false,
+    allows_walkins: true,
+    languages: ['English', 'Spanish'],
+    notes: 'Demonstration pantry hub',
+    distribution_model: 'client_choice',
+    phone: '(410) 732-0400',
+    shelf_items: [
+      { category_name: 'Produce', category_emoji: '🥕', band: 'plenty', confidence: 0.95, minutes_ago: 0 },
+      { category_name: 'Protein', category_emoji: '🥩', band: 'low', confidence: 0.90, minutes_ago: 0 },
+      { category_name: 'Dairy', category_emoji: '🥛', band: 'plenty', confidence: 0.92, minutes_ago: 0 },
+      { category_name: 'Grains', category_emoji: '🍞', band: 'plenty', confidence: 0.95, minutes_ago: 0 },
+      { category_name: 'Canned Goods', category_emoji: '🥫', band: 'plenty', confidence: 0.95, minutes_ago: 0 },
+      { category_name: 'Diapers', category_emoji: '👶', band: 'low', confidence: 0.88, minutes_ago: 0 },
+      { category_name: 'Hygiene', category_emoji: '🧼', band: 'plenty', confidence: 0.90, minutes_ago: 0 },
+      { category_name: 'Halal items', category_emoji: '☪️', band: 'plenty', confidence: 0.85, minutes_ago: 0 },
+    ],
+  };
+
   // Current active pantry state with live shelf levels
   const [currentPantry, setCurrentPantry] = useState<Pantry>(
-    activePantry || BALTIMORE_PANTRIES[0]
+    activePantry || DEFAULT_PANTRY_FALLBACK
   );
 
   // Sync the working copy when the selected pantry prop changes (external input).
@@ -100,6 +132,56 @@ export default function VolunteerDashboard({
     'Meat soup': { count: 3, category: 'Protein' },
   });
   const [donationsAddedNotice, setDonationsAddedNotice] = useState(false);
+  const [intakeCategoryMode, setIntakeCategoryMode] = useState<'shipment' | 'individual'>('shipment');
+  const [manualItemName, setManualItemName] = useState('');
+  const [manualCategory, setManualCategory] = useState('Produce');
+  const [manualCount, setManualCount] = useState(1);
+
+  const ALL_INTAKE_CATEGORIES = ['Produce', 'Protein', 'Dairy', 'Grains', 'Canned Goods', 'Diapers', 'Hygiene', 'Halal items'];
+
+  const handleAddManualItem = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const trimmed = manualItemName.trim();
+    if (!trimmed) return;
+    setDonationCounts((prev) => ({
+      ...prev,
+      [trimmed]: {
+        count: (prev[trimmed]?.count || 0) + Math.max(1, manualCount),
+        category: manualCategory,
+      },
+    }));
+    setManualItemName('');
+    setManualCount(1);
+  };
+
+  const handleRemoveItem = (itemKey: string) => {
+    setDonationCounts((prev) => {
+      const next = { ...prev };
+      delete next[itemKey];
+      return next;
+    });
+  };
+
+  const handleQuickCategoryTopUp = (cat: string) => {
+    const defaultLabels: Record<string, string> = {
+      'Produce': 'Fresh Produce Crates',
+      'Protein': 'Protein & Meat Cases',
+      'Dairy': 'Milk & Dairy Cartons',
+      'Grains': 'Rice & Cereal Sacks',
+      'Canned Goods': 'Canned Food Flats',
+      'Diapers': 'Diaper Cases',
+      'Hygiene': 'Hygiene Packs',
+      'Halal items': 'Halal Certified Items',
+    };
+    const label = defaultLabels[cat] || `${cat} Stock`;
+    setDonationCounts((prev) => ({
+      ...prev,
+      [label]: {
+        count: (prev[label]?.count || 0) + 1,
+        category: cat,
+      },
+    }));
+  };
 
   // Closing check state
   const [closingGuesses, setClosingGuesses] = useState<{ [key: string]: 'plenty' | 'low' | 'out' }>({
@@ -252,6 +334,7 @@ export default function VolunteerDashboard({
     setIsScanning(true);
     try {
       const formData = new FormData();
+      formData.append('mode', intakeCategoryMode);
       if (typeof presetOrFile === 'string') {
         formData.append('preset', presetOrFile);
       } else {
@@ -305,12 +388,13 @@ export default function VolunteerDashboard({
       );
       const currentQty =
         typeof existing?.estimated_qty === 'number' ? existing.estimated_qty : capacityLbs * 0.4;
+      const addedLbs = intakeCategoryMode === 'shipment' ? 80 : units * AVG_LBS_PER_ITEM;
       const newQty = Math.min(
         capacityLbs,
-        Math.round((currentQty + units * AVG_LBS_PER_ITEM) * 10) / 10
+        Math.round((currentQty + addedLbs) * 10) / 10
       );
       qtyByCategory[name] = newQty;
-      bandByCategory[name] = qtyToBand(newQty, capacityLbs);
+      bandByCategory[name] = intakeCategoryMode === 'shipment' ? 'plenty' : qtyToBand(newQty, capacityLbs);
     });
 
     // Optimistic on-screen update: update matching shelf items, and append any
@@ -324,7 +408,7 @@ export default function VolunteerDashboard({
           ...it,
           band: bandByCategory[name],
           estimated_qty: qtyByCategory[name],
-          confidence: 0.95,
+          confidence: 0.96,
           minutes_ago: 0,
         };
       }
@@ -834,13 +918,41 @@ export default function VolunteerDashboard({
           <div className="flex flex-col gap-5">
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-xl font-bold text-emerald-950">Donations in</h3>
+                <h3 className="text-xl font-bold text-emerald-950">Visual Intake</h3>
                 <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full flex items-center gap-1">
                   <Sparkles className="w-3 h-3 text-emerald-600" />
                   Gemini Vision
                 </span>
               </div>
-              <p className="text-xs text-slate-500">Snap incoming crates or bags. AI sorts it automatically.</p>
+              <p className="text-xs text-slate-500">
+                Snap photos of incoming delivery piles or small donations. AI recognizes the mixed stuff and groups by category—no scales needed.
+              </p>
+            </div>
+
+            {/* Mode Selector: Shipment vs Drop-off */}
+            <div className="flex bg-slate-100 p-1 rounded-2xl border border-slate-200">
+              <button
+                type="button"
+                onClick={() => setIntakeCategoryMode('shipment')}
+                className={`flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                  intakeCategoryMode === 'shipment'
+                    ? 'bg-emerald-800 text-white shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <span>🚚 Delivery / Shipment (Mixed Crates &amp; Pallets)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setIntakeCategoryMode('individual')}
+                className={`flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                  intakeCategoryMode === 'individual'
+                    ? 'bg-emerald-800 text-white shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <span>🛍️ Small Drop-off (Bags &amp; Boxes)</span>
+              </button>
             </div>
 
             {/* Hidden File Input */}
@@ -872,7 +984,7 @@ export default function VolunteerDashboard({
                   <div className="flex flex-col items-center gap-2 py-4">
                     <Loader2 className="w-8 h-8 text-emerald-400 animate-spin" />
                     <span className="text-xs text-emerald-200 font-semibold animate-pulse">
-                      Gemini Multimodal AI analyzing groceries...
+                      Gemini Vision analyzing delivery items &amp; categories...
                     </span>
                   </div>
                 ) : (
@@ -881,8 +993,12 @@ export default function VolunteerDashboard({
                       <Camera className="w-6 h-6" />
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-slate-300">Point at crates or grocery donation</p>
-                      <p className="text-[11px] text-slate-400">Privacy-guaranteed: photos are processed in-memory</p>
+                      <p className="text-xs font-medium text-slate-300">
+                        {intakeCategoryMode === 'shipment'
+                          ? 'Point at incoming delivery pallets, crates, or stacked boxes'
+                          : 'Point at donated grocery bags or boxes'}
+                      </p>
+                      <p className="text-[11px] text-slate-400">Privacy-guaranteed: photos processed in-memory &bull; No scales or weighing required</p>
                     </div>
 
                     <div className="flex items-center gap-2 mt-1">
@@ -908,70 +1024,194 @@ export default function VolunteerDashboard({
 
             {/* Quick Demo Pre-sets */}
             <div className="flex flex-col gap-2">
-              <span className="text-xs font-bold text-slate-700">Or quick demo with sample batch:</span>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={() => handleScanDonation('produce_crate')}
-                  className="bg-white hover:bg-emerald-50 border border-slate-200 py-2 px-3 rounded-xl text-xs font-semibold text-slate-700 text-left transition flex items-center justify-between cursor-pointer"
-                >
-                  <span>🥕 Crate of Vegetables</span>
-                  <span className="text-[11px] text-emerald-800">Scan</span>
-                </button>
-                <button
-                  onClick={() => handleScanDonation('canned_goods')}
-                  className="bg-white hover:bg-emerald-50 border border-slate-200 py-2 px-3 rounded-xl text-xs font-semibold text-slate-700 text-left transition flex items-center justify-between cursor-pointer"
-                >
-                  <span>🥫 Mixed Canned Goods</span>
-                  <span className="text-[11px] text-emerald-800">Scan</span>
-                </button>
-              </div>
+              <span className="text-xs font-bold text-slate-700">
+                {intakeCategoryMode === 'shipment' ? 'Quick demo with mixed delivery loads:' : 'Quick demo with drop-off batch:'}
+              </span>
+              {intakeCategoryMode === 'shipment' ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                  <button
+                    onClick={() => handleScanDonation('mfb_pallet_delivery')}
+                    className="bg-white hover:bg-emerald-50 border border-slate-200 p-2.5 rounded-xl text-xs font-semibold text-slate-700 text-left transition flex flex-col justify-between cursor-pointer shadow-xs"
+                  >
+                    <span className="font-bold text-emerald-950">🚚 Mixed Food Bank Drop</span>
+                    <span className="text-[10px] text-slate-500 mt-0.5">Produce crates, canned flats, rice sacks</span>
+                  </button>
+                  <button
+                    onClick={() => handleScanDonation('farm_produce_crates')}
+                    className="bg-white hover:bg-emerald-50 border border-slate-200 p-2.5 rounded-xl text-xs font-semibold text-slate-700 text-left transition flex flex-col justify-between cursor-pointer shadow-xs"
+                  >
+                    <span className="font-bold text-emerald-950">🌾 Local Farm Delivery</span>
+                    <span className="text-[10px] text-slate-500 mt-0.5">Vegetable crates, apples &amp; dairy</span>
+                  </button>
+                  <button
+                    onClick={() => handleScanDonation('emergency_relief_load')}
+                    className="bg-white hover:bg-emerald-50 border border-slate-200 p-2.5 rounded-xl text-xs font-semibold text-slate-700 text-left transition flex flex-col justify-between cursor-pointer shadow-xs"
+                  >
+                    <span className="font-bold text-emerald-950">📦 Emergency Relief Van</span>
+                    <span className="text-[10px] text-slate-500 mt-0.5">Protein cases, pasta &amp; diaper boxes</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => handleScanDonation('produce_crate')}
+                    className="bg-white hover:bg-emerald-50 border border-slate-200 py-2 px-3 rounded-xl text-xs font-semibold text-slate-700 text-left transition flex items-center justify-between cursor-pointer"
+                  >
+                    <span>🥕 Crate of Vegetables</span>
+                    <span className="text-[11px] text-emerald-800">Scan</span>
+                  </button>
+                  <button
+                    onClick={() => handleScanDonation('canned_box')}
+                    className="bg-white hover:bg-emerald-50 border border-slate-200 py-2 px-3 rounded-xl text-xs font-semibold text-slate-700 text-left transition flex items-center justify-between cursor-pointer"
+                  >
+                    <span>🥫 Mixed Canned Goods</span>
+                    <span className="text-[11px] text-emerald-800">Scan</span>
+                  </button>
+                </div>
+              )}
             </div>
 
-            {/* Editable AI Review Cards */}
-            <div className="bg-white rounded-3xl p-4 border border-emerald-900/10 flex flex-col gap-3 shadow-xs">
-              <div className="flex justify-between items-center">
-                <h4 className="font-bold text-sm text-emerald-950">AI Sorted Review</h4>
-                <span className="text-xs text-slate-400">Edit quantities before adding</span>
+            {/* Editable Intake Review & Manual Top-Up */}
+            <div className="bg-white rounded-3xl p-4 border border-emerald-900/10 flex flex-col gap-4 shadow-xs">
+              <div className="flex justify-between items-center border-b border-slate-100 pb-2.5">
+                <div>
+                  <h4 className="font-bold text-sm text-emerald-950">Intake Batch Review</h4>
+                  <p className="text-[11px] text-slate-400">Scanned items or manual additions ready for shelves</p>
+                </div>
+                {Object.keys(donationCounts).length > 0 && (
+                  <button
+                    onClick={() => setDonationCounts({})}
+                    className="text-[11px] text-slate-400 hover:text-rose-600 transition"
+                  >
+                    Clear All
+                  </button>
+                )}
               </div>
 
-              <div className="flex flex-col gap-2">
-                {Object.entries(donationCounts).map(([item, { count, category }]) => (
-                  <div key={item} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
-                    <div>
-                      <p className="text-xs font-bold text-slate-800">{item}</p>
-                      <span className="text-[11px] text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full font-semibold">
-                        {category}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-2 py-1">
-                      <button
-                        onClick={() => {
-                          if (count > 1) {
-                            setDonationCounts({
-                              ...donationCounts,
-                              [item]: { count: count - 1, category },
-                            });
-                          }
-                        }}
-                        className="p-1 text-slate-500 hover:text-slate-800 transition"
-                      >
-                        <Minus className="w-3 h-3" />
-                      </button>
-                      <span className="text-xs font-bold text-slate-800 min-w-[20px] text-center">{count}</span>
-                      <button
-                        onClick={() => {
-                          setDonationCounts({
-                            ...donationCounts,
-                            [item]: { count: count + 1, category },
-                          });
-                        }}
-                        className="p-1 text-slate-500 hover:text-slate-800 transition"
-                      >
-                        <Plus className="w-3 h-3" />
-                      </button>
-                    </div>
+              {/* 1-Tap Quick Category Top-Up Pills */}
+              <div>
+                <span className="text-[11px] font-bold text-slate-600 block mb-1.5">⚡ 1-Tap Quick Top-Up:</span>
+                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+                  {[
+                    { cat: 'Produce', emoji: '🥕' },
+                    { cat: 'Protein', emoji: '🥩' },
+                    { cat: 'Dairy', emoji: '🥛' },
+                    { cat: 'Grains', emoji: '🍞' },
+                    { cat: 'Canned Goods', emoji: '🥫' },
+                    { cat: 'Diapers', emoji: '👶' },
+                    { cat: 'Hygiene', emoji: '🧼' },
+                    { cat: 'Halal items', emoji: '☪️' },
+                  ].map(({ cat, emoji }) => (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => handleQuickCategoryTopUp(cat)}
+                      className="shrink-0 bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-slate-700 text-[11px] font-semibold py-1 px-2.5 rounded-full transition flex items-center gap-1 cursor-pointer"
+                    >
+                      <span>{emoji}</span>
+                      <span>+ {cat}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Type-To-Add Manual Form */}
+              <form onSubmit={handleAddManualItem} className="bg-slate-50 p-3 rounded-2xl border border-slate-200 flex flex-col gap-2">
+                <span className="text-[11px] font-bold text-slate-700">✍️ Type Custom Item:</span>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input
+                    type="text"
+                    value={manualItemName}
+                    onChange={(e) => setManualItemName(e.target.value)}
+                    placeholder="Item name (e.g., Peanut Butter, Halal Chicken, Diapers)..."
+                    className="flex-1 bg-white border border-slate-300 rounded-xl px-3 py-1.5 text-xs text-slate-800 outline-none focus:border-emerald-700 font-medium"
+                  />
+                  <select
+                    value={manualCategory}
+                    onChange={(e) => setManualCategory(e.target.value)}
+                    className="bg-white border border-slate-300 rounded-xl px-2.5 py-1.5 text-xs font-semibold text-slate-700 outline-none focus:border-emerald-700 cursor-pointer"
+                  >
+                    {ALL_INTAKE_CATEGORIES.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      type="number"
+                      min="1"
+                      value={manualCount}
+                      onChange={(e) => setManualCount(Math.max(1, parseInt(e.target.value) || 1))}
+                      className="w-14 bg-white border border-slate-300 rounded-xl px-2 py-1.5 text-xs font-bold text-slate-800 text-center outline-none focus:border-emerald-700"
+                    />
+                    <button
+                      type="submit"
+                      className="bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition cursor-pointer shrink-0"
+                    >
+                      + Add
+                    </button>
                   </div>
-                ))}
+                </div>
+              </form>
+
+              {/* Current Intake Items List */}
+              <div className="flex flex-col gap-2">
+                {Object.keys(donationCounts).length === 0 ? (
+                  <div className="text-center py-6 text-slate-400 text-xs">
+                    No items in current batch. Use the camera, tap a quick top-up above, or type an item.
+                  </div>
+                ) : (
+                  Object.entries(donationCounts).map(([item, { count, category }]) => (
+                    <div key={item} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
+                      <div className="flex-1 pr-2">
+                        <p className="text-xs font-bold text-slate-800">{item}</p>
+                        <span className="text-[10px] text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full font-semibold">
+                          {category}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-2 py-1">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (count > 1) {
+                                setDonationCounts({
+                                  ...donationCounts,
+                                  [item]: { count: count - 1, category },
+                                });
+                              } else {
+                                handleRemoveItem(item);
+                              }
+                            }}
+                            className="p-1 text-slate-500 hover:text-slate-800 transition cursor-pointer"
+                          >
+                            <Minus className="w-3 h-3" />
+                          </button>
+                          <span className="text-xs font-bold text-slate-800 min-w-[20px] text-center">{count}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setDonationCounts({
+                                ...donationCounts,
+                                [item]: { count: count + 1, category },
+                              });
+                            }}
+                            className="p-1 text-slate-500 hover:text-slate-800 transition cursor-pointer"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </button>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveItem(item)}
+                          className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition cursor-pointer"
+                          title="Remove item"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 

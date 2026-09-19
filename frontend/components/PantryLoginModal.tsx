@@ -293,7 +293,7 @@ export default function PantryLoginModal({ isOpen, pantries = [], onClose, onSuc
                 Register Your Pantry
               </h3>
               <p className="text-xs text-slate-500 max-w-sm leading-relaxed">
-                Join the Baltimore PantryPulse network in 60 seconds. Instantly start tracking shelf stock and receiving client lookups.
+                Join the Baltimore Pantree network in 60 seconds. Instantly start tracking shelf stock and receiving client lookups.
               </p>
             </div>
 

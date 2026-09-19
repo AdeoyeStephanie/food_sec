@@ -144,8 +144,8 @@ export default function BrandLogo({
       {showText && (
         <div className="flex flex-col leading-none">
           <div className="flex items-center font-black tracking-tight text-slate-900 text-base md:text-lg">
-            <span className="text-[#064E3B]">Pantry</span>
-            <span className="text-[#10B981] font-black ml-1">Pulse</span>
+            <span className="text-[#064E3B]">Pan</span>
+            <span className="text-[#10B981] font-black">tree</span>
           </div>
           <span className="text-[10px] uppercase font-extrabold tracking-widest text-slate-500 mt-0.5">
             Baltimore
