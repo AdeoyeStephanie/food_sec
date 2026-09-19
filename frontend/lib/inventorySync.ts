@@ -19,6 +19,19 @@ export const STOCK_THRESHOLD_FRACTIONS = {
   OUT_MAX: 0.10,    // <= 10% of capacity is Out (Red)
 };
 
+/**
+ * The single band-derivation rule for the whole app: stock in lbs vs. a fraction
+ * of the category's capacity. Depletion, closing-check blending, and donation
+ * intake all go through this so a given quantity always yields the same band.
+ */
+export function qtyToBand(qtyLbs: number, capacityLbs: number): 'plenty' | 'low' | 'out' {
+  const outThreshold = capacityLbs * STOCK_THRESHOLD_FRACTIONS.OUT_MAX;
+  const plentyThreshold = capacityLbs * STOCK_THRESHOLD_FRACTIONS.PLENTY_MIN;
+  if (qtyLbs <= outThreshold) return 'out';
+  if (qtyLbs <= plentyThreshold) return 'low';
+  return 'plenty';
+}
+
 export const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
   Produce: { name: 'Produce', emoji: '🥕', capacityLbs: 100, capacity: 100, defaultRateLbsPerPerson: 2.5 },
   Protein: { name: 'Protein', emoji: '🥩', capacityLbs: 75, capacity: 75, defaultRateLbsPerPerson: 1.8 },
@@ -28,6 +41,7 @@ export const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
   Diapers: { name: 'Diapers', emoji: '👶', capacityLbs: 35, capacity: 35, defaultRateLbsPerPerson: 0.5 },
   Hygiene: { name: 'Hygiene', emoji: '🧼', capacityLbs: 40, capacity: 40, defaultRateLbsPerPerson: 0.4 },
   'Halal items': { name: 'Halal items', emoji: '🌙', capacityLbs: 60, capacity: 60, defaultRateLbsPerPerson: 1.5 },
+  'Baby Essentials': { name: 'Baby Essentials', emoji: '🍼', capacityLbs: 45, capacity: 45, defaultRateLbsPerPerson: 0.6 },
 };
 
 const STORAGE_KEY = 'BALTIMORE_PANTRIES_DATA_V1';
@@ -128,16 +142,8 @@ export function calculateDepletedInventory(
 
     const newQty = Math.max(0, Math.round((currentQty - deductedLbs) * 10) / 10);
 
-    // Dynamic thresholds as fraction of capacity
-    const plentyThreshold = config.capacityLbs * STOCK_THRESHOLD_FRACTIONS.PLENTY_MIN;
-    const outThreshold = config.capacityLbs * STOCK_THRESHOLD_FRACTIONS.OUT_MAX;
-
-    let newBand: 'plenty' | 'low' | 'out' = 'plenty';
-    if (newQty <= outThreshold) {
-      newBand = 'out';
-    } else if (newQty <= plentyThreshold) {
-      newBand = 'low';
-    }
+    // Band from stock vs. capacity fraction (shared rule).
+    const newBand = qtyToBand(newQty, config.capacityLbs);
 
     if (item.band !== newBand && (newBand === 'low' || newBand === 'out')) {
       deductions.push(`${config.emoji} ${config.name} now ${newBand.toUpperCase()}`);
@@ -220,14 +226,8 @@ export function blendClosingCheck(
     // Posterior confidence: never a fake 1.0 reset, bounded at realistic 0.93 - 0.96
     const posteriorConfidence = Math.min(0.96, Math.max(0.88, Math.round((1.0 - posteriorVariance) * 100) / 100));
 
-    // Dynamic band evaluation from blended quantity
-    const plentyThreshold = config.capacityLbs * STOCK_THRESHOLD_FRACTIONS.PLENTY_MIN;
-    const outThreshold = config.capacityLbs * STOCK_THRESHOLD_FRACTIONS.OUT_MAX;
-
-    let finalBand: 'plenty' | 'low' | 'out' = chosenBand;
-    if (blendedQtyLbs <= outThreshold) finalBand = 'out';
-    else if (blendedQtyLbs <= plentyThreshold) finalBand = 'low';
-    else finalBand = 'plenty';
+    // Dynamic band evaluation from blended quantity (shared rule).
+    const finalBand = qtyToBand(blendedQtyLbs, config.capacityLbs);
 
     // Adaptive multiplier update if people were served
     const oldMultiplier = getCategoryMultiplier(pantryId, item.category_name);

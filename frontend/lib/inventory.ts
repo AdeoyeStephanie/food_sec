@@ -1,66 +1,66 @@
-// Category canonicalization + band thresholds for donation intake.
+// Category canonicalization for donation intake.
 //
-// The AI scanner (/api/scan-donation) and its presets emit category strings that
-// don't all match the DB `food_categories` names exactly (e.g. "Halal items" vs
-// "Halal Items"), and some have no DB category at all (e.g. "General"). We map
-// what we can and let callers skip + report the rest rather than dropping silently.
+// Single source of truth = the backend's category list (GET /api/categories,
+// served from store.CANONICAL_CATEGORIES). Callers pass those names in as `known`
+// so the frontend can't drift from the backend. A small synonym map handles
+// scanner/preset strings that aren't exact matches; anything unmapped is reported
+// by aggregateDonations (via `skipped`) rather than dropped silently.
 
-// Exact DB category names — keep in sync with db/seed.sql food_categories.
-export const DB_CATEGORIES = [
+// Fallback list, mirrors backend store.CANONICAL_CATEGORIES. Used only before the
+// backend category list has loaded.
+export const DEFAULT_CATEGORIES = [
   'Produce',
   'Protein',
   'Dairy',
   'Grains',
+  'Canned Goods',
   'Diapers',
   'Hygiene',
-  'Canned Goods',
-  'Halal Items',
+  'Halal items',
   'Baby Essentials',
-] as const;
+];
 
-// lowercase -> canonical DB name. Built from DB_CATEGORIES, plus explicit aliases.
-const LOOKUP: Record<string, string> = {};
-DB_CATEGORIES.forEach((c) => {
-  LOOKUP[c.toLowerCase()] = c;
-});
-// Aliases for strings the scanner/presets produce that aren't exact matches.
-// ("Halal items" already resolves via the DB_CATEGORIES lowercasing above.)
-LOOKUP['halal'] = 'Halal Items';
-LOOKUP['baby'] = 'Baby Essentials';
-LOOKUP['formula'] = 'Baby Essentials';
+// Synonyms: raw scanner/preset string -> a canonical name (still resolved against
+// `known`, so a synonym only maps if the backend actually has that category).
+const SYNONYMS: Record<string, string> = {
+  halal: 'Halal items',
+  baby: 'Baby Essentials',
+  formula: 'Baby Essentials',
+};
 
 /**
- * Resolve a raw scanner/preset category string to an exact DB category name,
- * or null when it maps to nothing known (caller should skip it and report).
+ * Resolve a raw scanner/preset category string to a backend category name
+ * (case-insensitive), or null when it maps to nothing the backend knows.
  */
-export function canonicalCategory(raw: string): string | null {
+export function canonicalCategory(
+  raw: string,
+  known: string[] = DEFAULT_CATEGORIES
+): string | null {
   if (!raw) return null;
-  return LOOKUP[raw.trim().toLowerCase()] ?? null;
-}
-
-// Band thresholds (units of donated items). Tune here.
-// total <= OUT_AT -> 'out', total < LOW_AT -> 'low', else 'plenty'.
-export const OUT_AT = 0;
-export const LOW_AT = 5;
-
-export function countToBand(total: number): 'plenty' | 'low' | 'out' {
-  if (total <= OUT_AT) return 'out';
-  if (total < LOW_AT) return 'low';
-  return 'plenty';
+  const key = raw.trim().toLowerCase();
+  const exact = known.find((n) => n.toLowerCase() === key);
+  if (exact) return exact;
+  const syn = SYNONYMS[key];
+  if (syn) {
+    const hit = known.find((n) => n.toLowerCase() === syn.toLowerCase());
+    if (hit) return hit;
+  }
+  return null;
 }
 
 /**
  * Aggregate raw donation counts (keyed by item name) into totals per canonical
- * DB category, returning the list of raw category strings that couldn't be mapped.
+ * category, returning the raw category strings that couldn't be mapped.
  */
 export function aggregateDonations(
-  donationCounts: Record<string, { count: number; category: string }>
+  donationCounts: Record<string, { count: number; category: string }>,
+  known: string[] = DEFAULT_CATEGORIES
 ): { totals: Record<string, number>; skipped: string[] } {
   const totals: Record<string, number> = {};
   const skipped = new Set<string>();
 
   Object.values(donationCounts).forEach(({ count, category }) => {
-    const canon = canonicalCategory(category);
+    const canon = canonicalCategory(category, known);
     if (!canon) {
       skipped.add(category || '(unknown)');
       return;

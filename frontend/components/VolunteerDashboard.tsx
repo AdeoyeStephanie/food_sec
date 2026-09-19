@@ -38,6 +38,7 @@ import {
   blendClosingCheck,
   BlendedCorrectionMetric,
   CATEGORY_CONFIGS,
+  qtyToBand,
   CheckInRecord
 } from '@/lib/inventorySync';
 import {
@@ -47,7 +48,7 @@ import {
   Category,
   CorrectionItem
 } from '@/lib/api';
-import { aggregateDonations, canonicalCategory, countToBand } from '@/lib/inventory';
+import { aggregateDonations, canonicalCategory } from '@/lib/inventory';
 
 interface VolunteerDashboardProps {
   activePantry?: Pantry | null;
@@ -229,12 +230,15 @@ export default function VolunteerDashboard({
     }
 
     // Persist this single-category correction to the backend.
-    const canon = canonicalCategory(cat);
-    const categoryId = canon ? catIdByName[canon.toLowerCase()] : undefined;
-    if (categoryId) {
-      postCorrection(currentPantry.id, [{ category_id: categoryId, band: newBand }]).catch(
-        (err) => console.warn(`Run-out for ${cat} not persisted:`, err)
-      );
+    const canon = canonicalCategory(cat, categories.map((c) => c.name));
+    if (canon) {
+      postCorrection(currentPantry.id, [
+        {
+          category_id: catIdByName[canon.toLowerCase()],
+          category_name: canon,
+          band: newBand,
+        },
+      ]).catch((err) => console.warn(`Run-out for ${cat} not persisted:`, err));
     }
 
     setLastCheckinToast(
@@ -283,24 +287,64 @@ export default function VolunteerDashboard({
   const handleApplyDonations = async () => {
     setDonationsAddedNotice(true);
 
-    // Aggregate raw scan counts into totals per canonical DB category.
-    // `skipped` holds any category strings that don't map to a DB category.
-    const { totals, skipped } = aggregateDonations(donationCounts);
+    // Rough weight per donated unit (can/box/bag). Tune with real intake data.
+    const AVG_LBS_PER_ITEM = 1.2;
+
+    // Aggregate raw scan counts into totals per canonical category, using the
+    // backend's category list as the single source of truth. `skipped` holds any
+    // scanner strings that don't map to a real category (reported, not dropped).
+    const knownCats = categories.map((c) => c.name);
+    const { totals, skipped } = aggregateDonations(donationCounts, knownCats);
+
+    // Convert donated units -> lbs, add to current stock, and derive the band via
+    // the SAME rule the depletion engine uses (qtyToBand) — one band model, not two.
     const bandByCategory: Record<string, 'plenty' | 'low' | 'out'> = {};
-    Object.entries(totals).forEach(([name, total]) => {
-      bandByCategory[name] = countToBand(total);
+    const qtyByCategory: Record<string, number> = {};
+    Object.entries(totals).forEach(([name, units]) => {
+      const capacityLbs = CATEGORY_CONFIGS[name]?.capacityLbs ?? 60;
+      const existing = (currentPantry.shelf_items || []).find(
+        (si) => si.category_name.toLowerCase() === name.toLowerCase()
+      );
+      const currentQty =
+        typeof existing?.estimated_qty === 'number' ? existing.estimated_qty : capacityLbs * 0.4;
+      const newQty = Math.min(
+        capacityLbs,
+        Math.round((currentQty + units * AVG_LBS_PER_ITEM) * 10) / 10
+      );
+      qtyByCategory[name] = newQty;
+      bandByCategory[name] = qtyToBand(newQty, capacityLbs);
     });
 
-    // Optimistic on-screen update (works even when the backend is down).
+    // Optimistic on-screen update: update matching shelf items, and append any
+    // donated category the shelf doesn't have yet (e.g. Baby Essentials).
     const updatedItems = (currentPantry.shelf_items || []).map((it) => {
-      const band = bandByCategory[it.category_name];
-      if (band) {
-        const config = CATEGORY_CONFIGS[it.category_name] || { capacityLbs: 60 };
-        const currentQty = typeof it.estimated_qty === 'number' ? it.estimated_qty : 20;
-        const newQty = Math.min(config.capacityLbs, currentQty + 30);
-        return { ...it, band, estimated_qty: newQty, confidence: 0.95, minutes_ago: 0 };
+      const name = Object.keys(qtyByCategory).find(
+        (n) => n.toLowerCase() === it.category_name.toLowerCase()
+      );
+      if (name) {
+        return {
+          ...it,
+          band: bandByCategory[name],
+          estimated_qty: qtyByCategory[name],
+          confidence: 0.95,
+          minutes_ago: 0,
+        };
       }
       return it;
+    });
+    Object.keys(qtyByCategory).forEach((name) => {
+      if (!updatedItems.some((it) => it.category_name.toLowerCase() === name.toLowerCase())) {
+        const config = CATEGORY_CONFIGS[name];
+        updatedItems.push({
+          category_name: name,
+          category_emoji: config?.emoji || '📦',
+          band: bandByCategory[name],
+          estimated_qty: qtyByCategory[name],
+          capacity: config?.capacityLbs || 60,
+          confidence: 0.95,
+          minutes_ago: 0,
+        });
+      }
     });
 
     const updatedPantry: Pantry = { ...currentPantry, shelf_items: updatedItems };
@@ -313,13 +357,17 @@ export default function VolunteerDashboard({
     });
 
     // Persist as a volunteer correction. Screen already updated, so a failure
-    // (backend down, or FK error for an unseeded pantry) just logs.
+    // (backend down, or unknown pantry) just logs. We send category_name too, so
+    // the backend can resolve/auto-add the category even without an id.
     try {
-      const corrections: CorrectionItem[] = [];
-      Object.entries(bandByCategory).forEach(([name, band]) => {
-        const id = catIdByName[name.toLowerCase()];
-        if (id) corrections.push({ category_id: id, band });
-      });
+      const corrections: CorrectionItem[] = Object.keys(qtyByCategory).map((name) => ({
+        category_id: catIdByName[name.toLowerCase()],
+        category_name: name,
+        band: bandByCategory[name],
+        estimated_qty: qtyByCategory[name],
+        capacity: CATEGORY_CONFIGS[name]?.capacityLbs,
+        confidence: 0.95,
+      }));
       if (corrections.length > 0) {
         await postCorrection(currentPantry.id, corrections);
       }

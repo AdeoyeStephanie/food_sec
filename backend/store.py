@@ -6,6 +6,8 @@ from datetime import datetime
 
 DATA_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "pantries.json"))
 
+# Single source of truth for food categories. The frontend derives its category
+# handling from this list (via GET /api/categories), so the two cannot drift.
 CANONICAL_CATEGORIES = [
     {"id": 1, "name": "Produce", "emoji": "🥕", "is_default": True},
     {"id": 2, "name": "Protein", "emoji": "🥩", "is_default": True},
@@ -15,6 +17,7 @@ CANONICAL_CATEGORIES = [
     {"id": 6, "name": "Diapers", "emoji": "👶", "is_default": True},
     {"id": 7, "name": "Hygiene", "emoji": "🧼", "is_default": True},
     {"id": 8, "name": "Halal items", "emoji": "🌙", "is_default": True},
+    {"id": 9, "name": "Baby Essentials", "emoji": "🍼", "is_default": True},
 ]
 
 def haversine_miles(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -118,30 +121,52 @@ class PantryStore:
         return new_pantry
 
     def update_shelf_corrections(self, pantry_id: str, corrections: List[Dict[str, Any]]) -> bool:
+        # Canonical category lookups so we can resolve a correction by id or name
+        # and reject anything that isn't a real category.
+        canon_by_id = {c["id"]: c for c in CANONICAL_CATEGORIES}
+        canon_by_name = {c["name"].lower(): c for c in CANONICAL_CATEGORIES}
+
         for idx, p in enumerate(self.pantries):
             if str(p.get("id")) == str(pantry_id):
                 shelf_map = {item["category_name"].lower(): item for item in p.get("shelf_items", [])}
                 for corr in corrections:
-                    cat_name = corr.get("category_name")
                     cat_id = corr.get("category_id")
-                    if not cat_name and cat_id is not None:
-                        for c in CANONICAL_CATEGORIES:
-                            if c["id"] == cat_id:
-                                cat_name = c["name"]
-                                break
-                    if not cat_name:
+                    cat_name = corr.get("category_name")
+
+                    # Resolve to a canonical category (by id first, then name).
+                    canon = None
+                    if cat_id is not None and cat_id in canon_by_id:
+                        canon = canon_by_id[cat_id]
+                    elif cat_name and cat_name.lower() in canon_by_name:
+                        canon = canon_by_name[cat_name.lower()]
+                    if not canon:
+                        # Not a real category — skip rather than write garbage.
                         continue
-                    key = cat_name.lower()
-                    if key in shelf_map:
-                        shelf_map[key]["band"] = corr.get("band", shelf_map[key]["band"])
-                        if "estimated_qty" in corr and corr["estimated_qty"] is not None:
-                            shelf_map[key]["estimated_qty"] = corr["estimated_qty"]
-                        if "confidence" in corr and corr["confidence"] is not None:
-                            shelf_map[key]["confidence"] = corr["confidence"]
-                        if "capacity" in corr and corr["capacity"] is not None:
-                            shelf_map[key]["capacity"] = corr["capacity"]
-                        shelf_map[key]["minutes_ago"] = 0
-                
+
+                    key = canon["name"].lower()
+                    if key not in shelf_map:
+                        # Auto-add the category to this pantry's shelf so a valid
+                        # correction always persists instead of being silently dropped.
+                        shelf_map[key] = {
+                            "category_name": canon["name"],
+                            "category_emoji": canon["emoji"],
+                            "band": corr.get("band", "plenty"),
+                            "minutes_ago": 0,
+                            "confidence": corr.get("confidence") if corr.get("confidence") is not None else 0.95,
+                            "estimated_qty": corr.get("estimated_qty") if corr.get("estimated_qty") is not None else 30,
+                            "capacity": corr.get("capacity") if corr.get("capacity") is not None else 60,
+                        }
+                        continue
+
+                    shelf_map[key]["band"] = corr.get("band", shelf_map[key]["band"])
+                    if corr.get("estimated_qty") is not None:
+                        shelf_map[key]["estimated_qty"] = corr["estimated_qty"]
+                    if corr.get("confidence") is not None:
+                        shelf_map[key]["confidence"] = corr["confidence"]
+                    if corr.get("capacity") is not None:
+                        shelf_map[key]["capacity"] = corr["capacity"]
+                    shelf_map[key]["minutes_ago"] = 0
+
                 self.pantries[idx]["shelf_items"] = list(shelf_map.values())
                 self.save()
                 return True
