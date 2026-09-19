@@ -47,11 +47,17 @@ export default function Home() {
   // Filter chips
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
 
+  const handleRegisterNewPantry = (newPantry: Pantry) => {
+    setPantriesList((prev) => [newPantry, ...prev]);
+    setSelectedPantry(newPantry);
+  };
+
   const handleUpdateInventory = (category: string, band: 'plenty' | 'low' | 'out') => {
+    const targetId = authenticatedPantry?.id;
     setPantriesList((prev) =>
       prev.map((p) => {
-        if (p.name.includes('Northside')) {
-          const updatedItems = p.shelf_items.map((it) =>
+        if ((targetId && p.id === targetId) || (!targetId && p.name.includes('Northside'))) {
+          const updatedItems = (p.shelf_items || []).map((it) =>
             it.category_name.toLowerCase() === category.toLowerCase()
               ? { ...it, band, minutes_ago: 1 }
               : it
@@ -59,6 +65,9 @@ export default function Home() {
           const updatedPantry = { ...p, shelf_items: updatedItems };
           if (selectedPantry?.id === p.id) {
             setSelectedPantry(updatedPantry);
+          }
+          if (authenticatedPantry?.id === p.id) {
+            setAuthenticatedPantry(updatedPantry);
           }
           return updatedPantry;
         }
@@ -528,6 +537,7 @@ export default function Home() {
       <PantryLoginModal
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
+        onRegisterPantry={handleRegisterNewPantry}
         onSuccess={(pantry) => {
           setAuthenticatedPantry(pantry);
           setIsVolunteerMode(true);
