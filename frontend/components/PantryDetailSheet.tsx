@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Pantry } from '@/lib/pantryData';
 import { Language, TRANSLATIONS } from '@/lib/translations';
-import { Navigation, Phone, CheckCircle2, ShoppingBag, Clock, Languages, ShieldCheck, ThumbsUp, ThumbsDown, X, Bus, Accessibility } from 'lucide-react';
+import { Navigation, Phone, CheckCircle2, ShoppingBag, Clock, Languages, ShieldCheck, ThumbsUp, ThumbsDown, X, Bus, Accessibility, Sparkles } from 'lucide-react';
 
 interface PantryDetailSheetProps {
   pantry: Pantry;
@@ -216,6 +216,50 @@ export default function PantryDetailSheet({ pantry, language = 'en', onClose }: 
             </div>
           </div>
         </div>
+
+        {/* Specialty Offerings & Cultural Diets */}
+        {((pantry.specialty_tags && pantry.specialty_tags.length > 0) || (pantry.notes && pantry.notes.toLowerCase().includes('halal'))) && (
+          <div className="flex items-start gap-3 border-t border-slate-100 pt-3">
+            <Sparkles className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
+            <div>
+              <h4 className="text-sm font-semibold text-slate-900">
+                {language === 'es' ? 'Dietas y Servicios Especiales' : 'Specialty Offerings & Dietary Needs'}
+              </h4>
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {(pantry.specialty_tags?.includes('halal') || (pantry.notes && pantry.notes.toLowerCase().includes('halal'))) && (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-900 bg-emerald-100 px-2.5 py-1 rounded-full border border-emerald-300">
+                    🕌 {language === 'es' ? 'Certificado Halal' : 'Halal Certified'}
+                  </span>
+                )}
+                {pantry.specialty_tags?.includes('kosher') && (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-900 bg-blue-100 px-2.5 py-1 rounded-full border border-blue-300">
+                    ✡️ {language === 'es' ? 'Certificado Kosher' : 'Kosher Certified'}
+                  </span>
+                )}
+                {(pantry.specialty_tags?.includes('formula') || pantry.shelf_items.some((it) => it.category_name.toLowerCase().includes('diaper'))) && (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-pink-900 bg-pink-100 px-2.5 py-1 rounded-full border border-pink-300">
+                    🍼 {language === 'es' ? 'Fórmula y Pañales' : 'Infant Formula & Diapers'}
+                  </span>
+                )}
+                {pantry.specialty_tags?.includes('no_cook') && (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-900 bg-amber-100 px-2.5 py-1 rounded-full border border-amber-300">
+                    🥫 {language === 'es' ? 'Bolsas Listas Para Comer' : 'No-Cook / Pop-Top Bags'}
+                  </span>
+                )}
+                {pantry.specialty_tags?.includes('pet_food') && (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-900 bg-slate-100 px-2.5 py-1 rounded-full border border-slate-300">
+                    🐾 {language === 'es' ? 'Alimento Para Mascotas' : 'Pet Food Available'}
+                  </span>
+                )}
+                {pantry.specialty_tags?.includes('dietary') && (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-teal-900 bg-teal-100 px-2.5 py-1 rounded-full border border-teal-300">
+                    🩺 {language === 'es' ? 'Bajo en Sodio / Diabético' : 'Diabetic & Low-Sodium'}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Community Feedback Loop: "Been here today?" */}

@@ -20,7 +20,8 @@ import {
   TrendingDown,
   RefreshCw,
   PackageCheck,
-  AlertCircle
+  AlertCircle,
+  SlidersHorizontal
 } from 'lucide-react';
 import { BALTIMORE_PANTRIES, Pantry, ShelfItem } from '@/lib/pantryData';
 import CameraViewfinder from '@/components/CameraViewfinder';
@@ -46,7 +47,7 @@ export default function VolunteerDashboard({
   onUpdateInventory,
   onUpdateFullPantry
 }: VolunteerDashboardProps) {
-  const [activeTab, setActiveTab] = useState<'checkin' | 'donations' | 'closing' | 'reports'>('checkin');
+  const [activeTab, setActiveTab] = useState<'checkin' | 'donations' | 'closing' | 'reports' | 'settings'>('checkin');
   
   // Current active pantry state with live shelf levels
   const [currentPantry, setCurrentPantry] = useState<Pantry>(
@@ -327,6 +328,67 @@ export default function VolunteerDashboard({
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  // Toggle specialty offering tags (Halal, Kosher, Baby Formula, No-Cook, etc.)
+  const handleToggleSpecialtyTag = (tag: string, label: string) => {
+    const currentTags = currentPantry.specialty_tags || [];
+    const hasTag = currentTags.includes(tag);
+    const newTags = hasTag
+      ? currentTags.filter((t) => t !== tag)
+      : [...currentTags, tag];
+
+    const updatedPantry: Pantry = {
+      ...currentPantry,
+      specialty_tags: newTags,
+    };
+
+    setCurrentPantry(updatedPantry);
+    if (onUpdateFullPantry) {
+      onUpdateFullPantry(updatedPantry);
+    }
+
+    setLastCheckinToast(
+      hasTag
+        ? `Removed specialty badge: ${label}`
+        : `✓ Added ${label}! Neighbors searching for this will now find your pantry.`
+    );
+    setTimeout(() => setLastCheckinToast(null), 3500);
+  };
+
+  const handleChangeDistributionModel = (model: 'client_choice' | 'pre_packed' | 'list') => {
+    const updatedPantry: Pantry = {
+      ...currentPantry,
+      distribution_model: model,
+    };
+    setCurrentPantry(updatedPantry);
+    if (onUpdateFullPantry) {
+      onUpdateFullPantry(updatedPantry);
+    }
+    const modelLabels = {
+      client_choice: 'Client Choice (Shop shelves)',
+      pre_packed: 'Pre-Packed Family Boxes',
+      list: 'Order from a List'
+    };
+    setLastCheckinToast(`Distribution model set to: ${modelLabels[model]}.`);
+    setTimeout(() => setLastCheckinToast(null), 3000);
+  };
+
+  const handleToggleRequiresId = () => {
+    const updatedPantry: Pantry = {
+      ...currentPantry,
+      requires_id: !currentPantry.requires_id,
+    };
+    setCurrentPantry(updatedPantry);
+    if (onUpdateFullPantry) {
+      onUpdateFullPantry(updatedPantry);
+    }
+    setLastCheckinToast(
+      updatedPantry.requires_id
+        ? 'ID Policy updated: Photo ID required.'
+        : 'ID Policy updated: No ID required (Walk-in dignity).'
+    );
+    setTimeout(() => setLastCheckinToast(null), 3000);
   };
 
   return (
@@ -790,13 +852,141 @@ export default function VolunteerDashboard({
             </div>
           </div>
         )}
+
+        {/* TAB 5: PANTRY SETTINGS & SPECIALTY OFFERINGS */}
+        {activeTab === 'settings' && (
+          <div className="flex flex-col gap-6">
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-xl font-bold text-emerald-950">Pantry Capabilities & Settings</h3>
+                <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
+                  Live on Map
+                </span>
+              </div>
+              <p className="text-xs text-slate-500">
+                Configure specialty diets, distribution models, and walk-in policies.
+              </p>
+            </div>
+
+            {/* Specialty Offerings Grid */}
+            <div className="bg-white rounded-3xl p-5 border border-emerald-900/10 shadow-xs flex flex-col gap-4">
+              <div>
+                <h4 className="font-bold text-sm text-emerald-950">Specialty Diets & Cultural Offerings</h4>
+                <p className="text-xs text-slate-500">
+                  Tap to toggle which specialty items your pantry distributes. Enables targeted neighbor search.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2.5">
+                {[
+                  { tag: 'halal', emoji: '🕌', label: 'Halal Certified', desc: 'Certified halal meats & poultry' },
+                  { tag: 'kosher', emoji: '✡️', label: 'Kosher Certified', desc: 'Kosher supervision staples' },
+                  { tag: 'formula', emoji: '🍼', label: 'Baby Formula & Care', desc: 'Infant formula & diaper bank' },
+                  { tag: 'no_cook', emoji: '🥫', label: 'No-Cook / Pop-Top', desc: 'For unhoused with no stove' },
+                  { tag: 'pet_food', emoji: '🐾', label: 'Pet Food Assistance', desc: 'Dog & cat food rations' },
+                  { tag: 'dietary', emoji: '🩺', label: 'Diabetic & Low-Sodium', desc: 'Health-tailored senior staples' },
+                ].map((spec) => {
+                  const isChecked = (currentPantry.specialty_tags || []).includes(spec.tag) || (spec.tag === 'halal' && currentPantry.notes?.toLowerCase().includes('halal'));
+                  return (
+                    <button
+                      key={spec.tag}
+                      type="button"
+                      onClick={() => handleToggleSpecialtyTag(spec.tag, spec.label)}
+                      className={`p-3 rounded-2xl border text-left transition cursor-pointer flex flex-col gap-1 ${
+                        isChecked
+                          ? 'bg-emerald-50/80 border-emerald-600 ring-1 ring-emerald-600'
+                          : 'bg-slate-50 hover:bg-slate-100 border-slate-200'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-lg">{spec.emoji}</span>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                          isChecked ? 'bg-emerald-700 text-white' : 'bg-slate-200 text-slate-600'
+                        }`}>
+                          {isChecked ? 'Active' : 'Off'}
+                        </span>
+                      </div>
+                      <span className="font-bold text-xs text-slate-900 mt-1">{spec.label}</span>
+                      <span className="text-[10px] text-slate-500 leading-tight">{spec.desc}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Distribution Model Card */}
+            <div className="bg-white rounded-3xl p-5 border border-emerald-900/10 shadow-xs flex flex-col gap-3">
+              <div>
+                <h4 className="font-bold text-sm text-emerald-950">Distribution Style</h4>
+                <p className="text-xs text-slate-500">
+                  Controls how neighbors receive food and how shelf math estimates depletion.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-2">
+                {[
+                  { id: 'client_choice', label: 'Client Choice (Shop Shelves)', desc: 'Neighbors pick items like a small grocery store (Predict math active)' },
+                  { id: 'pre_packed', label: 'Pre-Packed Family Boxes', desc: 'Volunteers assemble standard boxes (1 box deducted per check-in)' },
+                  { id: 'list', label: 'Order from a List', desc: 'Neighbors check items off a menu sheet at intake' },
+                ].map((m) => {
+                  const isSelected = currentPantry.distribution_model === m.id;
+                  return (
+                    <button
+                      key={m.id}
+                      type="button"
+                      onClick={() => handleChangeDistributionModel(m.id as any)}
+                      className={`p-3 rounded-xl border text-left transition cursor-pointer flex items-center justify-between ${
+                        isSelected
+                          ? 'bg-emerald-50 border-emerald-600 ring-1 ring-emerald-600'
+                          : 'bg-slate-50 hover:bg-slate-100 border-slate-200'
+                      }`}
+                    >
+                      <div>
+                        <p className="text-xs font-bold text-slate-900">{m.label}</p>
+                        <p className="text-[11px] text-slate-500">{m.desc}</p>
+                      </div>
+                      <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                        isSelected ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-slate-300'
+                      }`}>
+                        {isSelected && <Check className="w-3 h-3 text-white" />}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* ID Policy Toggle */}
+            <div className="bg-white rounded-3xl p-5 border border-emerald-900/10 shadow-xs flex items-center justify-between">
+              <div>
+                <h4 className="font-bold text-sm text-emerald-950">ID Requirement Policy</h4>
+                <p className="text-xs text-slate-500">
+                  {currentPantry.requires_id
+                    ? 'Photo ID or proof of address required from clients'
+                    : 'Zero ID, papers, or proof of income required (High-Dignity)'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleToggleRequiresId}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+                  currentPantry.requires_id
+                    ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                    : 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                }`}
+              >
+                {currentPantry.requires_id ? 'ID Required' : 'No ID Needed'}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Bottom Nav Bar matching Page 4/6 */}
-      <div className="bg-white border-t border-emerald-900/10 px-4 py-3 flex justify-around items-center">
+      <div className="bg-white border-t border-emerald-900/10 px-3 py-3 flex justify-around items-center">
         <button
           onClick={() => setActiveTab('checkin')}
-          className={`flex flex-col items-center gap-1 text-xs font-medium transition cursor-pointer ${
+          className={`flex flex-col items-center gap-1 text-[11px] font-medium transition cursor-pointer ${
             activeTab === 'checkin' ? 'text-emerald-800 font-bold scale-105' : 'text-slate-400 hover:text-slate-600'
           }`}
         >
@@ -806,32 +996,42 @@ export default function VolunteerDashboard({
 
         <button
           onClick={() => setActiveTab('donations')}
-          className={`flex flex-col items-center gap-1 text-xs font-medium transition cursor-pointer ${
+          className={`flex flex-col items-center gap-1 text-[11px] font-medium transition cursor-pointer ${
             activeTab === 'donations' ? 'text-emerald-800 font-bold scale-105' : 'text-slate-400 hover:text-slate-600'
           }`}
         >
           <Camera className="w-5 h-5" />
-          <span>Donations in</span>
+          <span>Donations</span>
         </button>
 
         <button
           onClick={() => setActiveTab('closing')}
-          className={`flex flex-col items-center gap-1 text-xs font-medium transition cursor-pointer ${
+          className={`flex flex-col items-center gap-1 text-[11px] font-medium transition cursor-pointer ${
             activeTab === 'closing' ? 'text-emerald-800 font-bold scale-105' : 'text-slate-400 hover:text-slate-600'
           }`}
         >
           <CheckSquare className="w-5 h-5" />
-          <span>Closing check</span>
+          <span>Closing</span>
         </button>
 
         <button
           onClick={() => setActiveTab('reports')}
-          className={`flex flex-col items-center gap-1 text-xs font-medium transition cursor-pointer ${
+          className={`flex flex-col items-center gap-1 text-[11px] font-medium transition cursor-pointer ${
             activeTab === 'reports' ? 'text-emerald-800 font-bold scale-105' : 'text-slate-400 hover:text-slate-600'
           }`}
         >
           <FileSpreadsheet className="w-5 h-5" />
           <span>Reports</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('settings')}
+          className={`flex flex-col items-center gap-1 text-[11px] font-medium transition cursor-pointer ${
+            activeTab === 'settings' ? 'text-emerald-800 font-bold scale-105' : 'text-slate-400 hover:text-slate-600'
+          }`}
+        >
+          <SlidersHorizontal className="w-5 h-5" />
+          <span>Settings</span>
         </button>
       </div>
     </div>

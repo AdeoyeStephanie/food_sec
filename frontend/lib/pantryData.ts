@@ -28,6 +28,7 @@ export interface Pantry {
   distribution_model: 'client_choice' | 'pre_packed' | 'list';
   shelf_items: ShelfItem[];
   phone: string;
+  specialty_tags?: string[];
 }
 
 export const BALTIMORE_PANTRIES: Pantry[] = [
