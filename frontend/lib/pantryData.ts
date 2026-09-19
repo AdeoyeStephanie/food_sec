@@ -82,26 +82,26 @@ export function getUrgencyIndicator(pantry: Pantry): UrgencyInfo {
 export const BALTIMORE_PANTRIES: Pantry[] = [
   {
     "id": "c1000000-0000-0000-0000-000000000001",
-    "name": "Northside Family Pantry [Demo Sandbox]",
-    "address": "1100 W 36th St, Baltimore, MD 21211",
+    "name": "Hampden Family Center",
+    "address": "1104 W 36th St, Baltimore, MD 21211",
     "neighborhood": "Hampden",
-    "lat": 39.331,
-    "lng": -76.6362,
+    "lat": 39.3312,
+    "lng": -76.6364,
     "distance_miles": 0.4,
     "walk_minutes": 8,
-    "hours_text": "Open Mon, Wed, Fri 5 to 8pm",
-    "open_today": false,
-    "open_tonight": true,
-    "open_hours_display": "Open Mon, Wed, Fri 5 to 8pm",
+    "hours_text": "Open Mon to Thu 9am to 4pm, Fri 9am to 3pm",
+    "open_today": true,
+    "open_tonight": false,
+    "open_hours_display": "Mon–Thu 9:00 AM – 4:00 PM, Fri 9:00 AM – 3:00 PM",
     "requires_id": false,
     "allows_walkins": true,
     "languages": [
       "English",
       "Spanish"
     ],
-    "notes": "Walk in, no appointment. Bring your own bags. You pick your own items, like a small store.",
+    "notes": "Emergency food assistance, fresh produce, and family support resources in partnership with the Maryland Food Bank. Walk-ins welcome.",
     "distribution_model": "client_choice",
-    "phone": "(410) 555-0105",
+    "phone": "(410) 467-8710",
     "shelf_items": [
       {
         "category_name": "Produce",
@@ -324,25 +324,25 @@ export const BALTIMORE_PANTRIES: Pantry[] = [
   },
   {
     "id": "c1000000-0000-0000-0000-000000000004",
-    "name": "Waverly Community Pantry",
-    "address": "3100 Greenmount Ave, Baltimore, MD 21218",
+    "name": "St. John's in the Village Food Pantry",
+    "address": "3009 Greenmount Ave, Baltimore, MD 21218",
     "neighborhood": "Waverly",
-    "lat": 39.327,
-    "lng": -76.6095,
+    "lat": 39.3255,
+    "lng": -76.6098,
     "distance_miles": 0.8,
     "walk_minutes": 15,
-    "hours_text": "Open Wed 2 to 6pm, Sat 9am to 12pm",
+    "hours_text": "Open Wednesday 10am to 12pm, Saturday 10am to 12pm",
     "open_today": true,
     "open_tonight": false,
-    "open_hours_display": "Open Wed 2 to 6pm, Sat 9am to 12pm",
+    "open_hours_display": "Open Wednesday 10am to 12pm, Saturday 10am to 12pm",
     "requires_id": false,
     "allows_walkins": true,
     "languages": [
       "English"
     ],
-    "notes": "Walk in, no appointment. Bring your own bags. Fresh produce and dry goods.",
+    "notes": "Walk in, no appointment. Fresh produce, dry goods, and community emergency groceries.",
     "distribution_model": "client_choice",
-    "phone": "(410) 555-0108",
+    "phone": "(410) 467-4793",
     "shelf_items": [
       {
         "category_name": "Produce",
@@ -504,7 +504,7 @@ export const BALTIMORE_PANTRIES: Pantry[] = [
     ],
     "notes": "Free fresh food distribution every Friday. Surplus produce rescued from local markets.",
     "distribution_model": "client_choice",
-    "phone": "(410) 555-0117",
+    "phone": "(410) 467-2792",
     "shelf_items": [
       {
         "category_name": "Produce",
@@ -1469,7 +1469,7 @@ export const BALTIMORE_PANTRIES: Pantry[] = [
     ],
     "notes": "Weekly fresh produce distribution and canned goods.",
     "distribution_model": "client_choice",
-    "phone": "(410) 555-0166",
+    "phone": "(410) 669-7000",
     "shelf_items": [
       {
         "category_name": "Produce",
@@ -3477,7 +3477,7 @@ export const BALTIMORE_PANTRIES: Pantry[] = [
     ],
     "notes": "Neighborhood grocery pantry for Northwest Baltimore. Bring sturdy bags.",
     "distribution_model": "client_choice",
-    "phone": "(410) 555-0145",
+    "phone": "(410) 466-2603",
     "shelf_items": [
       {
         "category_name": "Produce",

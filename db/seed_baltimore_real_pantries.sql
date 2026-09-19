@@ -11,19 +11,19 @@ TRUNCATE TABLE shelf_state, check_ins, pantry_categories, pantries CASCADE;
 -- Insert 28 Real Verified Baltimore City Food Pantries
 -- ============================================================
 
--- 1. Northside Family Pantry (Hampden - 21211)
+-- 1. Hampden Family Center (Hampden - 21211)
 INSERT INTO pantries (id, name, address, neighborhood, location, phone, distribution_model, hours, requires_id, allows_walkins, languages, notes)
 VALUES (
     'b1000000-0000-0000-0000-000000000001',
-    'Northside Family Pantry',
-    '1100 W 36th St, Baltimore, MD 21211',
+    'Hampden Family Center',
+    '1104 W 36th St, Baltimore, MD 21211',
     'Hampden',
-    ST_SetSRID(ST_MakePoint(-76.6362, 39.3310), 4326)::geography,
-    '(410) 555-0105',
+    ST_SetSRID(ST_MakePoint(-76.6364, 39.3312), 4326)::geography,
+    '(410) 467-8710',
     'client_choice',
-    '{"mon": {"open": "17:00", "close": "20:00"}, "wed": {"open": "17:00", "close": "20:00"}, "fri": {"open": "17:00", "close": "20:00"}}',
+    '{"mon": {"open": "09:00", "close": "16:00"}, "tue": {"open": "09:00", "close": "16:00"}, "wed": {"open": "09:00", "close": "16:00"}, "thu": {"open": "09:00", "close": "16:00"}, "fri": {"open": "09:00", "close": "15:00"}}',
     false, true, ARRAY['English', 'Spanish'],
-    'Walk in, no appointment. Bring your own bags. You pick your own items.'
+    'Community center offering emergency food assistance, fresh produce, and family support resources in partnership with the Maryland Food Bank. Walk-ins welcome.'
 );
 
 -- 2. Beans & Bread (Fells Point - 21231)
@@ -90,13 +90,13 @@ VALUES (
 INSERT INTO pantries (id, name, address, neighborhood, location, phone, distribution_model, hours, requires_id, allows_walkins, languages, notes)
 VALUES (
     'b1000000-0000-0000-0000-000000000006',
-    'Waverly Community Pantry',
-    '3100 Greenmount Ave, Baltimore, MD 21218',
+    'St. John''s in the Village Food Pantry',
+    '3009 Greenmount Ave, Baltimore, MD 21218',
     'Waverly',
-    ST_SetSRID(ST_MakePoint(-76.6095, 39.3270), 4326)::geography,
-    '(410) 555-0108',
+    ST_SetSRID(ST_MakePoint(-76.6098, 39.3255), 4326)::geography,
+    '(410) 467-4793',
     'client_choice',
-    '{"wed": {"open": "14:00", "close": "18:00"}, "sat": {"open": "09:00", "close": "12:00"}}',
+    '{"wed": {"open": "10:00", "close": "12:00"}, "sat": {"open": "10:00", "close": "12:00"}}',
     false, true, ARRAY['English'],
     'Walk in, no appointment. Fresh produce, dry goods, and dairy available.'
 );
@@ -109,7 +109,7 @@ VALUES (
     '3201 The Alameda, Baltimore, MD 21218',
     'Ednor Gardens',
     ST_SetSRID(ST_MakePoint(-76.5950, 39.3280), 4326)::geography,
-    '(410) 555-0117',
+    '(410) 467-2792',
     'client_choice',
     '{"fri": {"open": "11:30", "close": "13:00"}}',
     false, true, ARRAY['English', 'Spanish'],
@@ -184,7 +184,7 @@ VALUES (
     '2401 E North Ave, Baltimore, MD 21213',
     'Clifton Park',
     ST_SetSRID(ST_MakePoint(-76.5810, 39.3120), 4326)::geography,
-    '(410) 555-0122',
+    '(443) 800-0213',
     'client_choice',
     '{"mon": {"open": "09:00", "close": "12:00"}, "wed": {"open": "09:00", "close": "12:00"}, "fri": {"open": "09:00", "close": "12:00"}}',
     false, true, ARRAY['English'],
@@ -270,15 +270,15 @@ VALUES (
 INSERT INTO pantries (id, name, address, neighborhood, location, phone, distribution_model, hours, requires_id, allows_walkins, languages, notes)
 VALUES (
     'b1000000-0000-0000-0000-000000000018',
-    'Riverside Community Table',
-    '1234 E Fort Ave, Baltimore, MD 21230',
-    'Riverside',
-    ST_SetSRID(ST_MakePoint(-76.5960, 39.2720), 4326)::geography,
-    '(410) 555-0106',
-    'pre_packed',
-    '{"tue": {"open": "16:00", "close": "19:00"}, "thu": {"open": "16:00", "close": "19:00"}, "sat": {"open": "10:00", "close": "13:00"}}',
+    'Benedict''s Pantry (St. Benedict)',
+    '2612 Wilkens Ave, Baltimore, MD 21223',
+    'Mill Hill',
+    ST_SetSRID(ST_MakePoint(-76.6575, 39.2818), 4326)::geography,
+    '(410) 947-4988',
+    'client_choice',
+    '{"wed": {"open": "17:00", "close": "19:00"}, "sat": {"open": "09:30", "close": "11:30"}}',
     false, true, ARRAY['English', 'Spanish'],
-    'Pre-packed bags. Evening pickup available.'
+    'Maryland Food Bank partner providing client-choice grocery bags and community meals.'
 );
 
 -- 19. Lillies Place / Transformation Center (21225 - Brooklyn)
@@ -334,7 +334,7 @@ VALUES (
     '2810 Shirley Ave, Baltimore, MD 21215',
     'Park Heights',
     ST_SetSRID(ST_MakePoint(-76.6690, 39.3480), 4326)::geography,
-    '(410) 555-0145',
+    '(410) 466-2603',
     'client_choice',
     '{"mon": {"open": "10:00", "close": "13:00"}, "thu": {"open": "10:00", "close": "13:00"}}',
     false, true, ARRAY['English'],
@@ -394,7 +394,7 @@ VALUES (
     '610 Pennsylvania Ave, Baltimore, MD 21201',
     'Upton',
     ST_SetSRID(ST_MakePoint(-76.6250, 39.2965), 4326)::geography,
-    '(410) 555-0166',
+    '(410) 669-7000',
     'client_choice',
     '{"thu": {"open": "11:00", "close": "13:00"}}',
     false, true, ARRAY['English'],

@@ -157,20 +157,19 @@ VALUES (
     'Serving South Baltimore families with shelf-stable groceries, meat, and emergency supplies.'
 );
 
--- 10. Northside Family Pantry [Demo Sandbox] — Hampden
--- (Designated interactive sandbox pantry for evaluating evening distribution and volunteer check-in flows)
+-- 10. Hampden Family Center — Hampden (Real MFB Partner)
 INSERT INTO pantries (id, name, address, neighborhood, location, phone, distribution_model, hours, requires_id, allows_walkins, languages, notes)
 VALUES (
     'a1000000-0000-0000-0000-000000000010',
-    'Northside Family Pantry [Demo Sandbox]',
-    '1100 W 36th St, Baltimore, MD 21211',
+    'Hampden Family Center',
+    '1104 W 36th St, Baltimore, MD 21211',
     'Hampden',
-    ST_SetSRID(ST_MakePoint(-76.6362, 39.3310), 4326)::geography,
-    '(410) 555-0105',
+    ST_SetSRID(ST_MakePoint(-76.6364, 39.3312), 4326)::geography,
+    '(410) 467-8710',
     'client_choice',
-    '{"mon": {"open": "17:00", "close": "20:00"}, "wed": {"open": "17:00", "close": "20:00"}, "fri": {"open": "17:00", "close": "20:00"}}',
+    '{"mon": {"open": "09:00", "close": "16:00"}, "tue": {"open": "09:00", "close": "16:00"}, "wed": {"open": "09:00", "close": "16:00"}, "thu": {"open": "09:00", "close": "16:00"}, "fri": {"open": "09:00", "close": "15:00"}}',
     false, true, ARRAY['English', 'Spanish'],
-    'Interactive testing sandbox for evening walk-in hours (5-8pm) and volunteer kiosk simulation.'
+    'Community center offering emergency food assistance, fresh produce, and family support resources in partnership with the Maryland Food Bank. Walk-ins welcome.'
 );
 
 -- ============================================================
@@ -299,7 +298,7 @@ INSERT INTO shelf_state (time, pantry_id, category_id, band, estimated_qty, sour
     (now() - interval '2 hours', 'a1000000-0000-0000-0000-000000000009', 7, 'plenty', 45, 'volunteer_correction', 0.85),
     (now() - interval '2 hours', 'a1000000-0000-0000-0000-000000000009', 8, 'out',     0, 'volunteer_correction', 0.75);
 
--- Pantry 10: Northside Family Pantry [Demo Sandbox] (Hampden evening hours)
+-- Pantry 10: Hampden Family Center (Hampden community center)
 INSERT INTO shelf_state (time, pantry_id, category_id, band, estimated_qty, source, confidence) VALUES
     (now() - interval '46 minutes', 'a1000000-0000-0000-0000-000000000010', 1, 'plenty', 40, 'volunteer_correction', 0.95),
     (now() - interval '46 minutes', 'a1000000-0000-0000-0000-000000000010', 2, 'low',    14, 'volunteer_correction', 0.90),
@@ -311,7 +310,7 @@ INSERT INTO shelf_state (time, pantry_id, category_id, band, estimated_qty, sour
     (now() - interval '46 minutes', 'a1000000-0000-0000-0000-000000000010', 8, 'low',     9, 'volunteer_correction', 0.85);
 
 -- ============================================================
--- Seed check-in history for Northside [Demo Sandbox] (pantry 10)
+-- Seed check-in history for Hampden Family Center (pantry 10)
 -- to demo the predict-and-correct engine
 -- ============================================================
 INSERT INTO check_ins (time, pantry_id, household_size) VALUES

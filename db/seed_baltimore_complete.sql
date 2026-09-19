@@ -8,15 +8,15 @@ TRUNCATE TABLE shelf_state, check_ins, pantry_categories, pantries CASCADE;
 INSERT INTO pantries (id, name, address, neighborhood, location, phone, distribution_model, hours, requires_id, allows_walkins, languages, notes)
 VALUES (
     'c1000000-0000-0000-0000-000000000001',
-    'Northside Family Pantry',
-    '1100 W 36th St, Baltimore, MD 21211',
+    'Hampden Family Center',
+    '1104 W 36th St, Baltimore, MD 21211',
     'Hampden',
-    ST_SetSRID(ST_MakePoint(-76.6362, 39.331), 4326)::geography,
-    '(410) 555-0105',
+    ST_SetSRID(ST_MakePoint(-76.6364, 39.3312), 4326)::geography,
+    '(410) 467-8710',
     'client_choice',
-    '{"hours": "Open Mon, Wed, Fri 5 to 8pm"}',
-    false, true, ARRAY['English'],
-    'Walk in, no appointment. Bring your own bags. You pick your own items, like a small store.'
+    '{"hours": "Open Mon to Thu 9am to 4pm, Fri 9am to 3pm"}',
+    false, true, ARRAY['English', 'Spanish'],
+    'Community center offering emergency food assistance, fresh produce, and family support resources in partnership with the Maryland Food Bank. Walk-ins welcome.'
 );
 INSERT INTO pantries (id, name, address, neighborhood, location, phone, distribution_model, hours, requires_id, allows_walkins, languages, notes)
 VALUES (
@@ -47,15 +47,15 @@ VALUES (
 INSERT INTO pantries (id, name, address, neighborhood, location, phone, distribution_model, hours, requires_id, allows_walkins, languages, notes)
 VALUES (
     'c1000000-0000-0000-0000-000000000004',
-    'Waverly Community Pantry',
-    '3100 Greenmount Ave, Baltimore, MD 21218',
+    'St. John''s in the Village Food Pantry',
+    '3009 Greenmount Ave, Baltimore, MD 21218',
     'Waverly',
-    ST_SetSRID(ST_MakePoint(-76.6095, 39.327), 4326)::geography,
-    '(410) 555-0108',
+    ST_SetSRID(ST_MakePoint(-76.6098, 39.3255), 4326)::geography,
+    '(410) 467-4793',
     'client_choice',
-    '{"hours": "Open Wed 2 to 6pm, Sat 9am to 12pm"}',
+    '{"hours": "Open Wed 10am to 12pm, Sat 10am to 12pm"}',
     false, true, ARRAY['English'],
-    'Walk in, no appointment. Bring your own bags. Fresh produce and dry goods.'
+    'Walk in, no appointment. Fresh produce, dry goods, and community emergency groceries.'
 );
 INSERT INTO pantries (id, name, address, neighborhood, location, phone, distribution_model, hours, requires_id, allows_walkins, languages, notes)
 VALUES (
@@ -77,7 +77,7 @@ VALUES (
     '3201 The Alameda, Baltimore, MD 21218',
     'Ednor Gardens',
     ST_SetSRID(ST_MakePoint(-76.595, 39.328), 4326)::geography,
-    '(410) 555-0117',
+    '(410) 467-2792',
     'client_choice',
     '{"hours": "Open Friday 11:30am to 1pm"}',
     false, true, ARRAY['English'],
@@ -233,7 +233,7 @@ VALUES (
     '610 Pennsylvania Ave, Baltimore, MD 21201',
     'Upton',
     ST_SetSRID(ST_MakePoint(-76.625, 39.2965), 4326)::geography,
-    '(410) 555-0166',
+    '(410) 669-7000',
     'client_choice',
     '{"hours": "Open Thursday 11am to 1pm"}',
     false, true, ARRAY['English'],
@@ -437,15 +437,15 @@ VALUES (
 INSERT INTO pantries (id, name, address, neighborhood, location, phone, distribution_model, hours, requires_id, allows_walkins, languages, notes)
 VALUES (
     'c1000000-0000-0000-0000-000000000034',
-    'Riverside Community Table',
-    '1234 E Fort Ave, Baltimore, MD 21230',
-    'Riverside',
-    ST_SetSRID(ST_MakePoint(-76.596, 39.272), 4326)::geography,
-    '(410) 555-0106',
-    'pre_packed',
-    '{"hours": "Open Tue & Thu 4 to 7pm, Sat 10am-1pm"}',
-    false, true, ARRAY['English'],
-    'Pre-packed boxes with evening pickup available.'
+    'Benedict''s Pantry (St. Benedict)',
+    '2612 Wilkens Ave, Baltimore, MD 21223',
+    'Mill Hill',
+    ST_SetSRID(ST_MakePoint(-76.6575, 39.2818), 4326)::geography,
+    '(410) 947-4988',
+    'client_choice',
+    '{"hours": "Open Wednesday 5 to 7pm, Saturday 9:30 to 11:30am"}',
+    false, true, ARRAY['English', 'Spanish'],
+    'Maryland Food Bank partner providing client-choice grocery bags and community meals.'
 );
 INSERT INTO pantries (id, name, address, neighborhood, location, phone, distribution_model, hours, requires_id, allows_walkins, languages, notes)
 VALUES (
@@ -558,7 +558,7 @@ VALUES (
     '2810 Shirley Ave, Baltimore, MD 21215',
     'Park Heights',
     ST_SetSRID(ST_MakePoint(-76.669, 39.348), 4326)::geography,
-    '(410) 555-0145',
+    '(410) 466-2603',
     'client_choice',
     '{"hours": "Open Mon & Thu 10am to 1pm"}',
     false, true, ARRAY['English'],

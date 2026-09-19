@@ -591,7 +591,7 @@ export default function VolunteerDashboard({
             <span className="text-xs text-slate-500 font-medium">Verified Operator Session</span>
           </div>
           <h2 className="text-xl font-bold text-emerald-950 mt-0.5">
-            {currentPantry?.name || 'Northside Family Pantry'}
+            {currentPantry?.name || 'Hampden Family Center'}
           </h2>
           {currentPantry?.neighborhood && (
             <span className="text-xs text-slate-400 font-medium">{currentPantry.neighborhood}, Baltimore</span>

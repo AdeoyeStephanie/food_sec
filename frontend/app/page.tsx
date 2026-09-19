@@ -132,7 +132,7 @@ export default function Home() {
     const targetId = authenticatedPantry?.id;
     setPantriesList((prev) => {
       const nextList = prev.map((p) => {
-        if ((targetId && p.id === targetId) || (!targetId && p.name.includes('Northside'))) {
+        if ((targetId && p.id === targetId) || (!targetId && (p.name.includes('Hampden Family Center') || p.id === 'c1000000-0000-0000-0000-000000000001'))) {
           const updatedItems = (p.shelf_items || []).map((it) =>
             it.category_name.toLowerCase() === category.toLowerCase()
               ? { ...it, band, minutes_ago: 1 }
@@ -381,7 +381,7 @@ export default function Home() {
       return (
         <span>
           Found pantries open near Hampden.{' '}
-          <strong className="text-emerald-950">Northside Family Pantry [Demo Sandbox]</strong> has both diapers and halal items in stock.
+          <strong className="text-emerald-950">Hampden Family Center</strong> provides emergency food assistance, fresh produce, and family supplies.
         </span>
       );
     }
