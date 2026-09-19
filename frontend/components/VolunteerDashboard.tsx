@@ -418,7 +418,7 @@ export default function VolunteerDashboard({
       setLastCheckinToast('✓ Manager mode unlocked. Compliance reports & settings accessible.');
       setTimeout(() => setLastCheckinToast(null), 3000);
     } else {
-      setManagerPinError('Invalid Manager PIN. (Demo Manager PIN: 9999)');
+      setManagerPinError('Invalid Manager PIN.');
     }
   };
 
@@ -551,7 +551,7 @@ export default function VolunteerDashboard({
                 setShowManagerPinModal(true);
               }}
               className="flex items-center gap-1.5 text-xs text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer"
-              title="Unlock manager settings and TEFAP reports (PIN: 9999)"
+              title="Unlock manager settings and TEFAP reports"
             >
               <Lock className="w-3.5 h-3.5 text-slate-500" />
               <span>Manager</span>
@@ -1269,10 +1269,6 @@ export default function VolunteerDashboard({
                   Unlock
                 </button>
               </div>
-
-              <p className="text-[11px] text-slate-400 text-center mt-1">
-                Demo Manager PIN: <strong className="text-slate-600">9999</strong>
-              </p>
             </form>
           </div>
         </div>
