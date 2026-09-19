@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
 
     const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
 
-    // Preset Fallbacks for rapid demoing without breaking
+    // Preset Fallbacks for rapid demoing
     const PRESET_RESULTS: Record<string, ScannedItem[]> = {
       canned_box: [
         { name: 'Canned green beans & corn', category: 'Produce', count: 4 },
@@ -37,14 +37,11 @@ export async function POST(req: NextRequest) {
 
     if (file && apiKey) {
       try {
-        const { GoogleGenAI } = await import('@google/genai');
-        const ai = new GoogleGenAI({ apiKey });
-
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
         const base64Data = buffer.toString('base64');
 
-        const prompt = `You are an AI assistant for a Baltimore community food pantry helping volunteers quickly catalog food donations.
+        const promptText = `You are an AI assistant for a Baltimore community food pantry helping volunteers quickly catalog food donations.
 Examine this image of donated food or supplies.
 Group what you see into standard food pantry categories:
 - Produce
@@ -56,53 +53,68 @@ Group what you see into standard food pantry categories:
 - Hygiene
 - Halal items
 
-Estimate the quantity or count of each specific item.
+Estimate the count of each specific item.
 Respond ONLY with a valid JSON array of objects with the exact schema:
 [
   { "name": "Canned vegetables", "category": "Produce", "count": 2 },
   { "name": "Cereal box", "category": "Grains", "count": 1 }
 ]
-Do not include markdown backticks or any conversational text.`;
+Do not include markdown backticks or extra text.`;
 
-        const response = await ai.models.generateContent({
-          model: 'gemini-2.5-flash',
-          contents: [
-            {
-              role: 'user',
-              parts: [
-                { text: prompt },
-                {
-                  inlineData: {
-                    mimeType: file.type || 'image/jpeg',
-                    data: base64Data
+        // Direct Google Generative Language REST call with gemini-3.6-flash
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
+
+        const geminiRes = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  { text: promptText },
+                  {
+                    inlineData: {
+                      mimeType: file.type || 'image/jpeg',
+                      data: base64Data
+                    }
                   }
-                }
-              ]
+                ]
+              }
+            ],
+            generationConfig: {
+              temperature: 0.1,
+              responseMimeType: 'application/json'
             }
-          ]
+          })
         });
 
-        const rawText = response.text?.trim() || '[]';
-        const cleanedJson = rawText.replace(/^```json/i, '').replace(/^```/, '').replace(/```$/, '').trim();
-        const items: ScannedItem[] = JSON.parse(cleanedJson);
+        if (geminiRes.ok) {
+          const geminiData = await geminiRes.json();
+          const rawText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '[]';
+          const cleanedJson = rawText.replace(/^```json/i, '').replace(/^```/, '').replace(/```$/, '').trim();
+          const items: ScannedItem[] = JSON.parse(cleanedJson);
 
-        return NextResponse.json({
-          success: true,
-          source: 'gemini-2.5-flash',
-          items,
-          privacyGuarantee: 'Photo processed in-memory and discarded. No image data was persisted.'
-        });
+          return NextResponse.json({
+            success: true,
+            source: 'gemini-3.6-flash-live',
+            items,
+            privacyGuarantee: 'Photo processed in-memory and discarded. No image data was persisted.'
+          });
+        } else {
+          const errorDetails = await geminiRes.text();
+          console.warn('Gemini API returned error status:', errorDetails);
+        }
       } catch (geminiError: any) {
-        console.warn('Gemini API call warning, using fallback:', geminiError.message);
+        console.warn('Gemini processing exception:', geminiError.message);
       }
     }
 
-    // Default demo items if no key or error occurred
+    // Default demo items if no file or fallback
     const selectedPreset = preset && PRESET_RESULTS[preset] ? PRESET_RESULTS[preset] : PRESET_RESULTS['canned_box'];
 
     return NextResponse.json({
       success: true,
-      source: apiKey ? 'gemini-ai' : 'demo-simulation',
+      source: apiKey ? 'gemini-preset' : 'demo-simulation',
       items: selectedPreset,
       privacyGuarantee: 'Photo processed in-memory and discarded. No image data was persisted.'
     });

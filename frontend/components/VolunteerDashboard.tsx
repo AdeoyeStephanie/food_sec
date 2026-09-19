@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { Users, Camera, CheckSquare, Mic, Plus, Minus, Check, ShieldCheck, Upload, Sparkles, Loader2, Image as ImageIcon } from 'lucide-react';
+import { Users, Camera, CheckSquare, Mic, Plus, Minus, Check, ShieldCheck, Upload, Sparkles, Loader2, Image as ImageIcon, Video } from 'lucide-react';
+import CameraViewfinder from '@/components/CameraViewfinder';
 
 interface VolunteerDashboardProps {
   onExit?: () => void;
@@ -18,6 +19,7 @@ export default function VolunteerDashboard({ onExit, onUpdateInventory }: Volunt
 
   // Donations state
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showLiveCamera, setShowLiveCamera] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [scannedImagePreview, setScannedImagePreview] = useState<string | null>(null);
   const [donationCounts, setDonationCounts] = useState<{ [key: string]: { count: number; category: string } }>({
@@ -222,57 +224,74 @@ export default function VolunteerDashboard({ onExit, onUpdateInventory }: Volunt
               }}
             />
 
-            {/* Photo intake card with interactive Upload or Sample presets */}
-            <div className="bg-slate-900 text-white rounded-3xl p-5 flex flex-col items-center justify-center relative overflow-hidden min-h-[170px] border border-slate-700">
-              {isScanning ? (
-                <div className="flex flex-col items-center gap-2 py-4">
-                  <Loader2 className="w-8 h-8 text-emerald-400 animate-spin" />
-                  <span className="text-xs text-emerald-200 font-semibold animate-pulse">
-                    Gemini 2.5 Flash analyzing groceries...
-                  </span>
-                </div>
-              ) : (
-                <>
-                  {scannedImagePreview ? (
-                    <img
-                      src={scannedImagePreview}
-                      alt="Donation preview"
-                      className="max-h-32 object-contain rounded-xl mb-2"
-                    />
-                  ) : (
-                    <div className="flex gap-3 items-end mb-3">
-                      <div className="bg-emerald-800/90 px-3 py-2 rounded-xl text-center border border-emerald-500/40">
-                        <span className="text-[11px] text-emerald-200 block font-medium">Produce</span>
-                        <span className="text-base font-bold">×4</span>
+            {/* Live Camera Viewfinder or Photo Intake Card */}
+            {showLiveCamera ? (
+              <CameraViewfinder
+                onCapture={(file) => {
+                  setShowLiveCamera(false);
+                  handleScanDonation(file);
+                }}
+                onClose={() => setShowLiveCamera(false)}
+              />
+            ) : (
+              <div className="bg-slate-900 text-white rounded-3xl p-5 flex flex-col items-center justify-center relative overflow-hidden min-h-[170px] border border-slate-700">
+                {isScanning ? (
+                  <div className="flex flex-col items-center gap-2 py-4">
+                    <Loader2 className="w-8 h-8 text-emerald-400 animate-spin" />
+                    <span className="text-xs text-emerald-200 font-semibold animate-pulse">
+                      Gemini 3.6 Flash analyzing groceries...
+                    </span>
+                  </div>
+                ) : (
+                  <>
+                    {scannedImagePreview ? (
+                      <img
+                        src={scannedImagePreview}
+                        alt="Donation preview"
+                        className="max-h-32 object-contain rounded-xl mb-2"
+                      />
+                    ) : (
+                      <div className="flex gap-3 items-end mb-3">
+                        <div className="bg-emerald-800/90 px-3 py-2 rounded-xl text-center border border-emerald-500/40">
+                          <span className="text-[11px] text-emerald-200 block font-medium">Produce</span>
+                          <span className="text-base font-bold">×4</span>
+                        </div>
+                        <div className="bg-amber-800/90 px-3 py-2.5 rounded-xl text-center border border-amber-500/40">
+                          <span className="text-[11px] text-amber-200 block font-medium">Grains</span>
+                          <span className="text-lg font-bold">×2</span>
+                        </div>
+                        <div className="bg-rose-800/90 px-3 py-2 rounded-xl text-center border border-rose-500/40">
+                          <span className="text-[11px] text-rose-200 block font-medium">Protein</span>
+                          <span className="text-base font-bold">×3</span>
+                        </div>
                       </div>
-                      <div className="bg-amber-800/90 px-3 py-2.5 rounded-xl text-center border border-amber-500/40">
-                        <span className="text-[11px] text-amber-200 block font-medium">Grains</span>
-                        <span className="text-lg font-bold">×2</span>
-                      </div>
-                      <div className="bg-rose-800/90 px-3 py-2 rounded-xl text-center border border-rose-500/40">
-                        <span className="text-[11px] text-rose-200 block font-medium">Protein</span>
-                        <span className="text-base font-bold">×3</span>
-                      </div>
+                    )}
+
+                    <div className="flex flex-wrap justify-center gap-2 mb-2">
+                      <button
+                        onClick={() => setShowLiveCamera(true)}
+                        className="bg-[#10b981] hover:bg-[#059669] text-slate-950 text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-1.5 transition active:scale-95 shadow-md"
+                      >
+                        <Camera className="w-4 h-4 text-slate-950" />
+                        Open Live Camera
+                      </button>
+                      <button
+                        onClick={() => fileInputRef.current?.click()}
+                        className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 text-xs font-semibold px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 transition active:scale-95"
+                      >
+                        <Upload className="w-3.5 h-3.5" />
+                        Upload File
+                      </button>
                     </div>
-                  )}
 
-                  <div className="flex gap-2 mb-2">
-                    <button
-                      onClick={() => fileInputRef.current?.click()}
-                      className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition active:scale-95 shadow-sm"
-                    >
-                      <Camera className="w-3.5 h-3.5" />
-                      Take Photo / Upload
-                    </button>
-                  </div>
-
-                  <div className="bg-black/70 backdrop-blur-md px-3 py-1 rounded-full text-[11px] text-slate-300 flex items-center gap-1.5 mt-1">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                    Photo is deleted immediately after sorting
-                  </div>
-                </>
-              )}
-            </div>
+                    <div className="bg-black/70 backdrop-blur-md px-3 py-1 rounded-full text-[11px] text-slate-300 flex items-center gap-1.5 mt-1">
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                      Photo is deleted immediately after sorting
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
 
             {/* Quick Presets for Instant Demo */}
             <div className="flex flex-col gap-1.5">
