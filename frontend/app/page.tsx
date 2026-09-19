@@ -124,23 +124,45 @@ export default function Home() {
         const categoryMatch = p.shelf_items?.some((item) => 
           item.category_name.toLowerCase().includes(q)
         );
+        const zipMatch = p.address.includes(q) || (q.match(/\b\d{5}\b/) && p.address.includes(q.match(/\b\d{5}\b/)![0]));
         const toniteMatch = (q.includes('tonight') || q.includes('tonite') || q.includes('open')) && p.open_tonight;
         const noIdMatch = (q.includes('no id') || q.includes('without id')) && !p.requires_id;
 
-        return nameMatch || neighborhoodMatch || addressMatch || notesMatch || categoryMatch || toniteMatch || noIdMatch;
+        return nameMatch || neighborhoodMatch || addressMatch || zipMatch || notesMatch || categoryMatch || toniteMatch || noIdMatch;
       });
     }
 
-    return list.length > 0 ? list : pantriesList.slice(0, 10);
+    return list;
   }, [query, activeFilter, pantriesList]);
 
   // Conversational response synthesis
   const conversationalSummary = useMemo(() => {
-    const q = query.toLowerCase();
+    const q = query.toLowerCase().trim();
+    if (!q) {
+      return (
+        <span>
+          Showing verified pantries across Baltimore with live stock estimates.
+        </span>
+      );
+    }
+    if (filteredPantries.length === 0) {
+      return (
+        <span>
+          No direct pantries located matching &ldquo;<strong>{query}</strong>&rdquo;. Try searching by nearby neighborhoods like <em>Hampden</em>, <em>Old Goucher</em>, <em>Downtown</em>, or zip codes like <em>21211</em>, <em>21218</em>, <em>21220</em>.
+        </span>
+      );
+    }
+    if (q.includes('21220') || q.includes('middle river')) {
+      return (
+        <span>
+          Found <strong className="text-emerald-950">{filteredPantries.length} emergency food sites serving zip code 21220</strong> (Middle River / Eastern Baltimore).
+        </span>
+      );
+    }
     if (q.includes('hampden') || q.includes('diaper') || q.includes('halal')) {
       return (
         <span>
-          Two pantries near Hampden are open after 6 tonight.{' '}
+          Found pantries open near Hampden.{' '}
           <strong className="text-emerald-950">Northside Family Pantry</strong> has both diapers and halal items in stock.
         </span>
       );
@@ -148,23 +170,23 @@ export default function Home() {
     if (q.includes('produce')) {
       return (
         <span>
-          Found <strong className="text-emerald-950">3 pantries with Plenty of fresh produce</strong> on shelves right now in Baltimore.
+          Found <strong className="text-emerald-950">{filteredPantries.length} pantries with fresh produce</strong> on shelves right now in Baltimore.
         </span>
       );
     }
     if (q.includes('tonight')) {
       return (
         <span>
-          Found <strong className="text-emerald-950">2 pantries open tonight</strong> with walk-in availability.
+          Found <strong className="text-emerald-950">{filteredPantries.length} pantries open tonight</strong> with walk-in availability.
         </span>
       );
     }
     return (
       <span>
-        Showing verified pantries near Baltimore with real-time stock estimates.
+        Found <strong className="text-emerald-950">{filteredPantries.length} verified locations</strong> matching your search in Baltimore.
       </span>
     );
-  }, [query]);
+  }, [query, filteredPantries]);
 
   if (isVolunteerMode) {
     return (
@@ -451,6 +473,29 @@ export default function Home() {
                     </div>
                   );
                 })}
+
+                {filteredPantries.length === 0 && (
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center flex flex-col items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 font-bold">
+                      📍
+                    </div>
+                    <div>
+                      <p className="font-bold text-sm text-slate-800">No pantries found in this exact search</p>
+                      <p className="text-xs text-slate-500 mt-1 max-w-xs">
+                        Try clearing filters, searching by neighborhood (e.g. Hampden, Old Goucher, Essex), or exploring all 52 Baltimore pantries.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setQuery('');
+                        setActiveFilter(null);
+                      }}
+                      className="text-xs font-bold text-emerald-900 bg-emerald-100 hover:bg-emerald-200 px-4 py-2 rounded-xl transition cursor-pointer"
+                    >
+                      Show All 52 Pantries
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

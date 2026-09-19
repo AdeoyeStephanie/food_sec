@@ -4047,4 +4047,137 @@ export const BALTIMORE_PANTRIES: Pantry[] = [
       }
     ]
   }
+  {
+    "id": "c1000000-0000-0000-0000-000000000051",
+    "name": "Middle River Emergency Food Pantry (Hope Center)",
+    "address": "214 Stemmers Run Rd, Middle River, MD 21220",
+    "neighborhood": "Middle River",
+    "lat": 39.3298,
+    "lng": -76.4421,
+    "distance_miles": 1.2,
+    "walk_minutes": 24,
+    "hours_text": "Open Tuesday & Thursday 10am to 1pm",
+    "open_today": true,
+    "open_tonight": false,
+    "open_hours_display": "Open Tuesday & Thursday 10am to 1pm",
+    "requires_id": false,
+    "allows_walkins": true,
+    "languages": [
+      "English",
+      "Spanish"
+    ],
+    "notes": "Emergency groceries, canned proteins, bakery items, and seasonal fresh produce for Eastern Baltimore / 21220 neighbors.",
+    "distribution_model": "client_choice",
+    "phone": "(410) 686-4673",
+    "shelf_items": [
+      {
+        "category_name": "Produce",
+        "category_emoji": "🥕",
+        "band": "plenty",
+        "minutes_ago": 15,
+        "confidence": 0.88
+      },
+      {
+        "category_name": "Protein",
+        "category_emoji": "🥩",
+        "band": "plenty",
+        "minutes_ago": 15,
+        "confidence": 0.88
+      },
+      {
+        "category_name": "Dairy",
+        "category_emoji": "🥛",
+        "band": "low",
+        "minutes_ago": 15,
+        "confidence": 0.88
+      },
+      {
+        "category_name": "Grains",
+        "category_emoji": "🍞",
+        "band": "plenty",
+        "minutes_ago": 15,
+        "confidence": 0.88
+      },
+      {
+        "category_name": "Canned Goods",
+        "category_emoji": "🥫",
+        "band": "plenty",
+        "minutes_ago": 15,
+        "confidence": 0.88
+      },
+      {
+        "category_name": "Diapers",
+        "category_emoji": "👶",
+        "band": "low",
+        "minutes_ago": 15,
+        "confidence": 0.88
+      },
+      {
+        "category_name": "Hygiene",
+        "category_emoji": "🧼",
+        "band": "low",
+        "minutes_ago": 15,
+        "confidence": 0.88
+      }
+    ]
+  },
+  {
+    "id": "c1000000-0000-0000-0000-000000000052",
+    "name": "Eastern Regional Food Center (Essex / Middle River)",
+    "address": "1517 Eastern Ave, Essex, MD 21221",
+    "neighborhood": "Essex / Middle River",
+    "lat": 39.3112,
+    "lng": -76.4678,
+    "distance_miles": 1.8,
+    "walk_minutes": 35,
+    "hours_text": "Open Wednesday & Saturday 9am to 12pm",
+    "open_today": true,
+    "open_tonight": false,
+    "open_hours_display": "Open Wednesday & Saturday 9am to 12pm",
+    "requires_id": false,
+    "allows_walkins": true,
+    "languages": [
+      "English"
+    ],
+    "notes": "Walk-ins welcome, serves 21220 and 21221 zip codes. Pre-packed family grocery boxes and bakery.",
+    "distribution_model": "pre_packed",
+    "phone": "(410) 682-6228",
+    "shelf_items": [
+      {
+        "category_name": "Produce",
+        "category_emoji": "🥕",
+        "band": "low",
+        "minutes_ago": 30,
+        "confidence": 0.85
+      },
+      {
+        "category_name": "Protein",
+        "category_emoji": "🥩",
+        "band": "plenty",
+        "minutes_ago": 30,
+        "confidence": 0.85
+      },
+      {
+        "category_name": "Dairy",
+        "category_emoji": "🥛",
+        "band": "low",
+        "minutes_ago": 30,
+        "confidence": 0.85
+      },
+      {
+        "category_name": "Grains",
+        "category_emoji": "🍞",
+        "band": "plenty",
+        "minutes_ago": 30,
+        "confidence": 0.85
+      },
+      {
+        "category_name": "Canned Goods",
+        "category_emoji": "🥫",
+        "band": "plenty",
+        "minutes_ago": 30,
+        "confidence": 0.85
+      }
+    ]
+  },
 ];

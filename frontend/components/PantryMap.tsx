@@ -31,23 +31,22 @@ export default function PantryMap({ pantries, selectedPantry, onSelectPantry }: 
 
         const map = L.map(mapContainerRef.current, {
           center: [initialLat, initialLng],
-          zoom: 13,
+          zoom: 12,
           zoomControl: false,
         });
 
-        // Clean light/soft tile layer
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-          attribution: '&copy; OpenStreetMap contributors, CartoDB',
+        // 100% Free OpenStreetMap standard tile layer (Requires NO API key or token whatsoever)
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
           maxZoom: 19,
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         }).addTo(map);
 
         L.control.zoom({ position: 'bottomright' }).addTo(map);
         mapInstanceRef.current = map;
 
-        // Invalidate size shortly after render to guarantee full tile display
         setTimeout(() => {
           map.invalidateSize();
-        }, 200);
+        }, 150);
       }
 
       const map = mapInstanceRef.current;
@@ -74,7 +73,7 @@ export default function PantryMap({ pantries, selectedPantry, onSelectPantry }: 
             background: white;
             padding: 4px 8px;
             border-radius: 9999px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.22);
             border: 2px solid ${isSelected ? '#064e3b' : '#ffffff'};
             transform: ${isSelected ? 'scale(1.18)' : 'scale(1)'};
             transition: transform 0.2s ease;
@@ -82,15 +81,15 @@ export default function PantryMap({ pantries, selectedPantry, onSelectPantry }: 
             gap: 5px;
           ">
             <span style="
-              font-weight: 700;
+              font-weight: 800;
               font-size: 12px;
-              color: #1f2937;
+              color: #064e3b;
               line-height: 1;
             ">${idx + 1}</span>
-            <div style="display: flex; gap: 2px; align-items: flex-end; height: 12px;">
+            <div style="display: flex; gap: 2.5px; align-items: flex-end; height: 12px;">
               ${barColors.map((color, i) => `
                 <div style="
-                  width: 3px;
+                  width: 3.5px;
                   height: ${i === 0 ? '12px' : i === 1 ? '9px' : '6px'};
                   background-color: ${color};
                   border-radius: 1px;
@@ -103,8 +102,8 @@ export default function PantryMap({ pantries, selectedPantry, onSelectPantry }: 
         const customIcon = L.divIcon({
           html: iconHtml,
           className: 'custom-pantry-pin',
-          iconSize: [44, 28],
-          iconAnchor: [22, 14],
+          iconSize: [46, 28],
+          iconAnchor: [23, 14],
         });
 
         const marker = L.marker([pantry.lat, pantry.lng], { icon: customIcon }).addTo(map);
