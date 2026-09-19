@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Pantry, getUrgencyIndicator } from '@/lib/pantryData';
 import { Language, TRANSLATIONS } from '@/lib/translations';
-import { Navigation, Phone, CheckCircle2, ShoppingBag, Clock, Languages, ShieldCheck, ThumbsUp, ThumbsDown, X, Bus, Accessibility, Sparkles, Share2, Check } from 'lucide-react';
+import { Navigation, Phone, CheckCircle2, ShoppingBag, Clock, Languages, ShieldCheck, ThumbsUp, ThumbsDown, X, Bus, Accessibility, Sparkles } from 'lucide-react';
 
 interface PantryDetailSheetProps {
   pantry: Pantry;
@@ -13,28 +13,8 @@ interface PantryDetailSheetProps {
 
 export default function PantryDetailSheet({ pantry, language = 'en', onClose }: PantryDetailSheetProps) {
   const [feedbackSent, setFeedbackSent] = useState<string | null>(null);
-  const [copiedShare, setCopiedShare] = useState(false);
   const t = TRANSLATIONS[language] || TRANSLATIONS.en;
   const urgency = getUrgencyIndicator(pantry);
-
-  const handleShare = async () => {
-    const shareText = `${pantry.name}\n📍 ${pantry.address}\n⏰ ${pantry.hours_text}\n📞 ${pantry.phone}`;
-    if (typeof navigator !== 'undefined' && navigator.share) {
-      try {
-        await navigator.share({
-          title: pantry.name,
-          text: shareText,
-          url: window.location.href,
-        });
-      } catch {
-        // User cancelled share
-      }
-    } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      await navigator.clipboard.writeText(shareText);
-      setCopiedShare(true);
-      setTimeout(() => setCopiedShare(false), 2200);
-    }
-  };
 
   const getBandStyles = (band: 'plenty' | 'low' | 'out') => {
     switch (band) {
@@ -95,40 +75,24 @@ export default function PantryDetailSheet({ pantry, language = 'en', onClose }: 
         )}
       </div>
 
-      {/* Action Buttons: Directions, Phone, Share */}
-      <div className="grid grid-cols-3 gap-2">
+      {/* Action Buttons: Directions & Phone */}
+      <div className="grid grid-cols-2 gap-3">
         <a
           href={`https://www.google.com/maps/dir/?api=1&destination=${pantry.lat},${pantry.lng}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-[#064e3b] hover:bg-[#043d2e] active:scale-[0.98] text-white font-bold text-xs md:text-sm py-2.5 px-3 rounded-2xl flex items-center justify-center gap-1.5 shadow-sm transition"
+          className="bg-[#064e3b] hover:bg-[#043d2e] active:scale-[0.98] text-white font-bold text-sm py-3 px-4 rounded-2xl flex items-center justify-center gap-2 shadow-sm transition"
         >
           <Navigation className="w-4 h-4 shrink-0" />
           <span>{t.directions}</span>
         </a>
         <a
           href={`tel:${pantry.phone}`}
-          className="bg-white hover:bg-slate-50 active:scale-[0.98] border border-slate-300 text-slate-800 font-bold text-xs md:text-sm py-2.5 px-3 rounded-2xl flex items-center justify-center gap-1.5 shadow-xs transition"
+          className="bg-white hover:bg-slate-50 active:scale-[0.98] border border-slate-300 text-slate-800 font-bold text-sm py-3 px-4 rounded-2xl flex items-center justify-center gap-2 shadow-xs transition"
         >
           <Phone className="w-4 h-4 text-emerald-700 shrink-0" />
           <span>{t.callPantry}</span>
         </a>
-        <button
-          onClick={handleShare}
-          className="bg-white hover:bg-slate-50 active:scale-[0.98] border border-slate-300 text-slate-800 font-bold text-xs md:text-sm py-2.5 px-3 rounded-2xl flex items-center justify-center gap-1.5 shadow-xs transition cursor-pointer"
-        >
-          {copiedShare ? (
-            <>
-              <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span className="text-emerald-700">Copied!</span>
-            </>
-          ) : (
-            <>
-              <Share2 className="w-4 h-4 text-emerald-700 shrink-0" />
-              <span>Share</span>
-            </>
-          )}
-        </button>
       </div>
 
       {/* Category Stock Level Section matching Page 2 Detail Sheet */}
