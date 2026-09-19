@@ -126,6 +126,10 @@ export default function PantryMap({ pantries, selectedPantry, onSelectPantry }: 
 
     return () => {
       isCancelled = true;
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
     };
   }, [pantries, onSelectPantry]);
 
@@ -138,8 +142,11 @@ export default function PantryMap({ pantries, selectedPantry, onSelectPantry }: 
   }, [selectedPantry]);
 
   return (
-    <div className="relative w-full h-full min-h-[350px] rounded-2xl overflow-hidden border border-emerald-900/10 shadow-inner">
-      <div ref={mapContainerRef} className="w-full h-full absolute inset-0" />
+    <div 
+      className="relative w-full h-full min-h-[350px] rounded-2xl overflow-hidden border border-emerald-900/10 shadow-inner z-0"
+      style={{ isolation: 'isolate' }}
+    >
+      <div ref={mapContainerRef} className="w-full h-full absolute inset-0 z-0" />
     </div>
   );
 }

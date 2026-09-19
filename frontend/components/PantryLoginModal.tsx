@@ -109,7 +109,7 @@ export default function PantryLoginModal({ isOpen, pantries, onClose, onSuccess,
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 animate-in fade-in duration-200">
       <div 
         className="bg-white rounded-3xl max-w-lg w-full p-6 md:p-8 shadow-2xl border border-emerald-950/15 flex flex-col gap-5 relative max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}

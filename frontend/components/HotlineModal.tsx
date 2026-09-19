@@ -57,7 +57,7 @@ export default function HotlineModal({ isOpen, language, onClose, onSelectPantry
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 animate-in fade-in duration-200">
       <div 
         className="bg-slate-900 text-white rounded-3xl max-w-md w-full p-6 md:p-8 shadow-2xl border border-slate-700 flex flex-col gap-6 relative"
         onClick={(e) => e.stopPropagation()}

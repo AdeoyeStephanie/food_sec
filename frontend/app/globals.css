@@ -24,3 +24,23 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Ensure Leaflet stays strictly inside its own container and never bleeds over modals or dashboards */
+.leaflet-container {
+  isolation: isolate !important;
+  z-index: 1 !important;
+}
+
+.leaflet-pane {
+  z-index: 2 !important;
+}
+
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 3 !important;
+}
+
+.leaflet-control {
+  z-index: 3 !important;
+}
+
