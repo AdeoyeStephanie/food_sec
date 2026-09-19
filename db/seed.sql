@@ -14,7 +14,8 @@ INSERT INTO food_categories (name, emoji, is_default) VALUES
     ('Diapers',     '🧒', true),
     ('Hygiene',     '🧴', true),
     ('Canned Goods','🥫', true),
-    ('Halal Items', '🌙', true);
+    ('Halal Items', '🌙', true),
+    ('Baby Essentials', '🍼', true);
 
 -- ============================================================
 -- 10 Baltimore pantries with real names and coordinates
