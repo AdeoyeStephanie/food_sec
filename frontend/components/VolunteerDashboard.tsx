@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { BALTIMORE_PANTRIES, Pantry, ShelfItem } from '@/lib/pantryData';
 import CameraViewfinder from '@/components/CameraViewfinder';
+import BrandLogo from '@/components/BrandLogo';
 import {
   calculateDepletedInventory,
   recordCheckIn,
@@ -495,8 +496,8 @@ export default function VolunteerDashboard({
         {/* Kiosk Top Bar */}
         <div className="flex justify-between items-center border-b border-emerald-800/80 pb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-white text-[#064e3b] font-black text-xl flex items-center justify-center shadow-md">
-              B
+            <div className="w-10 h-10 rounded-2xl bg-white p-1 flex items-center justify-center shadow-md">
+              <BrandLogo variant="pulse-pin" size={30} showText={false} />
             </div>
             <div>
               <h1 className="text-xl md:text-2xl font-black tracking-tight">{currentPantry.name}</h1>

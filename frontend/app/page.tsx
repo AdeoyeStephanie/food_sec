@@ -7,6 +7,7 @@ import PantryDetailSheet from '@/components/PantryDetailSheet';
 import VolunteerDashboard from '@/components/VolunteerDashboard';
 import PantryLoginModal from '@/components/PantryLoginModal';
 import HotlineModal from '@/components/HotlineModal';
+import BrandLogo from '@/components/BrandLogo';
 import { Language, TRANSLATIONS } from '@/lib/translations';
 import { getStoredPantries, saveAndBroadcastPantries } from '@/lib/inventorySync';
 import { fetchPantries } from '@/lib/api';
@@ -428,11 +429,9 @@ export default function Home() {
             setQuery('');
             setSelectedPantry(null);
           }}
-          className="cursor-pointer flex items-center gap-2"
+          className="cursor-pointer flex items-center gap-2.5 select-none"
         >
-          <div className="w-8 h-8 rounded-xl bg-[#064e3b] text-white flex items-center justify-center font-bold text-base shadow-sm">
-            B
-          </div>
+          <BrandLogo variant="pulse-pin" size={32} showText={false} />
           <div>
             <h1 className="font-extrabold text-base md:text-lg tracking-tight text-emerald-950 leading-none">
               {t.appName}
