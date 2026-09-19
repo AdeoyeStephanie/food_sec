@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Users, Camera, CheckSquare, Mic, Plus, Minus, Check, ArrowRight, ShieldCheck, AlertCircle } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Users, Camera, CheckSquare, Mic, Plus, Minus, Check, ShieldCheck, Upload, Sparkles, Loader2, Image as ImageIcon } from 'lucide-react';
 
 interface VolunteerDashboardProps {
   onExit?: () => void;
+  onUpdateInventory?: (category: string, band: 'plenty' | 'low' | 'out') => void;
 }
 
-export default function VolunteerDashboard({ onExit }: VolunteerDashboardProps) {
+export default function VolunteerDashboard({ onExit, onUpdateInventory }: VolunteerDashboardProps) {
   const [activeTab, setActiveTab] = useState<'checkin' | 'donations' | 'closing'>('checkin');
   const [familiesServed, setFamiliesServed] = useState(23);
   const [lastCheckinToast, setLastCheckinToast] = useState<string | null>(null);
@@ -16,10 +17,13 @@ export default function VolunteerDashboard({ onExit }: VolunteerDashboardProps) 
   const [outAlerts, setOutAlerts] = useState<string[]>([]);
 
   // Donations state
-  const [donationCounts, setDonationCounts] = useState<{ [key: string]: number }>({
-    'Canned vegetables': 2,
-    'Cereal': 1,
-    'Meat soup': 2,
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isScanning, setIsScanning] = useState(false);
+  const [scannedImagePreview, setScannedImagePreview] = useState<string | null>(null);
+  const [donationCounts, setDonationCounts] = useState<{ [key: string]: { count: number; category: string } }>({
+    'Canned green beans': { count: 4, category: 'Produce' },
+    'Cereal box': { count: 2, category: 'Grains' },
+    'Meat soup': { count: 3, category: 'Protein' },
   });
   const [donationsAddedNotice, setDonationsAddedNotice] = useState(false);
 
@@ -42,9 +46,56 @@ export default function VolunteerDashboard({ onExit }: VolunteerDashboardProps) 
   const toggleRunOut = (cat: string) => {
     if (outAlerts.includes(cat)) {
       setOutAlerts(outAlerts.filter((c) => c !== cat));
+      if (onUpdateInventory) onUpdateInventory(cat, 'low');
     } else {
       setOutAlerts([...outAlerts, cat]);
+      if (onUpdateInventory) onUpdateInventory(cat, 'out');
     }
+  };
+
+  // AI Scanning handler
+  const handleScanDonation = async (presetOrFile: string | File) => {
+    setIsScanning(true);
+    try {
+      const formData = new FormData();
+      if (typeof presetOrFile === 'string') {
+        formData.append('preset', presetOrFile);
+      } else {
+        formData.append('image', presetOrFile);
+        const reader = new FileReader();
+        reader.onload = (e) => setScannedImagePreview(e.target?.result as string);
+        reader.readAsDataURL(presetOrFile);
+      }
+
+      const res = await fetch('/api/scan-donation', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (data.items && Array.isArray(data.items)) {
+        const newCounts: { [key: string]: { count: number; category: string } } = {};
+        data.items.forEach((it: any) => {
+          newCounts[it.name] = { count: it.count || 1, category: it.category || 'General' };
+        });
+        setDonationCounts(newCounts);
+      }
+    } catch (err) {
+      console.error('Scan error:', err);
+    } finally {
+      setIsScanning(false);
+    }
+  };
+
+  const handleApplyDonations = () => {
+    setDonationsAddedNotice(true);
+    // If any categories were added, bump their stock
+    Object.values(donationCounts).forEach(({ category }) => {
+      if (onUpdateInventory && ['Produce', 'Protein', 'Dairy', 'Diapers', 'Grains'].includes(category)) {
+        onUpdateInventory(category, 'plenty');
+      }
+    });
+    setTimeout(() => setDonationsAddedNotice(false), 3000);
   };
 
   return (
@@ -143,63 +194,148 @@ export default function VolunteerDashboard({ onExit }: VolunteerDashboardProps) 
           </div>
         )}
 
-        {/* TAB 2: DONATIONS IN */}
+        {/* TAB 2: DONATIONS IN (GEMINI MULTIMODAL INTAKE) */}
         {activeTab === 'donations' && (
           <div className="flex flex-col gap-5">
             <div>
-              <h3 className="text-xl font-bold text-emerald-950">Donations in</h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-xl font-bold text-emerald-950">Donations in</h3>
+                <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <Sparkles className="w-3 h-3 text-emerald-600" />
+                  Gemini Vision
+                </span>
+              </div>
               <p className="text-xs text-slate-500">Snap the pile. We sort it into your categories.</p>
             </div>
 
-            {/* Photo intake card */}
-            <div className="bg-slate-800 text-white rounded-3xl p-5 flex flex-col items-center justify-center relative overflow-hidden min-h-[160px] border border-slate-700">
-              <div className="flex gap-4 items-end mb-3">
-                <div className="bg-emerald-800/80 px-3 py-2 rounded-xl text-center border border-emerald-500/40">
-                  <span className="text-xs text-emerald-200 block font-medium">Vegetables</span>
-                  <span className="text-lg font-bold">×2</span>
-                </div>
-                <div className="bg-amber-800/80 px-4 py-3 rounded-xl text-center border border-amber-500/40">
-                  <span className="text-xs text-amber-200 block font-medium">Cereal</span>
-                  <span className="text-xl font-bold">×1</span>
-                </div>
-                <div className="bg-rose-800/80 px-3 py-2 rounded-xl text-center border border-rose-500/40">
-                  <span className="text-xs text-rose-200 block font-medium">Meat soup</span>
-                  <span className="text-lg font-bold">×2</span>
-                </div>
-              </div>
+            {/* Hidden File Input */}
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              ref={fileInputRef}
+              className="hidden"
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  handleScanDonation(e.target.files[0]);
+                }
+              }}
+            />
 
-              <div className="bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[11px] text-slate-300 flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                Photo is deleted immediately after sorting
+            {/* Photo intake card with interactive Upload or Sample presets */}
+            <div className="bg-slate-900 text-white rounded-3xl p-5 flex flex-col items-center justify-center relative overflow-hidden min-h-[170px] border border-slate-700">
+              {isScanning ? (
+                <div className="flex flex-col items-center gap-2 py-4">
+                  <Loader2 className="w-8 h-8 text-emerald-400 animate-spin" />
+                  <span className="text-xs text-emerald-200 font-semibold animate-pulse">
+                    Gemini 2.5 Flash analyzing groceries...
+                  </span>
+                </div>
+              ) : (
+                <>
+                  {scannedImagePreview ? (
+                    <img
+                      src={scannedImagePreview}
+                      alt="Donation preview"
+                      className="max-h-32 object-contain rounded-xl mb-2"
+                    />
+                  ) : (
+                    <div className="flex gap-3 items-end mb-3">
+                      <div className="bg-emerald-800/90 px-3 py-2 rounded-xl text-center border border-emerald-500/40">
+                        <span className="text-[11px] text-emerald-200 block font-medium">Produce</span>
+                        <span className="text-base font-bold">×4</span>
+                      </div>
+                      <div className="bg-amber-800/90 px-3 py-2.5 rounded-xl text-center border border-amber-500/40">
+                        <span className="text-[11px] text-amber-200 block font-medium">Grains</span>
+                        <span className="text-lg font-bold">×2</span>
+                      </div>
+                      <div className="bg-rose-800/90 px-3 py-2 rounded-xl text-center border border-rose-500/40">
+                        <span className="text-[11px] text-rose-200 block font-medium">Protein</span>
+                        <span className="text-base font-bold">×3</span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex gap-2 mb-2">
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition active:scale-95 shadow-sm"
+                    >
+                      <Camera className="w-3.5 h-3.5" />
+                      Take Photo / Upload
+                    </button>
+                  </div>
+
+                  <div className="bg-black/70 backdrop-blur-md px-3 py-1 rounded-full text-[11px] text-slate-300 flex items-center gap-1.5 mt-1">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                    Photo is deleted immediately after sorting
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Quick Presets for Instant Demo */}
+            <div className="flex flex-col gap-1.5">
+              <span className="text-xs text-slate-500 font-semibold">Or test with demo sample boxes:</span>
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  onClick={() => handleScanDonation('canned_box')}
+                  className="bg-white hover:bg-emerald-50 border border-slate-200 rounded-xl p-2 text-left text-xs transition"
+                >
+                  🥫 <span className="font-semibold block text-slate-800">Canned Box</span>
+                  <span className="text-[10px] text-slate-400">Beans &amp; Soups</span>
+                </button>
+                <button
+                  onClick={() => handleScanDonation('produce_crate')}
+                  className="bg-white hover:bg-emerald-50 border border-slate-200 rounded-xl p-2 text-left text-xs transition"
+                >
+                  🥕 <span className="font-semibold block text-slate-800">Produce Crate</span>
+                  <span className="text-[10px] text-slate-400">Apples &amp; Carrots</span>
+                </button>
+                <button
+                  onClick={() => handleScanDonation('baby_essentials')}
+                  className="bg-white hover:bg-emerald-50 border border-slate-200 rounded-xl p-2 text-left text-xs transition"
+                >
+                  🍼 <span className="font-semibold block text-slate-800">Baby Box</span>
+                  <span className="text-[10px] text-slate-400">Diapers &amp; Formula</span>
+                </button>
               </div>
             </div>
 
             {/* Check the counts editable list */}
-            <div className="bg-white rounded-2xl p-4 border border-emerald-900/10 flex flex-col gap-3">
+            <div className="bg-white rounded-2xl p-4 border border-emerald-900/10 flex flex-col gap-3 shadow-xs">
               <div className="flex justify-between items-center">
                 <h4 className="font-bold text-sm text-emerald-950">Check the counts</h4>
                 <span className="text-xs text-slate-400">Tap to fix anything</span>
               </div>
 
-              {Object.entries(donationCounts).map(([item, count]) => (
+              {Object.entries(donationCounts).map(([item, { count, category }]) => (
                 <div key={item} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
                   <div>
                     <span className="text-sm font-semibold text-slate-800 block">{item}</span>
-                    <span className="text-xs text-slate-400">
-                      {item.includes('vegetables') ? 'Produce' : item.includes('soup') ? 'Protein' : 'Grains'}
-                    </span>
+                    <span className="text-xs text-emerald-800 font-medium">{category}</span>
                   </div>
 
                   <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl px-2 py-1">
                     <button
-                      onClick={() => setDonationCounts({ ...donationCounts, [item]: Math.max(0, count - 1) })}
+                      onClick={() =>
+                        setDonationCounts({
+                          ...donationCounts,
+                          [item]: { count: Math.max(0, count - 1), category }
+                        })
+                      }
                       className="p-1 hover:bg-slate-200 rounded-lg text-slate-600 transition"
                     >
                       <Minus className="w-3.5 h-3.5" />
                     </button>
                     <span className="font-bold text-sm w-4 text-center">{count}</span>
                     <button
-                      onClick={() => setDonationCounts({ ...donationCounts, [item]: count + 1 })}
+                      onClick={() =>
+                        setDonationCounts({
+                          ...donationCounts,
+                          [item]: { count: count + 1, category }
+                        })
+                      }
                       className="p-1 hover:bg-slate-200 rounded-lg text-slate-600 transition"
                     >
                       <Plus className="w-3.5 h-3.5" />
@@ -211,10 +347,7 @@ export default function VolunteerDashboard({ onExit }: VolunteerDashboardProps) 
 
             {/* Action buttons */}
             <button
-              onClick={() => {
-                setDonationsAddedNotice(true);
-                setTimeout(() => setDonationsAddedNotice(false), 3000);
-              }}
+              onClick={handleApplyDonations}
               className="bg-[#064e3b] text-white py-3.5 rounded-2xl font-bold text-sm hover:bg-[#043d2e] shadow-sm transition active:scale-[0.98] flex items-center justify-center gap-2"
             >
               {donationsAddedNotice ? '✓ Added to shelves!' : 'Add to shelves'}
@@ -236,7 +369,7 @@ export default function VolunteerDashboard({ onExit }: VolunteerDashboardProps) 
               </p>
             </div>
 
-            <div className="bg-white rounded-3xl p-4 border border-emerald-900/10 flex flex-col gap-4">
+            <div className="bg-white rounded-3xl p-4 border border-emerald-900/10 flex flex-col gap-4 shadow-xs">
               {Object.entries(closingGuesses).map(([cat, currentBand]) => (
                 <div key={cat} className="flex flex-col gap-1.5 pb-3 border-b border-slate-100 last:border-0">
                   <div className="flex justify-between items-center">
@@ -250,7 +383,10 @@ export default function VolunteerDashboard({ onExit }: VolunteerDashboardProps) 
                       return (
                         <button
                           key={band}
-                          onClick={() => setClosingGuesses({ ...closingGuesses, [cat]: band })}
+                          onClick={() => {
+                            setClosingGuesses({ ...closingGuesses, [cat]: band });
+                            if (onUpdateInventory) onUpdateInventory(cat, band);
+                          }}
                           className={`py-2 text-xs font-bold rounded-xl border transition ${
                             isSelected
                               ? band === 'plenty'

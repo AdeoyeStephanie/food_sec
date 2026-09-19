@@ -32,6 +32,7 @@ const PantryMap = dynamic(() => import('@/components/PantryMap'), {
 
 export default function Home() {
   // Navigation & Search State
+  const [pantriesList, setPantriesList] = useState<Pantry[]>(BALTIMORE_PANTRIES);
   const [hasSearched, setHasSearched] = useState(false);
   const [query, setQuery] = useState('');
   const [language, setLanguage] = useState<'en' | 'es'>('en');
@@ -41,6 +42,26 @@ export default function Home() {
 
   // Filter chips
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
+
+  const handleUpdateInventory = (category: string, band: 'plenty' | 'low' | 'out') => {
+    setPantriesList((prev) =>
+      prev.map((p) => {
+        if (p.name.includes('Northside')) {
+          const updatedItems = p.shelf_items.map((it) =>
+            it.category_name.toLowerCase() === category.toLowerCase()
+              ? { ...it, band, minutes_ago: 1 }
+              : it
+          );
+          const updatedPantry = { ...p, shelf_items: updatedItems };
+          if (selectedPantry?.id === p.id) {
+            setSelectedPantry(updatedPantry);
+          }
+          return updatedPantry;
+        }
+        return p;
+      })
+    );
+  };
 
   // Speech recognition handler
   const handleVoiceSearch = () => {
@@ -75,7 +96,7 @@ export default function Home() {
 
   // Filtered Pantries
   const filteredPantries = useMemo(() => {
-    let list = [...BALTIMORE_PANTRIES];
+    let list = [...pantriesList];
     const q = query.toLowerCase();
 
     if (q.includes('hampden') || activeFilter === 'hampden') {
@@ -98,8 +119,8 @@ export default function Home() {
       );
     }
 
-    return list.length > 0 ? list : BALTIMORE_PANTRIES;
-  }, [query, activeFilter]);
+    return list.length > 0 ? list : pantriesList;
+  }, [query, activeFilter, pantriesList]);
 
   // Conversational response synthesis
   const conversationalSummary = useMemo(() => {
@@ -137,7 +158,10 @@ export default function Home() {
   if (isVolunteerMode) {
     return (
       <main className="min-h-screen bg-[#e9f1ed] p-3 md:p-8">
-        <VolunteerDashboard onExit={() => setIsVolunteerMode(false)} />
+        <VolunteerDashboard
+          onExit={() => setIsVolunteerMode(false)}
+          onUpdateInventory={handleUpdateInventory}
+        />
       </main>
     );
   }
