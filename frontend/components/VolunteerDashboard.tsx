@@ -70,6 +70,7 @@ export default function VolunteerDashboard({
 
   // Stand-In Tablet Kiosk Mode
   const [isKioskMode, setIsKioskMode] = useState(false);
+  const [kioskConfirmed, setKioskConfirmed] = useState<{ size: number; tableNum: number } | null>(null);
 
   // Current active pantry state with live shelf levels
   const [currentPantry, setCurrentPantry] = useState<Pantry>(
@@ -168,8 +169,16 @@ export default function VolunteerDashboard({
       onUpdateFullPantry(updatedPantry);
     }
 
-    setLastCheckinToast(`Household of ${size} checked in! ${deductionsSummary}`);
-    setTimeout(() => setLastCheckinToast(null), 3500);
+    if (isKioskMode) {
+      const tableNum = (size % 3) + 1;
+      setKioskConfirmed({ size, tableNum });
+      setTimeout(() => {
+        setKioskConfirmed(null);
+      }, 2500);
+    } else {
+      setLastCheckinToast(`Household of ${size} checked in! ${deductionsSummary}`);
+      setTimeout(() => setLastCheckinToast(null), 3500);
+    }
 
     // Persist the check-in to the FastAPI backend. Screen already updated above,
     // so a network/FK failure just logs (static demo mode still works client-side).
@@ -462,7 +471,7 @@ export default function VolunteerDashboard({
       setLastCheckinToast('✓ Manager mode unlocked. Compliance reports & settings accessible.');
       setTimeout(() => setLastCheckinToast(null), 3000);
     } else {
-      setManagerPinError('Invalid Manager PIN. (Demo Manager PIN: 9999)');
+      setManagerPinError('Invalid Manager PIN.');
     }
   };
 
@@ -503,14 +512,33 @@ export default function VolunteerDashboard({
           </button>
         </div>
 
-        {/* Kiosk Center: Big Friendly Touch Pad */}
-        <div className="max-w-2xl mx-auto w-full flex flex-col items-center justify-center gap-6 my-auto text-center">
-          {/* Flashing Toast / Greeting */}
-          {lastCheckinToast ? (
-            <div className="bg-emerald-400 text-emerald-950 px-6 py-4 rounded-3xl text-lg md:text-xl font-black shadow-2xl animate-bounce">
-              {lastCheckinToast}
+        {/* Kiosk Center: Big Friendly Touch Pad or Reassurance Card */}
+        {kioskConfirmed ? (
+          <div className="max-w-xl mx-auto w-full bg-white text-slate-900 rounded-3xl p-8 md:p-12 shadow-2xl flex flex-col items-center justify-center gap-5 my-auto text-center animate-in zoom-in-95 duration-200">
+            <div className="w-20 h-20 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shadow-inner">
+              <Check className="w-12 h-12 stroke-[3]" />
             </div>
-          ) : (
+            <div>
+              <span className="text-xs font-bold uppercase tracking-widest text-emerald-800 bg-emerald-100/80 px-3 py-1 rounded-full border border-emerald-300">
+                Check-In Confirmed
+              </span>
+              <h2 className="text-3xl md:text-4xl font-black text-slate-900 mt-3">
+                Welcome to our pantry!
+              </h2>
+              <p className="text-base md:text-lg text-slate-600 font-medium mt-2">
+                Household of <strong className="text-emerald-950 font-bold">{kioskConfirmed.size === 8 ? '8+' : kioskConfirmed.size} {kioskConfirmed.size === 1 ? 'person' : 'people'}</strong> recorded.
+              </p>
+              <div className="mt-4 bg-[#064e3b] text-white rounded-2xl py-3.5 px-6 inline-block shadow-md">
+                <p className="text-xs text-emerald-300 font-medium">Please step inside to</p>
+                <p className="text-xl font-black">Welcome Table {kioskConfirmed.tableNum}</p>
+              </div>
+            </div>
+            <p className="text-xs text-slate-400 font-medium animate-pulse">
+              Resetting for the next neighbor...
+            </p>
+          </div>
+        ) : (
+          <div className="max-w-2xl mx-auto w-full flex flex-col items-center justify-center gap-6 my-auto text-center">
             <div className="flex flex-col gap-2">
               <span className="text-emerald-300 font-bold uppercase tracking-widest text-xs">
                 Welcome to our food pantry
@@ -522,28 +550,28 @@ export default function VolunteerDashboard({
                 Tap your family size below. No name or ID required.
               </p>
             </div>
-          )}
 
-          {/* Huge Touch Buttons */}
-          <div className="grid grid-cols-4 gap-4 w-full">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((size) => (
-              <button
-                key={size}
-                onClick={() => handleHouseholdTap(size)}
-                className="bg-white hover:bg-emerald-50 active:bg-emerald-100 text-slate-900 rounded-3xl py-6 md:py-8 flex flex-col items-center justify-center font-black text-3xl md:text-4xl shadow-xl transition active:scale-95 cursor-pointer border-2 border-transparent hover:border-emerald-400"
-              >
-                <span>{size === 8 ? '8+' : size}</span>
-                <span className="text-xs text-slate-500 font-bold mt-1">
-                  {size === 1 ? 'person' : 'people'}
-                </span>
-              </button>
-            ))}
+            {/* Huge Touch Buttons */}
+            <div className="grid grid-cols-4 gap-4 w-full">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((size) => (
+                <button
+                  key={size}
+                  onClick={() => handleHouseholdTap(size)}
+                  className="bg-white hover:bg-emerald-50 active:bg-emerald-100 text-slate-900 rounded-3xl py-6 md:py-8 flex flex-col items-center justify-center font-black text-3xl md:text-4xl shadow-xl transition active:scale-95 cursor-pointer border-2 border-transparent hover:border-emerald-400"
+                >
+                  <span>{size === 8 ? '8+' : size}</span>
+                  <span className="text-xs text-slate-500 font-bold mt-1">
+                    {size === 1 ? 'person' : 'people'}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            <p className="text-xs text-emerald-300/70 font-medium mt-2">
+              Total families checked in today: <strong className="text-white font-bold">{familiesServed}</strong>
+            </p>
           </div>
-
-          <p className="text-xs text-emerald-300/70 font-medium mt-2">
-            Total families checked in today: <strong className="text-white font-bold">{familiesServed}</strong>
-          </p>
-        </div>
+        )}
 
         {/* Kiosk Footer */}
         <div className="text-center text-xs text-emerald-300/60 font-medium border-t border-emerald-800/80 pt-4">
@@ -595,7 +623,7 @@ export default function VolunteerDashboard({
                 setShowManagerPinModal(true);
               }}
               className="flex items-center gap-1.5 text-xs text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer"
-              title="Unlock manager settings and TEFAP reports (PIN: 9999)"
+              title="Unlock manager settings and TEFAP reports"
             >
               <Lock className="w-3.5 h-3.5 text-slate-500" />
               <span>Manager</span>
@@ -1313,10 +1341,6 @@ export default function VolunteerDashboard({
                   Unlock
                 </button>
               </div>
-
-              <p className="text-[11px] text-slate-400 text-center mt-1">
-                Demo Manager PIN: <strong className="text-slate-600">9999</strong>
-              </p>
             </form>
           </div>
         </div>

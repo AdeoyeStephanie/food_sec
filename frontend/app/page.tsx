@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import { BALTIMORE_PANTRIES, Pantry } from '@/lib/pantryData';
+import { BALTIMORE_PANTRIES, Pantry, getUrgencyIndicator } from '@/lib/pantryData';
 import PantryDetailSheet from '@/components/PantryDetailSheet';
 import VolunteerDashboard from '@/components/VolunteerDashboard';
 import PantryLoginModal from '@/components/PantryLoginModal';
@@ -13,6 +13,7 @@ import { fetchPantries } from '@/lib/api';
 import {
   Search,
   Mic,
+  Phone,
   PhoneCall,
   Sparkles,
   Navigation,
@@ -24,6 +25,7 @@ import {
   Clock,
   HeartHandshake,
   Lock,
+  RotateCcw,
   Map as MapIcon,
   List as ListIcon
 } from 'lucide-react';
@@ -46,6 +48,7 @@ export default function Home() {
   const [language, setLanguage] = useState<Language>('en');
   const t = TRANSLATIONS[language] || TRANSLATIONS.en;
   const [selectedPantry, setSelectedPantry] = useState<Pantry | null>(null);
+  const [hoveredPantryId, setHoveredPantryId] = useState<string | null>(null);
   const [isVolunteerMode, setIsVolunteerMode] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [authenticatedPantry, setAuthenticatedPantry] = useState<Pantry | null>(null);
@@ -647,34 +650,49 @@ export default function Home() {
               <div className="flex flex-col gap-3">
                 {filteredPantries.map((pantry, idx) => {
                   const isSelected = selectedPantry?.id === pantry.id;
+                  const isHovered = hoveredPantryId === pantry.id;
+                  const urgency = getUrgencyIndicator(pantry);
+
                   return (
                     <div
+                      id={`pantry-card-${pantry.id}`}
                       key={pantry.id}
                       onClick={() => setSelectedPantry(pantry)}
+                      onMouseEnter={() => setHoveredPantryId(pantry.id)}
+                      onMouseLeave={() => setHoveredPantryId(null)}
                       className={`cursor-pointer rounded-2xl p-4 border transition-all duration-200 ${
                         isSelected
-                          ? 'border-emerald-800 bg-emerald-50/40 shadow-md ring-1 ring-emerald-700'
+                          ? 'border-emerald-800 bg-emerald-50/50 shadow-md ring-2 ring-emerald-700'
+                          : isHovered
+                          ? 'border-emerald-600 bg-emerald-50/30 shadow-md ring-1 ring-emerald-400'
                           : 'border-slate-200 bg-white hover:border-emerald-300 shadow-xs'
                       }`}
                     >
-                      <div className="flex items-start justify-between">
+                      <div className="flex items-start justify-between gap-2">
                         <div className="flex items-start gap-2.5">
-                          <span className="w-6 h-6 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center shrink-0">
+                          <span className="w-6 h-6 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
                             {idx + 1}
                           </span>
                           <div>
                             <h4 className="font-bold text-sm text-emerald-950 leading-snug">
                               {pantry.name}
                             </h4>
-                            <p className="text-xs text-slate-500">
-                              {pantry.distance_miles} miles, ~{pantry.walk_minutes} {t.walkingDistance}
+                            <p className="text-xs text-slate-600 font-medium">
+                              {pantry.distance_miles} miles · ~{pantry.walk_minutes} {t.walkingDistance}
                             </p>
                           </div>
                         </div>
+
+                        {/* Live Urgency Status Pill */}
+                        <span className={`shrink-0 text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-2xs ${urgency.badgeClass}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${urgency.dotClass}`}></span>
+                          <span>{urgency.status === 'open_tonight' ? 'Tonight' : urgency.status === 'closing_soon' ? 'Closes Soon' : urgency.status === 'open' ? 'Open Today' : 'Closed'}</span>
+                        </span>
                       </div>
 
-                      <div className="mt-2 text-xs font-semibold text-emerald-800">
-                        {pantry.hours_text}
+                      <div className="mt-2 text-xs font-semibold text-emerald-900 flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                        <span>{pantry.hours_text}</span>
                       </div>
 
                       {/* Prominent category badges */}
@@ -684,14 +702,14 @@ export default function Home() {
                             key={i}
                             className={`px-2.5 py-1 rounded-xl text-xs flex items-center justify-between font-semibold ${
                               item.band === 'plenty'
-                                ? 'bg-emerald-100/70 text-emerald-800'
+                                ? 'bg-emerald-100/80 text-emerald-900 border border-emerald-200/60'
                                 : item.band === 'low'
-                                ? 'bg-amber-100/70 text-amber-800'
-                                : 'bg-rose-100/70 text-rose-800'
+                                ? 'bg-amber-100/80 text-amber-900 border border-amber-200/60'
+                                : 'bg-rose-100/80 text-rose-900 border border-rose-200/60'
                             }`}
                           >
                             <span>{item.category_name}</span>
-                            <span className="capitalize text-[11px]">
+                            <span className="capitalize text-[11px] font-bold">
                               {item.band === 'plenty' ? t.plenty : item.band === 'low' ? t.low : t.out}
                             </span>
                           </div>
@@ -700,8 +718,8 @@ export default function Home() {
 
                       {/* Card Footer */}
                       <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between">
-                        <span className="text-[11px] text-slate-400 flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        <span className="text-[11px] text-slate-600 font-semibold flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                           {t.updatedAgo}
                         </span>
                         <div className="flex items-center gap-2">
@@ -710,7 +728,7 @@ export default function Home() {
                               e.stopPropagation();
                               setSelectedPantry(pantry);
                             }}
-                            className="text-xs font-bold text-slate-700 hover:text-emerald-900 px-2.5 py-1 bg-slate-100 rounded-lg hover:bg-slate-200 transition cursor-pointer"
+                            className="text-xs font-bold text-slate-700 hover:text-emerald-900 px-3 py-1.5 bg-slate-100 rounded-xl hover:bg-slate-200 transition cursor-pointer"
                           >
                             {t.details}
                           </button>
@@ -719,7 +737,7 @@ export default function Home() {
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="text-xs font-bold text-white px-2.5 py-1 bg-[#064e3b] rounded-lg hover:bg-[#043d2e] transition flex items-center gap-1"
+                            className="text-xs font-bold text-white px-3 py-1.5 bg-[#064e3b] rounded-xl hover:bg-[#043d2e] transition flex items-center gap-1"
                           >
                             <Navigation className="w-3 h-3" />
                             {t.directions}
@@ -730,25 +748,50 @@ export default function Home() {
                   );
                 })}
 
+                {/* Compassionate Empty State */}
                 {filteredPantries.length === 0 && (
-                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center flex flex-col items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 font-bold">
-                      📍
+                  <div className="bg-white border-2 border-emerald-900/10 rounded-3xl p-6 text-center flex flex-col items-center gap-4 shadow-sm animate-in fade-in duration-200">
+                    <div className="w-12 h-12 rounded-2xl bg-amber-100 border border-amber-200 flex items-center justify-center text-amber-900 font-bold text-xl">
+                      🌾
                     </div>
-                    <div>
-                      <p className="font-bold text-sm text-slate-800">{t.emptyTitle}</p>
-                      <p className="text-xs text-slate-500 mt-1 max-w-xs">
-                        {t.emptyDesc}
+                    <div className="max-w-sm">
+                      <h4 className="font-extrabold text-base text-slate-900">
+                        {language === 'es' ? 'No se encontraron despensas exactas' : 'No pantries match every active filter'}
+                      </h4>
+                      <p className="text-xs text-slate-600 font-medium mt-1.5 leading-relaxed">
+                        {language === 'es'
+                          ? 'No se preocupe: la comida de emergencia siempre está disponible en Baltimore. Llame a la línea directa de alimentos o borre los filtros para ver las 52 despensas comunitarias.'
+                          : 'Don’t worry—emergency food access is always available in Baltimore. Call the direct helpline or clear your filters to view all 52 neighborhood pantries.'}
                       </p>
                     </div>
+
+                    {/* Direct 1-Tap Helplines */}
+                    <div className="grid grid-cols-2 gap-2.5 w-full max-w-xs">
+                      <a
+                        href="tel:211"
+                        className="flex items-center justify-center gap-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-950 py-2.5 px-3 rounded-xl text-xs font-bold transition cursor-pointer"
+                      >
+                        <Phone className="w-3.5 h-3.5 text-emerald-700" />
+                        <span>Call 2-1-1 Maryland</span>
+                      </a>
+                      <button
+                        onClick={() => setShowHotlineModal(true)}
+                        className="flex items-center justify-center gap-2 bg-emerald-800 hover:bg-emerald-900 text-white py-2.5 px-3 rounded-xl text-xs font-bold shadow-sm transition cursor-pointer"
+                      >
+                        <PhoneCall className="w-3.5 h-3.5 text-emerald-300" />
+                        <span>(410) 555-FOOD</span>
+                      </button>
+                    </div>
+
                     <button
                       onClick={() => {
                         setQuery('');
                         setActiveFilter(null);
                       }}
-                      className="text-xs font-bold text-emerald-900 bg-emerald-100 hover:bg-emerald-200 px-4 py-2 rounded-xl transition cursor-pointer"
+                      className="text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 px-4 py-2 rounded-xl transition flex items-center gap-1.5 cursor-pointer mt-1"
                     >
-                      {t.showAllBtn}
+                      <RotateCcw className="w-3.5 h-3.5 text-slate-500" />
+                      <span>{t.showAllBtn}</span>
                     </button>
                   </div>
                 )}
@@ -763,6 +806,7 @@ export default function Home() {
               <PantryMap
                 pantries={filteredPantries}
                 selectedPantry={selectedPantry}
+                hoveredPantryId={hoveredPantryId}
                 onSelectPantry={(p) => setSelectedPantry(p)}
               />
             </div>

@@ -31,6 +31,54 @@ export interface Pantry {
   specialty_tags?: string[];
 }
 
+export interface UrgencyInfo {
+  status: 'open' | 'closing_soon' | 'open_tonight' | 'closed';
+  label: string;
+  badgeClass: string;
+  dotClass: string;
+}
+
+export function getUrgencyIndicator(pantry: Pantry): UrgencyInfo {
+  // Check if open tonight
+  if (pantry.open_tonight) {
+    return {
+      status: 'open_tonight',
+      label: '🌙 Open Tonight · 5:00 PM – 8:00 PM',
+      badgeClass: 'bg-indigo-50 text-indigo-900 border border-indigo-200',
+      dotClass: 'bg-indigo-600 animate-pulse',
+    };
+  }
+
+  // Check if open today
+  if (pantry.open_today) {
+    // Check if hours text suggests closing soon (e.g. 1pm or afternoon)
+    const hours = (pantry.hours_text || '').toLowerCase();
+    if (hours.includes('1pm') || hours.includes('1:00 pm') || hours.includes('12pm')) {
+      return {
+        status: 'closing_soon',
+        label: '⚠️ Closes Soon · Check Hours',
+        badgeClass: 'bg-amber-50 text-amber-900 border border-amber-300',
+        dotClass: 'bg-amber-600 animate-ping',
+      };
+    }
+
+    return {
+      status: 'open',
+      label: '🟢 Open Today · Walk-ins Welcome',
+      badgeClass: 'bg-emerald-50 text-emerald-900 border border-emerald-300',
+      dotClass: 'bg-emerald-600 animate-pulse',
+    };
+  }
+
+  // Closed today
+  return {
+    status: 'closed',
+    label: pantry.hours_text ? `Closed Today · ${pantry.hours_text}` : 'Closed Today',
+    badgeClass: 'bg-slate-100 text-slate-700 border border-slate-200',
+    dotClass: 'bg-slate-400',
+  };
+}
+
 export const BALTIMORE_PANTRIES: Pantry[] = [
   {
     "id": "c1000000-0000-0000-0000-000000000001",
