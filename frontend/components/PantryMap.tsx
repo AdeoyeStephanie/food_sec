@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef } from 'react';
 import { Pantry } from '@/lib/pantryData';
-import 'leaflet/dist/leaflet.css';
 
 interface PantryMapProps {
   pantries: Pantry[];

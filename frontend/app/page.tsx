@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { BALTIMORE_PANTRIES, Pantry } from '@/lib/pantryData';
 import PantryDetailSheet from '@/components/PantryDetailSheet';
+import VolunteerDashboard from '@/components/VolunteerDashboard';
 import {
   Search,
   Mic,
@@ -15,7 +16,8 @@ import {
   ShieldCheck,
   Languages,
   SlidersHorizontal,
-  Clock
+  Clock,
+  HeartHandshake
 } from 'lucide-react';
 
 // Dynamic import for Leaflet map to prevent SSR issues
@@ -152,6 +154,17 @@ export default function Home() {
     );
   }, [query]);
 
+  if (isVolunteerMode) {
+    return (
+      <main className="min-h-screen bg-[#e9f1ed] p-3 md:p-8">
+        <VolunteerDashboard
+          onExit={() => setIsVolunteerMode(false)}
+          onUpdateInventory={handleUpdateInventory}
+        />
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-[#f3f7f5] text-slate-900 flex flex-col justify-between">
       {/* Top Header */}
@@ -175,7 +188,17 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
+          {/* Switch View Toggle (Demo & Operations) */}
+          <button
+            onClick={() => setIsVolunteerMode(true)}
+            className="flex items-center gap-1.5 text-xs font-semibold text-emerald-900 bg-emerald-100/90 hover:bg-emerald-200 border border-emerald-300 px-3.5 py-1.5 rounded-full transition shadow-xs cursor-pointer active:scale-95"
+            title="Switch to Pantry Volunteer Operations View"
+          >
+            <HeartHandshake className="w-4 h-4 text-emerald-700" />
+            <span>Switch to Volunteer View</span>
+          </button>
+
           {/* Language Switch */}
           <div className="bg-slate-100 p-0.5 rounded-full flex text-xs font-semibold">
             <button
