@@ -21,7 +21,11 @@ import {
   RefreshCw,
   PackageCheck,
   AlertCircle,
-  SlidersHorizontal
+  SlidersHorizontal,
+  Lock,
+  Unlock,
+  X,
+  Tablet
 } from 'lucide-react';
 import { BALTIMORE_PANTRIES, Pantry, ShelfItem } from '@/lib/pantryData';
 import CameraViewfinder from '@/components/CameraViewfinder';
@@ -49,6 +53,16 @@ export default function VolunteerDashboard({
 }: VolunteerDashboardProps) {
   const [activeTab, setActiveTab] = useState<'checkin' | 'donations' | 'closing' | 'reports' | 'settings'>('checkin');
   
+  // Manager Access Protection
+  const [isManagerUnlocked, setIsManagerUnlocked] = useState(false);
+  const [showManagerPinModal, setShowManagerPinModal] = useState(false);
+  const [managerPinInput, setManagerPinInput] = useState('');
+  const [managerPinError, setManagerPinError] = useState<string | null>(null);
+  const [targetAdminTab, setTargetAdminTab] = useState<'reports' | 'settings' | null>(null);
+
+  // Stand-In Tablet Kiosk Mode
+  const [isKioskMode, setIsKioskMode] = useState(false);
+
   // Current active pantry state with live shelf levels
   const [currentPantry, setCurrentPantry] = useState<Pantry>(
     activePantry || BALTIMORE_PANTRIES[0]
@@ -391,6 +405,110 @@ export default function VolunteerDashboard({
     setTimeout(() => setLastCheckinToast(null), 3000);
   };
 
+  // Manager PIN Verification
+  const handleManagerPinSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (managerPinInput === '9999' || managerPinInput === '4827' || managerPinInput === '1234') {
+      setIsManagerUnlocked(true);
+      setShowManagerPinModal(false);
+      setManagerPinError(null);
+      if (targetAdminTab) {
+        setActiveTab(targetAdminTab);
+      }
+      setLastCheckinToast('✓ Manager mode unlocked. Compliance reports & settings accessible.');
+      setTimeout(() => setLastCheckinToast(null), 3000);
+    } else {
+      setManagerPinError('Invalid Manager PIN. (Demo Manager PIN: 9999)');
+    }
+  };
+
+  const handleTabClick = (tab: 'checkin' | 'donations' | 'closing' | 'reports' | 'settings') => {
+    if (tab === 'reports' || tab === 'settings') {
+      if (!isManagerUnlocked) {
+        setTargetAdminTab(tab);
+        setManagerPinInput('');
+        setManagerPinError(null);
+        setShowManagerPinModal(true);
+        return;
+      }
+    }
+    setActiveTab(tab);
+  };
+
+  // KIOSK MODE: Dedicated Stand-In Tablet View
+  if (isKioskMode) {
+    return (
+      <div className="fixed inset-0 z-50 bg-[#064e3b] text-white flex flex-col justify-between p-6 md:p-12 animate-in fade-in duration-200 select-none">
+        {/* Kiosk Top Bar */}
+        <div className="flex justify-between items-center border-b border-emerald-800/80 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-white text-[#064e3b] font-black text-xl flex items-center justify-center shadow-md">
+              B
+            </div>
+            <div>
+              <h1 className="text-xl md:text-2xl font-black tracking-tight">{currentPantry.name}</h1>
+              <p className="text-xs text-emerald-200 font-medium">Welcome Center Check-In Kiosk • {currentPantry.neighborhood}</p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setIsKioskMode(false)}
+            className="flex items-center gap-1.5 text-xs font-semibold text-emerald-200 bg-emerald-900/60 hover:bg-emerald-900 border border-emerald-700 px-3.5 py-2 rounded-xl transition cursor-pointer"
+          >
+            <span>Exit Kiosk</span>
+          </button>
+        </div>
+
+        {/* Kiosk Center: Big Friendly Touch Pad */}
+        <div className="max-w-2xl mx-auto w-full flex flex-col items-center justify-center gap-6 my-auto text-center">
+          {/* Flashing Toast / Greeting */}
+          {lastCheckinToast ? (
+            <div className="bg-emerald-400 text-emerald-950 px-6 py-4 rounded-3xl text-lg md:text-xl font-black shadow-2xl animate-bounce">
+              {lastCheckinToast}
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <span className="text-emerald-300 font-bold uppercase tracking-widest text-xs">
+                Welcome to our food pantry
+              </span>
+              <h2 className="text-3xl md:text-5xl font-black tracking-tight text-white">
+                How many in your household?
+              </h2>
+              <p className="text-sm md:text-base text-emerald-200/90 font-medium">
+                Tap your family size below. No name or ID required.
+              </p>
+            </div>
+          )}
+
+          {/* Huge Touch Buttons */}
+          <div className="grid grid-cols-4 gap-4 w-full">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((size) => (
+              <button
+                key={size}
+                onClick={() => handleHouseholdTap(size)}
+                className="bg-white hover:bg-emerald-50 active:bg-emerald-100 text-slate-900 rounded-3xl py-6 md:py-8 flex flex-col items-center justify-center font-black text-3xl md:text-4xl shadow-xl transition active:scale-95 cursor-pointer border-2 border-transparent hover:border-emerald-400"
+              >
+                <span>{size === 8 ? '8+' : size}</span>
+                <span className="text-xs text-slate-500 font-bold mt-1">
+                  {size === 1 ? 'person' : 'people'}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          <p className="text-xs text-emerald-300/70 font-medium mt-2">
+            Total families checked in today: <strong className="text-white font-bold">{familiesServed}</strong>
+          </p>
+        </div>
+
+        {/* Kiosk Footer */}
+        <div className="text-center text-xs text-emerald-300/60 font-medium border-t border-emerald-800/80 pt-4">
+          Community Food Access • Dignity &amp; Privacy Guaranteed
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-[#f2f6f4] min-h-[85vh] text-slate-800 rounded-3xl border border-emerald-900/10 shadow-xl flex flex-col justify-between overflow-hidden max-w-2xl mx-auto">
       {/* Top Header */}
@@ -409,14 +527,46 @@ export default function VolunteerDashboard({
             <span className="text-xs text-slate-400 font-medium">{currentPantry.neighborhood}, Baltimore</span>
           )}
         </div>
-        {onExit && (
-          <button
-            onClick={onExit}
-            className="text-xs text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer"
-          >
-            ← Exit to Neighbor View
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {isManagerUnlocked ? (
+            <button
+              onClick={() => {
+                setIsManagerUnlocked(false);
+                if (activeTab === 'reports' || activeTab === 'settings') {
+                  setActiveTab('checkin');
+                }
+              }}
+              className="flex items-center gap-1.5 text-xs text-amber-900 bg-amber-100 hover:bg-amber-200 border border-amber-300 px-3 py-1.5 rounded-xl font-bold transition cursor-pointer"
+              title="Click to lock admin reports and settings"
+            >
+              <Unlock className="w-3.5 h-3.5 text-amber-700" />
+              <span>Lock Admin</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                setTargetAdminTab(null);
+                setManagerPinInput('');
+                setManagerPinError(null);
+                setShowManagerPinModal(true);
+              }}
+              className="flex items-center gap-1.5 text-xs text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer"
+              title="Unlock manager settings and TEFAP reports (PIN: 9999)"
+            >
+              <Lock className="w-3.5 h-3.5 text-slate-500" />
+              <span>Manager</span>
+            </button>
+          )}
+
+          {onExit && (
+            <button
+              onClick={onExit}
+              className="text-xs text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer"
+            >
+              ← Exit
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Main Tab Content */}
@@ -432,6 +582,15 @@ export default function VolunteerDashboard({
         {/* TAB 1: CHECK-IN & REAL-TIME PREDICT ENGINE */}
         {activeTab === 'checkin' && (
           <div className="flex flex-col gap-6">
+            {/* Tablet Kiosk Mode Launcher */}
+            <button
+              onClick={() => setIsKioskMode(true)}
+              className="flex items-center justify-center gap-2 bg-emerald-800/10 hover:bg-emerald-800/20 text-emerald-950 border border-emerald-800/20 rounded-2xl py-3 px-4 text-xs font-bold transition cursor-pointer shadow-xs"
+            >
+              <Tablet className="w-4 h-4 text-emerald-700" />
+              <span>Launch Stand-In Tablet Kiosk Mode (Welcome Desk Touchscreen)</span>
+            </button>
+
             {/* Counter Card */}
             <div className="bg-[#064e3b] text-white rounded-3xl p-5 shadow-sm flex items-center justify-between">
               <div>
@@ -985,7 +1144,7 @@ export default function VolunteerDashboard({
       {/* Bottom Nav Bar matching Page 4/6 */}
       <div className="bg-white border-t border-emerald-900/10 px-3 py-3 flex justify-around items-center">
         <button
-          onClick={() => setActiveTab('checkin')}
+          onClick={() => handleTabClick('checkin')}
           className={`flex flex-col items-center gap-1 text-[11px] font-medium transition cursor-pointer ${
             activeTab === 'checkin' ? 'text-emerald-800 font-bold scale-105' : 'text-slate-400 hover:text-slate-600'
           }`}
@@ -995,7 +1154,7 @@ export default function VolunteerDashboard({
         </button>
 
         <button
-          onClick={() => setActiveTab('donations')}
+          onClick={() => handleTabClick('donations')}
           className={`flex flex-col items-center gap-1 text-[11px] font-medium transition cursor-pointer ${
             activeTab === 'donations' ? 'text-emerald-800 font-bold scale-105' : 'text-slate-400 hover:text-slate-600'
           }`}
@@ -1005,7 +1164,7 @@ export default function VolunteerDashboard({
         </button>
 
         <button
-          onClick={() => setActiveTab('closing')}
+          onClick={() => handleTabClick('closing')}
           className={`flex flex-col items-center gap-1 text-[11px] font-medium transition cursor-pointer ${
             activeTab === 'closing' ? 'text-emerald-800 font-bold scale-105' : 'text-slate-400 hover:text-slate-600'
           }`}
@@ -1015,25 +1174,109 @@ export default function VolunteerDashboard({
         </button>
 
         <button
-          onClick={() => setActiveTab('reports')}
-          className={`flex flex-col items-center gap-1 text-[11px] font-medium transition cursor-pointer ${
+          onClick={() => handleTabClick('reports')}
+          className={`flex flex-col items-center gap-1 text-[11px] font-medium transition cursor-pointer relative ${
             activeTab === 'reports' ? 'text-emerald-800 font-bold scale-105' : 'text-slate-400 hover:text-slate-600'
           }`}
         >
-          <FileSpreadsheet className="w-5 h-5" />
+          <div className="relative">
+            <FileSpreadsheet className="w-5 h-5" />
+            {!isManagerUnlocked && (
+              <span className="absolute -top-1 -right-1 bg-amber-100 text-amber-900 border border-amber-300 rounded-full p-0.5">
+                <Lock className="w-2.5 h-2.5" />
+              </span>
+            )}
+          </div>
           <span>Reports</span>
         </button>
 
         <button
-          onClick={() => setActiveTab('settings')}
-          className={`flex flex-col items-center gap-1 text-[11px] font-medium transition cursor-pointer ${
+          onClick={() => handleTabClick('settings')}
+          className={`flex flex-col items-center gap-1 text-[11px] font-medium transition cursor-pointer relative ${
             activeTab === 'settings' ? 'text-emerald-800 font-bold scale-105' : 'text-slate-400 hover:text-slate-600'
           }`}
         >
-          <SlidersHorizontal className="w-5 h-5" />
+          <div className="relative">
+            <SlidersHorizontal className="w-5 h-5" />
+            {!isManagerUnlocked && (
+              <span className="absolute -top-1 -right-1 bg-amber-100 text-amber-900 border border-amber-300 rounded-full p-0.5">
+                <Lock className="w-2.5 h-2.5" />
+              </span>
+            )}
+          </div>
           <span>Settings</span>
         </button>
       </div>
+
+      {/* Manager PIN Modal */}
+      {showManagerPinModal && (
+        <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl p-6 max-w-sm w-full border border-slate-200 shadow-2xl relative animate-in zoom-in-95 duration-150">
+            <button
+              onClick={() => setShowManagerPinModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-100 transition cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-2xl bg-amber-100 border border-amber-300 text-amber-900 flex items-center justify-center font-bold">
+                <Lock className="w-5 h-5 text-amber-800" />
+              </div>
+              <div>
+                <h3 className="font-extrabold text-base text-slate-900">Manager Access Required</h3>
+                <p className="text-xs text-slate-500 font-medium">Compliance reports & pantry settings</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600 mb-4 leading-relaxed">
+              This section contains TEFAP compliance reports, USDA audit exports, and pantry policies. Enter the manager PIN to unlock.
+            </p>
+
+            <form onSubmit={handleManagerPinSubmit} className="flex flex-col gap-3">
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  4-Digit Manager PIN
+                </label>
+                <input
+                  type="password"
+                  maxLength={4}
+                  autoFocus
+                  value={managerPinInput}
+                  onChange={(e) => setManagerPinInput(e.target.value)}
+                  placeholder="••••"
+                  className="w-full text-center tracking-[0.5em] text-2xl font-black py-3 rounded-2xl border-2 border-slate-200 focus:border-emerald-600 focus:outline-hidden bg-slate-50 text-slate-900"
+                />
+                {managerPinError && (
+                  <p className="text-xs text-rose-600 font-semibold mt-1.5 text-center">
+                    {managerPinError}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex gap-2 mt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowManagerPinModal(false)}
+                  className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-xs transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2.5 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs shadow-md transition cursor-pointer"
+                >
+                  Unlock
+                </button>
+              </div>
+
+              <p className="text-[11px] text-slate-400 text-center mt-1">
+                Demo Manager PIN: <strong className="text-slate-600">9999</strong>
+              </p>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
