@@ -109,49 +109,180 @@ export default function Home() {
     }
   };
 
+  // Conversational Natural Language Matcher for Voice & Text Queries
+  const filterPantriesIntelligently = (
+    pantries: Pantry[],
+    rawQuery: string,
+    filterChip: string | null
+  ): Pantry[] => {
+    let list = [...pantries];
+
+    // Quick filter chips
+    if (filterChip === 'tonight') {
+      list = list.filter((p) => p.open_tonight);
+    } else if (filterChip === 'no_id') {
+      list = list.filter((p) => !p.requires_id);
+    } else if (filterChip === 'produce') {
+      list = list.filter((p) =>
+        p.shelf_items?.some(
+          (item) => item.category_name.toLowerCase().includes('produce') && item.band === 'plenty'
+        )
+      );
+    }
+
+    const q = rawQuery.trim().toLowerCase();
+    if (!q) return list;
+
+    // 1. Extract 5-digit zip codes (e.g. 21220, 21218, 21211, etc.)
+    const zipCodes = q.match(/\b\d{5}\b/g) || [];
+
+    // 2. Filter conversational stopwords (e.g. "I'm looking for food in", "busco comida en")
+    const conversationalStopwords = new Set([
+      'i', "i'm", 'im', 'me', 'my', 'we', 'our', 'you', 'your',
+      'looking', 'look', 'search', 'searching', 'find', 'finding', 'need', 'needs', 'needed',
+      'want', 'wants', 'food', 'pantry', 'pantries', 'bank', 'banks', 'site', 'sites', 'place', 'places',
+      'assistance', 'help', 'give', 'get', 'got', 'having', 'have',
+      'in', 'at', 'near', 'around', 'close', 'closer', 'for', 'to', 'from', 'on', 'by', 'of', 'with', 'and', 'or',
+      'the', 'a', 'an', 'some', 'any', 'is', 'are', 'there', 'where', 'can', 'please', 'today', 'now',
+      'somewhere', 'open', 'opened', 'neighborhood', 'area', 'city', 'county',
+      // Spanish conversational fillers
+      'yo', 'busco', 'buscar', 'necesito', 'necesitamos', 'quiero', 'comida', 'alimentos',
+      'despensa', 'banco', 'en', 'cerca', 'de', 'por', 'favor', 'donde', 'hay', 'un', 'una',
+      'los', 'las', 'el', 'la', 'con', 'sin', 'para', 'hoy', 'ahora'
+    ]);
+
+    // 3. High-intent detectors
+    const wantsTonight =
+      q.includes('tonight') ||
+      q.includes('tonite') ||
+      q.includes('noche') ||
+      q.includes('evening') ||
+      q.includes('after 5') ||
+      q.includes('after 6') ||
+      q.includes('open tonight');
+
+    const wantsNoId =
+      q.includes('no id') ||
+      q.includes('without id') ||
+      q.includes('sin id') ||
+      q.includes('sin identificacion') ||
+      q.includes('sin identificación');
+
+    const wantsProduce =
+      q.includes('produce') ||
+      q.includes('vegetable') ||
+      q.includes('fruit') ||
+      q.includes('verdura') ||
+      q.includes('fruta') ||
+      q.includes('fresh');
+
+    const wantsDiapers =
+      q.includes('diaper') ||
+      q.includes('formula') ||
+      q.includes('baby') ||
+      q.includes('wipe') ||
+      q.includes('pañal');
+
+    const wantsHalal = q.includes('halal');
+    const wantsKosher = q.includes('kosher');
+
+    // 4. Tokenize meaningful terms
+    const meaningfulTokens = q
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .split(/\s+/)
+      .filter((word) => word.length > 1 && !conversationalStopwords.has(word));
+
+    return list.filter((p) => {
+      const name = p.name.toLowerCase();
+      const neigh = p.neighborhood.toLowerCase();
+      const addr = p.address.toLowerCase();
+      const notes = (p.notes || '').toLowerCase();
+      const allText = `${name} ${neigh} ${addr} ${notes}`;
+
+      // A. Zip code match (e.g. 21220)
+      if (zipCodes.length > 0) {
+        if (zipCodes.some((zip) => addr.includes(zip))) {
+          return true;
+        }
+      }
+
+      // B. Neighborhood presence in query (e.g. user said "Middle River" or "Hampden")
+      if (neigh.length >= 3 && q.includes(neigh)) {
+        return true;
+      }
+      if (neigh.includes('/')) {
+        const parts = neigh.split('/').map((s) => s.trim());
+        if (parts.some((part) => part.length >= 3 && q.includes(part))) {
+          return true;
+        }
+      }
+
+      // C. Intent filters
+      if (wantsTonight && p.open_tonight) return true;
+      if (wantsNoId && !p.requires_id) return true;
+      if (wantsHalal && (notes.includes('halal') || name.includes('halal'))) return true;
+      if (wantsKosher && (notes.includes('kosher') || name.includes('kosher'))) return true;
+
+      if (wantsProduce && p.shelf_items?.some((it) => it.category_name.toLowerCase().includes('produce'))) {
+        if (meaningfulTokens.every((t) => ['produce', 'fresh', 'vegetable', 'fruit', 'verdura', 'fruta'].includes(t))) {
+          return true;
+        }
+      }
+
+      if (wantsDiapers && p.shelf_items?.some((it) => it.category_name.toLowerCase().includes('diaper'))) {
+        if (meaningfulTokens.every((t) => ['diaper', 'diapers', 'baby', 'formula', 'wipes', 'pañal', 'pañales'].includes(t))) {
+          return true;
+        }
+      }
+
+      // D. Token keyword matching (e.g. ["middle", "river"])
+      if (meaningfulTokens.length > 0) {
+        // Multi-word neighborhood special case
+        if (meaningfulTokens.includes('middle') && meaningfulTokens.includes('river')) {
+          return (neigh.includes('middle') && neigh.includes('river')) || (addr.includes('middle') && addr.includes('river'));
+        }
+
+        const matched = meaningfulTokens.filter((token) => {
+          return (
+            allText.includes(token) ||
+            p.shelf_items?.some((it) => it.category_name.toLowerCase().includes(token))
+          );
+        });
+
+        if (matched.length > 0) {
+          return true;
+        }
+      }
+
+      // E. Direct substring fallback
+      return name.includes(q) || neigh.includes(q) || addr.includes(q);
+    });
+  };
+
   const handleExecuteSearch = (searchQuery: string) => {
     setQuery(searchQuery);
     setHasSearched(true);
-    // Select first matching pantry automatically for detail view on desktop
-    setSelectedPantry(BALTIMORE_PANTRIES[0]);
+    const matches = filterPantriesIntelligently(pantriesList, searchQuery, activeFilter);
+    if (matches.length > 0) {
+      setSelectedPantry(matches[0]);
+    } else {
+      setSelectedPantry(null);
+    }
   };
 
   // Filtered Pantries
   const filteredPantries = useMemo(() => {
-    let list = [...pantriesList];
-    const q = query.trim().toLowerCase();
-
-    if (!q && !activeFilter) return pantriesList;
-
-    if (activeFilter === 'tonight') {
-      list = list.filter((p) => p.open_tonight);
-    } else if (activeFilter === 'no_id') {
-      list = list.filter((p) => !p.requires_id);
-    } else if (activeFilter === 'produce') {
-      list = list.filter((p) =>
-        p.shelf_items?.some((item) => item.category_name.toLowerCase().includes('produce') && item.band === 'plenty')
-      );
-    }
-
-    if (q) {
-      list = list.filter((p) => {
-        const nameMatch = p.name.toLowerCase().includes(q);
-        const neighborhoodMatch = p.neighborhood.toLowerCase().includes(q);
-        const addressMatch = p.address.toLowerCase().includes(q);
-        const notesMatch = p.notes.toLowerCase().includes(q);
-        const categoryMatch = p.shelf_items?.some((item) => 
-          item.category_name.toLowerCase().includes(q)
-        );
-        const zipMatch = p.address.includes(q) || (q.match(/\b\d{5}\b/) && p.address.includes(q.match(/\b\d{5}\b/)![0]));
-        const toniteMatch = (q.includes('tonight') || q.includes('tonite') || q.includes('open')) && p.open_tonight;
-        const noIdMatch = (q.includes('no id') || q.includes('without id')) && !p.requires_id;
-
-        return nameMatch || neighborhoodMatch || addressMatch || zipMatch || notesMatch || categoryMatch || toniteMatch || noIdMatch;
-      });
-    }
-
-    return list;
+    return filterPantriesIntelligently(pantriesList, query, activeFilter);
   }, [query, activeFilter, pantriesList]);
+
+  // Ensure first matching pantry is selected on results view
+  React.useEffect(() => {
+    if (hasSearched && filteredPantries.length > 0) {
+      if (!selectedPantry || !filteredPantries.some((p) => p.id === selectedPantry.id)) {
+        setSelectedPantry(filteredPantries[0]);
+      }
+    }
+  }, [filteredPantries, hasSearched]);
 
   // Conversational response synthesis
   const conversationalSummary = useMemo(() => {
@@ -166,14 +297,14 @@ export default function Home() {
     if (filteredPantries.length === 0) {
       return (
         <span>
-          No direct pantries located matching &ldquo;<strong>{query}</strong>&rdquo;. Try searching by nearby neighborhoods like <em>Hampden</em>, <em>Old Goucher</em>, <em>Downtown</em>, or zip codes like <em>21211</em>, <em>21218</em>, <em>21220</em>.
+          No direct pantries located matching &ldquo;<strong>{query}</strong>&rdquo;. Try searching by nearby neighborhoods like <em>Hampden</em>, <em>Middle River</em>, <em>Downtown</em>, or zip codes like <em>21211</em>, <em>21218</em>, <em>21220</em>.
         </span>
       );
     }
     if (q.includes('21220') || q.includes('middle river')) {
       return (
         <span>
-          Found <strong className="text-emerald-950">{filteredPantries.length} emergency food sites serving zip code 21220</strong> (Middle River / Eastern Baltimore).
+          Found <strong className="text-emerald-950">{filteredPantries.length} emergency food sites serving Middle River / Eastern Baltimore</strong>.
         </span>
       );
     }
@@ -185,14 +316,14 @@ export default function Home() {
         </span>
       );
     }
-    if (q.includes('produce')) {
+    if (q.includes('produce') || q.includes('verdura') || q.includes('fruta')) {
       return (
         <span>
           Found <strong className="text-emerald-950">{filteredPantries.length} pantries with fresh produce</strong> on shelves right now in Baltimore.
         </span>
       );
     }
-    if (q.includes('tonight')) {
+    if (q.includes('tonight') || q.includes('noche')) {
       return (
         <span>
           Found <strong className="text-emerald-950">{filteredPantries.length} pantries open tonight</strong> with walk-in availability.
