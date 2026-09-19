@@ -536,6 +536,7 @@ export default function Home() {
       {/* Secure Pantry View Login Modal */}
       <PantryLoginModal
         isOpen={showLoginModal}
+        pantries={pantriesList}
         onClose={() => setShowLoginModal(false)}
         onRegisterPantry={handleRegisterNewPantry}
         onSuccess={(pantry) => {

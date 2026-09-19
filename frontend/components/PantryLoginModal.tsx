@@ -6,16 +6,19 @@ import { Lock, ShieldCheck, Building2, KeyRound, X, AlertCircle, PlusCircle, Spa
 
 interface PantryLoginModalProps {
   isOpen: boolean;
+  pantries?: Pantry[];
   onClose: () => void;
   onSuccess: (pantry: Pantry) => void;
   onRegisterPantry?: (newPantry: Pantry) => void;
 }
 
-export default function PantryLoginModal({ isOpen, onClose, onSuccess, onRegisterPantry }: PantryLoginModalProps) {
+export default function PantryLoginModal({ isOpen, pantries, onClose, onSuccess, onRegisterPantry }: PantryLoginModalProps) {
   const [activeMode, setActiveMode] = useState<'login' | 'register'>('login');
   
+  const allPantries = pantries && pantries.length > 0 ? pantries : BALTIMORE_PANTRIES;
+
   // Login State
-  const [selectedPantryId, setSelectedPantryId] = useState<string>(BALTIMORE_PANTRIES[0].id);
+  const [selectedPantryId, setSelectedPantryId] = useState<string>(allPantries[0].id);
   const [pin, setPin] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,7 +35,7 @@ export default function PantryLoginModal({ isOpen, onClose, onSuccess, onRegiste
 
   if (!isOpen) return null;
 
-  const currentPantry = BALTIMORE_PANTRIES.find((p) => p.id === selectedPantryId) || BALTIMORE_PANTRIES[0];
+  const currentPantry = allPantries.find((p) => p.id === selectedPantryId) || allPantries[0];
 
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,6 +100,7 @@ export default function PantryLoginModal({ isOpen, onClose, onSuccess, onRegiste
 
     setTimeout(() => {
       setIsSubmitting(false);
+      setSelectedPantryId(newPantry.id);
       if (onRegisterPantry) {
         onRegisterPantry(newPantry);
       }
@@ -184,7 +188,7 @@ export default function PantryLoginModal({ isOpen, onClose, onSuccess, onRegiste
                     }}
                     className="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl px-3.5 py-2.5 font-medium focus:ring-2 focus:ring-emerald-700 focus:border-transparent outline-none transition appearance-none cursor-pointer"
                   >
-                    {BALTIMORE_PANTRIES.map((pantry) => (
+                    {allPantries.map((pantry) => (
                       <option key={pantry.id} value={pantry.id}>
                         {pantry.name} ({pantry.neighborhood})
                       </option>
