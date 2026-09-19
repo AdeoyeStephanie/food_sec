@@ -37,13 +37,21 @@ async def checkin(request: CheckInRequest, conn: asyncpg.Connection = Depends(ge
 
 @router.post("/correction")
 async def correction(request: CorrectionRequest, conn: asyncpg.Connection = Depends(get_db_conn)):
-    """Volunteer closing check. Insert shelf_state rows with source='volunteer_correction'."""
+    """Volunteer closing check. Insert shelf_state rows with Kalman-blended confidence and estimated quantity."""
     query = """
-        INSERT INTO shelf_state (time, pantry_id, category_id, band, source, confidence)
-        VALUES (NOW(), $1, $2, $3, 'volunteer_correction', 1.0)
+        INSERT INTO shelf_state (time, pantry_id, category_id, band, estimated_qty, source, confidence)
+        VALUES (NOW(), $1, $2, $3, $4, 'volunteer_correction', $5)
     """
-    # Use executemany for batch inserts
-    args = [(request.pantry_id, c.category_id, c.band) for c in request.corrections]
+    args = [
+        (
+            request.pantry_id,
+            c.category_id,
+            c.band,
+            c.estimated_qty,
+            c.confidence if c.confidence is not None else 0.92
+        )
+        for c in request.corrections
+    ]
     try:
         await conn.executemany(query, args)
     except asyncpg.exceptions.ForeignKeyViolationError as err:

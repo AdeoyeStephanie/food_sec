@@ -38,7 +38,8 @@ export default function VolunteerPage() {
 
     setTimeout(() => {
       setIsSubmitting(false);
-      if (pin === '4827' || pin === '1234' || pin === '7789') {
+      const validPins = ['2026', '1234', '7789', '4827'];
+      if (validPins.includes(pin)) {
         setAuthenticatedPantry(currentPantry);
         setIsAuthenticated(true);
       } else {

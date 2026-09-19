@@ -381,7 +381,7 @@ export default function Home() {
       return (
         <span>
           Found pantries open near Hampden.{' '}
-          <strong className="text-emerald-950">Northside Family Pantry</strong> has both diapers and halal items in stock.
+          <strong className="text-emerald-950">Northside Family Pantry [Demo Sandbox]</strong> has both diapers and halal items in stock.
         </span>
       );
     }
@@ -431,7 +431,7 @@ export default function Home() {
           }}
           className="cursor-pointer flex items-center gap-2.5 select-none"
         >
-          <BrandLogo variant="pulse-pin" size={32} showText={false} />
+          <BrandLogo variant="community-bowl" size={32} showText={false} />
           <div>
             <h1 className="font-extrabold text-base md:text-lg tracking-tight text-emerald-950 leading-none">
               {t.appName}

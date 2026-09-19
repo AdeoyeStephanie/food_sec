@@ -54,8 +54,8 @@ export interface TranslationDict {
 
 export const TRANSLATIONS: Record<Language, TranslationDict> = {
   en: {
-    appName: 'Find Food Baltimore',
-    appSubtitle: 'Live Shelf Stock & Pantries',
+    appName: 'Pantry Pulse',
+    appSubtitle: 'Baltimore',
     pantryView: 'Pantry View',
     heroTitle: 'What do you need today?',
     heroSubtitle: "Search by zip code (e.g. 21218, 21220), neighborhood, or food item. Say it however you'd ask a neighbor.",
@@ -103,8 +103,8 @@ export const TRANSLATIONS: Record<Language, TranslationDict> = {
     out: 'Out',
   },
   es: {
-    appName: 'Encuentra Comida Baltimore',
-    appSubtitle: 'Disponibilidad de Alimentos en Vivo',
+    appName: 'Pantry Pulse',
+    appSubtitle: 'Baltimore',
     pantryView: 'Vista de Despensa',
     heroTitle: '¿Qué necesita el día de hoy?',
     heroSubtitle: 'Busque por código postal (ej. 21218, 21220), vecindario o alimento. Escríbalo como le preguntaría a un vecino.',

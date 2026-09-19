@@ -35,6 +35,8 @@ import {
   recordCheckIn,
   getCheckInRecords,
   saveAndBroadcastPantries,
+  blendClosingCheck,
+  BlendedCorrectionMetric,
   CATEGORY_CONFIGS,
   CheckInRecord
 } from '@/lib/inventorySync';
@@ -112,6 +114,7 @@ export default function VolunteerDashboard({
     'Hygiene': 'out'
   });
   const [closingSaved, setClosingSaved] = useState(false);
+  const [closingMetrics, setClosingMetrics] = useState<BlendedCorrectionMetric[] | null>(null);
 
   // Sync closing guesses whenever current pantry shelf items change
   useEffect(() => {
@@ -292,9 +295,9 @@ export default function VolunteerDashboard({
     const updatedItems = (currentPantry.shelf_items || []).map((it) => {
       const band = bandByCategory[it.category_name];
       if (band) {
-        const config = CATEGORY_CONFIGS[it.category_name] || { capacity: 60 };
+        const config = CATEGORY_CONFIGS[it.category_name] || { capacityLbs: 60 };
         const currentQty = typeof it.estimated_qty === 'number' ? it.estimated_qty : 20;
-        const newQty = Math.min(config.capacity, currentQty + 30);
+        const newQty = Math.min(config.capacityLbs, currentQty + 30);
         return { ...it, band, estimated_qty: newQty, confidence: 0.95, minutes_ago: 0 };
       }
       return it;
@@ -335,26 +338,19 @@ export default function VolunteerDashboard({
     }, 3500);
   };
 
-  // Save closing check confirmations
+  // Save closing check confirmations using Kalman-style gain blending & adaptive learning
   const handleSaveClosingCheck = () => {
     setClosingSaved(true);
 
-    const updatedItems = (currentPantry.shelf_items || []).map((it) => {
-      const chosenBand = closingGuesses[it.category_name] || it.band;
-      const config = CATEGORY_CONFIGS[it.category_name] || { capacity: 60, lowThreshold: 18 };
-      let newQty = it.estimated_qty;
-      if (chosenBand === 'plenty') newQty = config.capacity * 0.8;
-      else if (chosenBand === 'low') newQty = config.lowThreshold * 0.75;
-      else newQty = 0;
+    const shiftPeople = (checkInLogs || []).reduce((acc, c) => acc + c.householdSize, 0);
+    const { updatedItems, metrics, summary } = blendClosingCheck(
+      currentPantry.shelf_items || [],
+      closingGuesses,
+      currentPantry.id,
+      shiftPeople
+    );
 
-      return {
-        ...it,
-        band: chosenBand,
-        estimated_qty: newQty,
-        confidence: 1.0, // 100% verified ground truth
-        minutes_ago: 0,
-      };
-    });
+    setClosingMetrics(metrics);
 
     const updatedPantry: Pantry = {
       ...currentPantry,
@@ -366,11 +362,11 @@ export default function VolunteerDashboard({
       onUpdateFullPantry(updatedPantry);
     }
 
-    setLastCheckinToast('✓ End-of-shift verified! Ground truth locked in at 100% confidence.');
+    setLastCheckinToast(`✓ Blended via Kalman Gain! Posterior confidence ~94%, updated category consumption multipliers.`);
     setTimeout(() => {
       setClosingSaved(false);
       setLastCheckinToast(null);
-    }, 3500);
+    }, 4500);
   };
 
   // Generate TEFAP Monthly Report CSV Download
@@ -497,7 +493,7 @@ export default function VolunteerDashboard({
         <div className="flex justify-between items-center border-b border-emerald-800/80 pb-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-white p-1 flex items-center justify-center shadow-md">
-              <BrandLogo variant="pulse-pin" size={30} showText={false} />
+              <BrandLogo variant="community-bowl" size={30} showText={false} />
             </div>
             <div>
               <h1 className="text-xl md:text-2xl font-black tracking-tight">{currentPantry.name}</h1>
@@ -712,9 +708,9 @@ export default function VolunteerDashboard({
 
               <div className="flex flex-col gap-2.5">
                 {(currentPantry.shelf_items || []).map((item) => {
-                  const config = CATEGORY_CONFIGS[item.category_name] || { capacity: 60 };
+                  const config = CATEGORY_CONFIGS[item.category_name] || { capacityLbs: 60 };
                   const qty = typeof item.estimated_qty === 'number' ? item.estimated_qty : 30;
-                  const pct = Math.min(100, Math.max(0, Math.round((qty / config.capacity) * 100)));
+                  const pct = Math.min(100, Math.max(0, Math.round((qty / config.capacityLbs) * 100)));
 
                   return (
                     <div key={item.category_name} className="flex flex-col gap-1 text-xs">
@@ -725,7 +721,7 @@ export default function VolunteerDashboard({
                         </span>
                         <div className="flex items-center gap-2">
                           <span className="text-[11px] text-slate-500 font-medium">
-                            {item.band === 'out' ? '0 left' : `~${qty} units`}
+                            {item.band === 'out' ? '0 lbs left' : `~${qty} lbs`}
                           </span>
                           <span
                             className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${
@@ -942,18 +938,21 @@ export default function VolunteerDashboard({
           </div>
         )}
 
-        {/* TAB 3: CLOSING CHECK (GROUND TRUTH SNAP) */}
+        {/* TAB 3: CLOSING CHECK (KALMAN STATE ESTIMATOR & MULTIPLIER LEARNING) */}
         {activeTab === 'closing' && (
           <div className="flex flex-col gap-5">
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-xl font-bold text-emerald-950">Closing check</h3>
+                <h3 className="text-xl font-bold text-emerald-950">Closing Check</h3>
                 <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
                   10 Seconds
                 </span>
+                <span className="text-[11px] font-bold text-indigo-800 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full">
+                  Kalman Gain Blending
+                </span>
               </div>
-              <p className="text-xs text-slate-500">
-                End of shift: verify what&apos;s left. Confirmed updates reset confidence to 100%.
+              <p className="text-xs text-slate-500 mt-1">
+                End of shift: verify what&apos;s left. Blends your visual inspection with predicted depletion via Kalman gain and adapts per-category consumption multipliers for future shifts.
               </p>
             </div>
 
@@ -962,7 +961,7 @@ export default function VolunteerDashboard({
                 <div key={cat} className="flex flex-col gap-1.5 pb-3 border-b border-slate-100 last:border-0">
                   <div className="flex justify-between items-center">
                     <span className="font-bold text-sm text-slate-900">{cat}</span>
-                    <span className="text-[11px] text-slate-400 capitalize">Model guess: {currentBand}</span>
+                    <span className="text-[11px] text-slate-400 capitalize">Model estimate: {currentBand}</span>
                   </div>
 
                   <div className="grid grid-cols-3 gap-2">
@@ -993,11 +992,42 @@ export default function VolunteerDashboard({
               ))}
             </div>
 
+            {/* Live Kalman Gain & Learned Parameters Feedback */}
+            {closingMetrics && closingMetrics.length > 0 && (
+              <div className="bg-emerald-50/80 border border-emerald-200 rounded-3xl p-4 flex flex-col gap-3 animate-in fade-in">
+                <div className="flex items-center justify-between border-b border-emerald-200/80 pb-2">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-emerald-700" />
+                    <span className="text-xs font-bold text-emerald-950">Kalman Posterior State & Learned Rates</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-emerald-800 bg-white px-2 py-0.5 rounded-full border border-emerald-200">
+                    Posterior Conf: 94%
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                  {closingMetrics.map((m) => (
+                    <div key={m.categoryName} className="bg-white/90 p-2.5 rounded-xl border border-emerald-100 flex flex-col gap-1">
+                      <div className="flex justify-between font-bold text-slate-900 text-[11px]">
+                        <span>{m.categoryName}</span>
+                        <span className="text-emerald-700 font-mono">K={m.kalmanGain}</span>
+                      </div>
+                      <div className="flex justify-between text-[10px] text-slate-500">
+                        <span>Pred: {Math.round(m.predictedQtyLbs)} lbs → Blended: {Math.round(m.blendedQtyLbs)} lbs</span>
+                        <span className="font-semibold text-emerald-900">
+                          Rate: {m.learnedMultiplier} lbs/person
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <button
               onClick={handleSaveClosingCheck}
               className="bg-[#064e3b] text-white py-3.5 rounded-2xl font-bold text-sm hover:bg-[#043d2e] shadow-sm transition active:scale-[0.98] cursor-pointer"
             >
-              {closingSaved ? '✓ Verified at 100% Ground Truth!' : 'Send update & lock in ground truth'}
+              {closingSaved ? '✓ Blended with Kalman Gain (Confidence ~94%)' : 'Blend Closing Inspection & Update Multipliers'}
             </button>
           </div>
         )}

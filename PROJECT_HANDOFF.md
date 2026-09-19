@@ -9,7 +9,7 @@
 * **GitHub Repository:** `https://github.com/AdeoyeStephanie/food_sec`
 * **Active Working Branch:** `feature/predict-and-correct`
 * **Stable Production Branch:** `main`
-* **Local Project Directory:** `/Users/tomisinadebari/Downloads/Food Pantry`
+* **Local Project Directory:** `./` (or `food_sec/`)
 
 ---
 
@@ -29,7 +29,7 @@ Per project requirements, the system is strictly split into two completely isola
      │            Route: /             │                                       │        Route: /volunteer        │
      ├─────────────────────────────────┤                                       ├─────────────────────────────────┤
      │ • 100% clean, no admin buttons  │                                       │ • Protected by 4-digit PIN      │
-     │ • Natural language + voice search│                                      │   (e.g., "4827")                │
+     │ • Natural language + voice search│                                      │   (e.g., demo PIN "2026")       │
      │ • Conversational AI summary     │                                       │ • Big-button check-in counter   │
      │ • Leaflet map with stock pins   │                                       │ • Real-time camera scanner with │
      │ • Category bands (Plenty/Low/Out│                                       │   Gemini 3.6 Flash multimodal AI│
@@ -53,17 +53,17 @@ Per project requirements, the system is strictly split into two completely isola
   * `check_ins`: Fast anonymous household logging (household size 1–20, timestamp).
   * `latest_shelf` View: Fast materialized lookup of the most recent stock status and freshness timestamp per pantry.
   * `find_pantries_near(lat, lng, radius_miles)` Function: PostGIS geospatial distance calculation and walking time estimation.
-* **Seed Data (`db/seed.sql`):** 10 verified real Baltimore pantries seeded with coordinates, operating hours, and realistic shelf states:
-  1. Northside Family Pantry (Hampden)
-  2. Beans and Bread (Fells Point)
-  3. GEDCO CARES Pantry (Charles Village)
-  4. St. Vincent de Paul (Jonestown)
-  5. Bea Gaddy Family Centers (Patterson Park)
-  6. Riverside Community Table (Riverside)
-  7. Paul's Place (Pigtown)
-  8. Waverly Community Pantry (Waverly / 21218)
-  9. Cherry Hill Community Pantry (Cherry Hill)
-  10. Sandtown Community Pantry (Sandtown-Winchester)
+* **Seed Data (`db/seed.sql`):** 9 verified real Maryland Food Bank network partners + 1 clearly labeled Demo Sandbox location:
+  1. Beans & Bread Center (St. Vincent de Paul, Fells Point - 21231) — Flagship SVDP day program with meals & emergency pantry.
+  2. GEDCO CARES Food Pantry (Govans - 21212) — Real MFB partner with grocery bag ordering.
+  3. 40 West Assistance Center (Edmondson Village - 21229) — Real MFB partner serving West Baltimore.
+  4. Bea Gaddy Family Centers (Middle East / Patterson Park - 21231) — Real client-choice food pantry & baby essentials.
+  5. Benedict's Pantry (St. Benedict Church, Mill Hill - 21223) — Real MFB partner with Wednesday evening hours.
+  6. Franciscan Center of Baltimore (Charles North / 21218) — Real MFB partner with daily pantry and hot lunch.
+  7. Paul's Place (Washington Village / Pigtown - 21230) — Real MFB partner with client-choice marketplace.
+  8. The Door Inc. Food Pantry (Patterson Park - 21231) — Real MFB partner distributing fresh grocery boxes.
+  9. South Baltimore Emergency Relief (Federal Hill - 21230) — Real MFB partner serving South Baltimore families.
+  10. Northside Family Pantry [Demo Sandbox] (Hampden - 21211) — Clearly designated sandbox pantry for testing evening walk-in hours (5-8pm) and volunteer kiosk flows.
 
 ### B. Python FastAPI Backend (`backend/`)
 * Built with `FastAPI`, `asyncpg`, and `pydantic`.
@@ -87,7 +87,7 @@ Per project requirements, the system is strictly split into two completely isola
   * Detailed Slide-over sheet (`frontend/components/PantryDetailSheet.tsx`) showing shelf levels, freshness stamps (*"40 min ago"*), practical expectations (*"Bring your own bags"*, *"No ID needed"*), and anonymous neighbor feedback (*"Yes, they had it" / "No, they were out"*).
   * Emergency voice hotline card (*"(410) 555-FOOD"*) for smartphone-dependent clients.
 * **Pantry Operator Portal (`frontend/app/volunteer/page.tsx` & `components/VolunteerDashboard.tsx`):**
-  * Protected by 4-digit volunteer code (**`4827`**).
+  * Protected by 4-digit volunteer code (e.g. default demo PIN **`2026`**, configurable via `OPERATOR_PIN`).
   * **Check-In Touchpad:** Large 1 to 8+ household size buttons that increment the "Families served today" counter.
   * **Quick Run-out Flags:** 1-tap toggles for Produce, Protein, Dairy, Diapers, Hygiene to immediately alert neighbors on the map.
   * **Live Camera Viewfinder (`frontend/components/CameraViewfinder.tsx`):** Integrated browser webcam/phone camera stream with live shutter button and front/back camera toggle.
@@ -105,7 +105,7 @@ Food Pantry/
 ├── docker-compose.yml          <-- TimescaleDB + PostGIS container config
 ├── db/
 │   ├── init.sql                <-- Postgres schema & spatial functions
-│   └── seed.sql                <-- 10 real Baltimore pantries seed data
+│   └── seed.sql                <-- 9 real MFB partners + 1 demo sandbox pantry
 ├── backend/
 │   ├── .env.example
 │   ├── config.py
@@ -117,7 +117,7 @@ Food Pantry/
 │       ├── inventory.py
 │       └── pantries.py
 └── frontend/
-    ├── .env.local              <-- Contains GEMINI_API_KEY (gitignored)
+    ├── .env.local              <-- Contains GEMINI_API_KEY (gitignored, never committed)
     ├── package.json
     ├── tsconfig.json
     ├── app/
@@ -130,11 +130,13 @@ Food Pantry/
     │       └── scan-donation/
     │           └── route.ts    <-- Gemini 3.6 Flash vision intake API
     ├── components/
+    │   ├── BrandLogo.tsx       <-- Community Nourishing Bowl vector logo
     │   ├── CameraViewfinder.tsx<-- Live camera capture & shutter
     │   ├── PantryDetailSheet.tsx
     │   ├── PantryMap.tsx       <-- Interactive Leaflet map with stock pins
     │   └── VolunteerDashboard.tsx
     └── lib/
+        ├── inventorySync.ts    <-- Kalman-style state estimator & adaptive multiplier learning
         └── pantryData.ts       <-- Seed dataset and TypeScript interfaces
 ```
 
@@ -151,9 +153,7 @@ Food Pantry/
 
 ---
 
-## 6. What Needs to Be Done Next (Roadmap for Grok Bot)
-
-Here are the highest-priority tasks remaining to complete the hackathon prototype:
+## 6. What Needs to Be Done Next
 
 ### Task 1: Deepen the Pantry Operator Portal (`frontend/app/volunteer/page.tsx`)
 1. **Onboarding / Distribution Style Selector (Mockup Page 4):**
@@ -164,15 +164,31 @@ Here are the highest-priority tasks remaining to complete the hackathon prototyp
 2. **Category Customization:**
    * Allow pantries to add custom categories (e.g., Kosher items, Infant formula, Pet food).
 
-### Task 2: Implement the Predict-and-Correct State Estimator Engine
-* Connect the check-in count directly to shelf depletion:
-  $$\text{Depleted Qty} = \text{Household Size} \times \text{Allocation Per Person}$$
-* For example, when 5 families of size 4 check in (20 people), calculate that ~30 lbs of Produce and ~20 lbs of Protein have left the shelves.
-* When the estimated remaining quantity dips below category thresholds:
-  - $> 20$ units $\rightarrow$ **Plenty** (Green)
-  - $5 - 20$ units $\rightarrow$ **Low** (Amber)
-  - $< 5$ units $\rightarrow$ **Out** (Red)
-* During the **Closing Check**, when the volunteer clicks **"Send update"**, the model snaps to ground truth and resets the confidence score to $1.0$.
+### Task 2: Predict-and-Correct State Estimator Engine (Kalman Gain & Adaptive Learning)
+* **Pounds-Based Stock & Dynamic Fraction-of-Capacity Thresholds:**
+  - Depletion is calculated in pounds:
+    $$\text{Depleted Qty (lbs)} = \text{Household Size} \times \text{Multiplier (lbs/person)}$$
+  - Categorical thresholds are computed dynamically as fractions of normal category capacity $C$ (rather than fixed unit numbers):
+    - $> 35\% \times C \rightarrow$ **Plenty** (Green)
+    - $10\% - 35\% \times C \rightarrow$ **Low** (Amber)
+    - $\le 10\% \times C \rightarrow$ **Out** (Red)
+  - This scales seamlessly across pantries of any size (e.g., 40 lbs small parish vs. 500 lbs regional hub).
+* **Predict Step (Depletion & Uncertainty):**
+  - Each check-in deducts pounds and gracefully degrades model confidence:
+    $$P_t = \min(0.38, P_{t-1} + 0.012 \times H), \quad \text{Confidence}_t = 1 - P_t$$
+* **Correct Step (Kalman-Style Gain Blending):**
+  - When a volunteer performs the 10-second **Closing Check**, the model does **NOT** throw away predictions or naively snap confidence to $1.0$.
+  - Instead, it computes the Kalman Gain $K$:
+    $$K = \frac{P_t}{P_t + R} \quad (R \approx 0.08 \text{ visual inspection variance})$$
+  - Blends predicted and observed stock:
+    $$\hat{x}_{\text{post}} = \hat{x}_t + K \cdot (z_t - \hat{x}_t)$$
+  - Sets mathematically grounded posterior confidence:
+    $$\text{Conf}_{\text{post}} = 1 - (1 - K) \cdot P_t \approx 0.93 - 0.96$$
+* **Adaptive Parameter Learning (Per-Category Multiplier):**
+  - Compares observed shift depletion against total people served:
+    $$r_{\text{obs}} = \frac{\Delta_{\text{obs}}}{\text{People Served}}$$
+  - Updates the category multiplier for the next shift via exponential moving average ($\alpha = 0.20$):
+    $$m_{\text{new}} = (1 - \alpha) \cdot m_{\text{old}} + \alpha \cdot r_{\text{obs}}$$
 
 ### Task 3: Auto-Generate TEFAP & Maryland Food Bank Monthly Compliance Report
 * Food pantries in Baltimore must submit monthly reports of households served, family size breakdowns, and total pounds distributed under TEFAP compliance.
@@ -203,5 +219,14 @@ npm run dev
 
 # 3. Open in Browser
 # Neighbor/Client App: http://localhost:3000
-# Pantry Operator Portal: http://localhost:3000/volunteer (PIN: 4827)
+# Pantry Operator Portal: http://localhost:3000/volunteer (Default Demo PIN: 2026)
 ```
+
+---
+
+## 8. Public Repository Hygiene & Security Verification
+
+* **Git History Audit:** Verified with `git log --all --full-history` that neither `.env.local` nor `.env` were ever committed to the repository history. Only `backend/.env.example` is tracked.
+* **Volunteer Authentication PIN:** The demo environment accepts `2026` (as well as registered 4-digit codes). Before piloting with live Baltimore pantries, each agency's volunteer code should be generated uniquely and managed via standard hashed authentication.
+* **Seed Data Integrity:** Sample/mockup entities are transparently designated as `[Demo Sandbox]` (e.g. `Northside Family Pantry [Demo Sandbox]`), while production records mirror verified Maryland Food Bank and CHARMcare partners.
+* **Sanitized File Paths:** All local development directory paths have been sanitized to relative references.

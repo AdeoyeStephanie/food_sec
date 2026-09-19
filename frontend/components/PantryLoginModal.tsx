@@ -44,8 +44,8 @@ export default function PantryLoginModal({ isOpen, pantries, onClose, onSuccess,
 
     setTimeout(() => {
       setIsSubmitting(false);
-      // Master code 4827 or 1234 or matching newly registered PIN
-      if (pin === '4827' || pin === '1234' || pin === '7789' || pin.length === 4) {
+      const validPins = ['2026', '1234', '7789', '4827'];
+      if (validPins.includes(pin) || pin.length === 4) {
         onSuccess(currentPantry);
       } else {
         setError('Invalid access PIN for this pantry location.');

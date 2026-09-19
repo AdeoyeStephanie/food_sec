@@ -37,6 +37,8 @@ class CheckInRequest(BaseModel):
 class CorrectionItem(BaseModel):
     category_id: int
     band: str
+    confidence: Optional[float] = None
+    estimated_qty: Optional[float] = None
 
 class CorrectionRequest(BaseModel):
     pantry_id: UUID

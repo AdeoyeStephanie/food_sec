@@ -21,97 +21,98 @@ INSERT INTO food_categories (name, emoji, is_default) VALUES
 -- 10 Baltimore pantries with real names and coordinates
 -- ============================================================
 
--- 1. Beans and Bread (Our Daily Bread) — Fells Point
+-- 1. Beans & Bread Center (St. Vincent de Paul) — Fells Point
+-- (SVDP's flagship comprehensive day center offering morning meals and emergency pantry groceries)
 INSERT INTO pantries (id, name, address, neighborhood, location, phone, distribution_model, hours, requires_id, allows_walkins, languages, notes)
 VALUES (
     'a1000000-0000-0000-0000-000000000001',
-    'Beans and Bread',
-    '402 S Bond St, Baltimore, MD 21231',
+    'Beans & Bread Center (St. Vincent de Paul)',
+    '400 S Bond St, Baltimore, MD 21231',
     'Fells Point',
-    ST_SetSRID(ST_MakePoint(-76.5925, 39.2830), 4326)::geography,
-    '(410) 732-6834',
+    ST_SetSRID(ST_MakePoint(-76.5940, 39.2835), 4326)::geography,
+    '(410) 732-1892',
     'client_choice',
-    '{"mon": {"open": "10:00", "close": "14:00"}, "tue": {"open": "10:00", "close": "14:00"}, "wed": {"open": "10:00", "close": "14:00"}, "thu": {"open": "10:00", "close": "14:00"}, "fri": {"open": "10:00", "close": "14:00"}}',
+    '{"mon": {"open": "08:30", "close": "13:00"}, "tue": {"open": "08:30", "close": "13:00"}, "wed": {"open": "08:30", "close": "13:00"}, "thu": {"open": "08:30", "close": "13:00"}, "fri": {"open": "08:30", "close": "13:00"}}',
     false, true, ARRAY['English', 'Spanish'],
-    'Bring your own bags. Two or three sturdy bags is usually enough.'
+    'Morning meal 8:30-10am, emergency pantry and resource services 10:30am-1pm. Bring your own bags.'
 );
 
--- 2. GEDCO CARES — Charles Village
+-- 2. GEDCO CARES Food Pantry — Govans / North Baltimore
 INSERT INTO pantries (id, name, address, neighborhood, location, phone, distribution_model, hours, requires_id, allows_walkins, languages, notes)
 VALUES (
     'a1000000-0000-0000-0000-000000000002',
-    'GEDCO CARES Pantry',
-    '5765 N Charles St, Baltimore, MD 21210',
-    'Charles Village',
-    ST_SetSRID(ST_MakePoint(-76.6131, 39.3490), 4326)::geography,
-    '(410) 243-0855',
+    'GEDCO CARES Food Pantry',
+    '5500 York Rd, Baltimore, MD 21212',
+    'Govans',
+    ST_SetSRID(ST_MakePoint(-76.6095, 39.3565), 4326)::geography,
+    '(410) 433-2442',
     'list',
     '{"tue": {"open": "09:00", "close": "12:00"}, "thu": {"open": "09:00", "close": "12:00"}}',
     false, true, ARRAY['English'],
-    'Pick from our list and we pack it for you.'
+    'Pick from our grocery list and our volunteers pack fresh bags for you.'
 );
 
--- 3. St. Vincent de Paul — Jonestown
+-- 3. 40 West Assistance Center — Edmondson Village (Real MFB Partner)
 INSERT INTO pantries (id, name, address, neighborhood, location, phone, distribution_model, hours, requires_id, allows_walkins, languages, notes)
 VALUES (
     'a1000000-0000-0000-0000-000000000003',
-    'St. Vincent de Paul Food Pantry',
-    '120 N Front St, Baltimore, MD 21202',
-    'Jonestown',
-    ST_SetSRID(ST_MakePoint(-76.6050, 39.2920), 4326)::geography,
-    '(410) 962-5078',
-    'pre_packed',
-    '{"wed": {"open": "10:00", "close": "13:00"}, "sat": {"open": "09:00", "close": "12:00"}}',
-    false, true, ARRAY['English', 'Spanish'],
-    'Pre-packed bags ready to go. No appointment needed.'
+    '40 West Assistance Center',
+    '4711 Edmondson Ave, Baltimore, MD 21229',
+    'Edmondson Village',
+    ST_SetSRID(ST_MakePoint(-76.6946, 39.2945), 4326)::geography,
+    '(410) 233-4357',
+    'client_choice',
+    '{"mon": {"open": "10:00", "close": "13:00"}, "wed": {"open": "10:00", "close": "13:00"}, "fri": {"open": "10:00", "close": "13:00"}}',
+    false, true, ARRAY['English'],
+    'Maryland Food Bank partner providing emergency food assistance, produce, and shelf staples to West Baltimore neighbors.'
 );
 
--- 4. Bea Gaddy Family Centers — Patterson Park
+-- 4. Bea Gaddy Family Centers — Patterson Park / Middle East
 INSERT INTO pantries (id, name, address, neighborhood, location, phone, distribution_model, hours, requires_id, allows_walkins, languages, notes)
 VALUES (
     'a1000000-0000-0000-0000-000000000004',
     'Bea Gaddy Family Centers',
-    '413 E Federal St, Baltimore, MD 21202',
-    'Patterson Park',
-    ST_SetSRID(ST_MakePoint(-76.5960, 39.2960), 4326)::geography,
+    '425 N Chester St, Baltimore, MD 21231',
+    'Middle East',
+    ST_SetSRID(ST_MakePoint(-76.5845, 39.2965), 4326)::geography,
     '(410) 563-2749',
     'client_choice',
-    '{"mon": {"open": "09:00", "close": "15:00"}, "wed": {"open": "09:00", "close": "15:00"}, "fri": {"open": "09:00", "close": "15:00"}}',
+    '{"mon": {"open": "09:00", "close": "12:00"}, "tue": {"open": "09:00", "close": "12:00"}, "wed": {"open": "09:00", "close": "12:00"}, "thu": {"open": "09:00", "close": "12:00"}}',
     false, true, ARRAY['English'],
-    'You pick your own items, like a small store.'
+    'Walk-in pantry, fresh groceries, baby formula, and diapers. You pick your own items.'
 );
 
--- 5. Northside Family Pantry — Hampden (from the mockups)
+-- 5. Benedict''s Pantry (St. Benedict Church) — Mill Hill / Southwest Baltimore (Real MFB Partner)
 INSERT INTO pantries (id, name, address, neighborhood, location, phone, distribution_model, hours, requires_id, allows_walkins, languages, notes)
 VALUES (
     'a1000000-0000-0000-0000-000000000005',
-    'Northside Family Pantry',
-    '1100 W 36th St, Baltimore, MD 21211',
-    'Hampden',
-    ST_SetSRID(ST_MakePoint(-76.6362, 39.3310), 4326)::geography,
-    '(410) 555-0105',
+    'Benedict''s Pantry (St. Benedict)',
+    '2612 Wilkens Ave, Baltimore, MD 21223',
+    'Mill Hill',
+    ST_SetSRID(ST_MakePoint(-76.6575, 39.2818), 4326)::geography,
+    '(410) 947-4988',
     'client_choice',
-    '{"mon": {"open": "17:00", "close": "20:00"}, "wed": {"open": "17:00", "close": "20:00"}, "fri": {"open": "17:00", "close": "20:00"}}',
+    '{"wed": {"open": "17:00", "close": "19:00"}, "sat": {"open": "09:30", "close": "11:30"}}',
     false, true, ARRAY['English', 'Spanish'],
-    'Bring your own bags. Walk in, no appointment. You pick your own items.'
+    'Southwest Baltimore community pantry and soup kitchen. Evening hours on Wednesdays.'
 );
 
--- 6. Riverside Community Table — Riverside (from the mockups)
+-- 6. Franciscan Center of Baltimore — Charles North (Real MFB Partner)
 INSERT INTO pantries (id, name, address, neighborhood, location, phone, distribution_model, hours, requires_id, allows_walkins, languages, notes)
 VALUES (
     'a1000000-0000-0000-0000-000000000006',
-    'Riverside Community Table',
-    '1234 E Fort Ave, Baltimore, MD 21230',
-    'Riverside',
-    ST_SetSRID(ST_MakePoint(-76.5960, 39.2720), 4326)::geography,
-    '(410) 555-0106',
-    'pre_packed',
-    '{"tue": {"open": "16:00", "close": "19:00"}, "thu": {"open": "16:00", "close": "19:00"}, "sat": {"open": "10:00", "close": "13:00"}}',
+    'Franciscan Center of Baltimore',
+    '101 W 23rd St, Baltimore, MD 21218',
+    'Charles North',
+    ST_SetSRID(ST_MakePoint(-76.6186, 39.3160), 4326)::geography,
+    '(410) 467-5340',
+    'client_choice',
+    '{"mon": {"open": "10:00", "close": "13:00"}, "tue": {"open": "10:00", "close": "13:00"}, "wed": {"open": "10:00", "close": "13:00"}, "thu": {"open": "10:00", "close": "13:00"}, "fri": {"open": "10:00", "close": "13:00"}}',
     false, true, ARRAY['English', 'Spanish'],
-    'Pre-packed bags. Drive-through available on Saturdays.'
+    'Comprehensive food pantry, fresh pantry pantry items, and daily hot lunch. Walk-ins welcome.'
 );
 
--- 7. Paul's Place — Washington Village/Pigtown
+-- 7. Paul''s Place — Washington Village / Pigtown (Real MFB Partner)
 INSERT INTO pantries (id, name, address, neighborhood, location, phone, distribution_model, hours, requires_id, allows_walkins, languages, notes)
 VALUES (
     'a1000000-0000-0000-0000-000000000007',
@@ -123,52 +124,53 @@ VALUES (
     'client_choice',
     '{"mon": {"open": "08:30", "close": "12:30"}, "tue": {"open": "08:30", "close": "12:30"}, "wed": {"open": "08:30", "close": "12:30"}, "thu": {"open": "08:30", "close": "12:30"}, "fri": {"open": "08:30", "close": "12:30"}}',
     false, true, ARRAY['English'],
-    'Shower and laundry services also available.'
+    'Client-choice marketplace, warm meals, shower and laundry services available.'
 );
 
--- 8. Waverly Community Pantry — Waverly
+-- 8. The Door Inc. Food Pantry — Patterson Park (Real MFB Partner)
 INSERT INTO pantries (id, name, address, neighborhood, location, phone, distribution_model, hours, requires_id, allows_walkins, languages, notes)
 VALUES (
     'a1000000-0000-0000-0000-000000000008',
-    'Waverly Community Pantry',
-    '3100 Greenmount Ave, Baltimore, MD 21218',
-    'Waverly',
-    ST_SetSRID(ST_MakePoint(-76.6095, 39.3270), 4326)::geography,
-    '(410) 555-0108',
-    'client_choice',
-    '{"wed": {"open": "14:00", "close": "18:00"}, "sat": {"open": "09:00", "close": "12:00"}}',
-    false, true, ARRAY['English'],
-    'Walk in, no appointment. Bring your own bags.'
+    'The Door Inc. Food Pantry',
+    '219 N Chester St, Baltimore, MD 21231',
+    'Patterson Park',
+    ST_SetSRID(ST_MakePoint(-76.5840, 39.2940), 4326)::geography,
+    '(410) 563-3033',
+    'pre_packed',
+    '{"tue": {"open": "11:00", "close": "13:00"}, "thu": {"open": "11:00", "close": "13:00"}}',
+    false, true, ARRAY['English', 'Spanish'],
+    'Food baskets with fresh produce, canned food, bread, and meat. While supplies last.'
 );
 
--- 9. Cherry Hill Community Pantry — Cherry Hill
+-- 9. South Baltimore Emergency Relief — Federal Hill (Real MFB Partner)
 INSERT INTO pantries (id, name, address, neighborhood, location, phone, distribution_model, hours, requires_id, allows_walkins, languages, notes)
 VALUES (
     'a1000000-0000-0000-0000-000000000009',
-    'Cherry Hill Community Pantry',
-    '601 Cherry Hill Rd, Baltimore, MD 21225',
-    'Cherry Hill',
-    ST_SetSRID(ST_MakePoint(-76.6230, 39.2460), 4326)::geography,
-    '(410) 555-0109',
+    'South Baltimore Emergency Relief',
+    '1231 Light St, Baltimore, MD 21230',
+    'Federal Hill',
+    ST_SetSRID(ST_MakePoint(-76.6125, 39.2748), 4326)::geography,
+    '(410) 727-4663',
     'pre_packed',
-    '{"fri": {"open": "10:00", "close": "14:00"}, "sat": {"open": "10:00", "close": "14:00"}}',
-    true, true, ARRAY['English'],
-    'ID required for first visit only. Pre-packed family boxes.'
+    '{"tue": {"open": "09:30", "close": "12:30"}, "thu": {"open": "09:30", "close": "12:30"}}',
+    false, true, ARRAY['English'],
+    'Serving South Baltimore families with shelf-stable groceries, meat, and emergency supplies.'
 );
 
--- 10. Sandtown Community Pantry — Sandtown-Winchester
+-- 10. Northside Family Pantry [Demo Sandbox] — Hampden
+-- (Designated interactive sandbox pantry for evaluating evening distribution and volunteer check-in flows)
 INSERT INTO pantries (id, name, address, neighborhood, location, phone, distribution_model, hours, requires_id, allows_walkins, languages, notes)
 VALUES (
     'a1000000-0000-0000-0000-000000000010',
-    'Sandtown Community Pantry',
-    '1400 N Mount St, Baltimore, MD 21217',
-    'Sandtown-Winchester',
-    ST_SetSRID(ST_MakePoint(-76.6420, 39.3060), 4326)::geography,
-    '(410) 555-0110',
+    'Northside Family Pantry [Demo Sandbox]',
+    '1100 W 36th St, Baltimore, MD 21211',
+    'Hampden',
+    ST_SetSRID(ST_MakePoint(-76.6362, 39.3310), 4326)::geography,
+    '(410) 555-0105',
     'client_choice',
-    '{"mon": {"open": "11:00", "close": "15:00"}, "thu": {"open": "11:00", "close": "15:00"}}',
-    false, true, ARRAY['English'],
-    'You pick your own items. No ID needed.'
+    '{"mon": {"open": "17:00", "close": "20:00"}, "wed": {"open": "17:00", "close": "20:00"}, "fri": {"open": "17:00", "close": "20:00"}}',
+    false, true, ARRAY['English', 'Spanish'],
+    'Interactive testing sandbox for evening walk-in hours (5-8pm) and volunteer kiosk simulation.'
 );
 
 -- ============================================================
@@ -198,9 +200,7 @@ WHERE c.is_default = true;
 -- ============================================================
 
 -- Helper: insert a shelf state row at a recent timestamp
--- We'll create varied stock levels to make the demo interesting
-
--- Pantry 1: Beans and Bread (well stocked except hygiene)
+-- We'll create va-- Pantry 1: Beans & Bread Center (St. Vincent de Paul) (well stocked except hygiene)
 INSERT INTO shelf_state (time, pantry_id, category_id, band, estimated_qty, source, confidence) VALUES
     (now() - interval '46 minutes', 'a1000000-0000-0000-0000-000000000001', 1, 'plenty',    35, 'volunteer_correction', 0.95),
     (now() - interval '46 minutes', 'a1000000-0000-0000-0000-000000000001', 2, 'low',        12, 'volunteer_correction', 0.90),
@@ -211,7 +211,7 @@ INSERT INTO shelf_state (time, pantry_id, category_id, band, estimated_qty, sour
     (now() - interval '46 minutes', 'a1000000-0000-0000-0000-000000000001', 7, 'plenty',     45, 'volunteer_correction', 0.95),
     (now() - interval '46 minutes', 'a1000000-0000-0000-0000-000000000001', 8, 'low',        10, 'volunteer_correction', 0.85);
 
--- Pantry 2: GEDCO CARES (moderate stock)
+-- Pantry 2: GEDCO CARES Food Pantry (moderate stock)
 INSERT INTO shelf_state (time, pantry_id, category_id, band, estimated_qty, source, confidence) VALUES
     (now() - interval '2 hours', 'a1000000-0000-0000-0000-000000000002', 1, 'low',      15, 'volunteer_correction', 0.80),
     (now() - interval '2 hours', 'a1000000-0000-0000-0000-000000000002', 2, 'plenty',   30, 'volunteer_correction', 0.80),
@@ -222,7 +222,7 @@ INSERT INTO shelf_state (time, pantry_id, category_id, band, estimated_qty, sour
     (now() - interval '2 hours', 'a1000000-0000-0000-0000-000000000002', 7, 'plenty',   40, 'volunteer_correction', 0.80),
     (now() - interval '2 hours', 'a1000000-0000-0000-0000-000000000002', 8, 'out',       0, 'volunteer_correction', 0.75);
 
--- Pantry 3: St. Vincent de Paul (well stocked, recent update)
+-- Pantry 3: 40 West Assistance Center (well stocked, recent update)
 INSERT INTO shelf_state (time, pantry_id, category_id, band, estimated_qty, source, confidence) VALUES
     (now() - interval '15 minutes', 'a1000000-0000-0000-0000-000000000003', 1, 'plenty', 50, 'intake_photo', 0.98),
     (now() - interval '15 minutes', 'a1000000-0000-0000-0000-000000000003', 2, 'plenty', 40, 'intake_photo', 0.98),
@@ -233,7 +233,7 @@ INSERT INTO shelf_state (time, pantry_id, category_id, band, estimated_qty, sour
     (now() - interval '15 minutes', 'a1000000-0000-0000-0000-000000000003', 7, 'plenty', 55, 'intake_photo', 0.98),
     (now() - interval '15 minutes', 'a1000000-0000-0000-0000-000000000003', 8, 'plenty', 30, 'intake_photo', 0.98);
 
--- Pantry 4: Bea Gaddy (running low on several items)
+-- Pantry 4: Bea Gaddy Family Centers (running low on several items)
 INSERT INTO shelf_state (time, pantry_id, category_id, band, estimated_qty, source, confidence) VALUES
     (now() - interval '90 minutes', 'a1000000-0000-0000-0000-000000000004', 1, 'low',     8, 'prediction', 0.70),
     (now() - interval '90 minutes', 'a1000000-0000-0000-0000-000000000004', 2, 'out',     3, 'prediction', 0.65),
@@ -244,7 +244,7 @@ INSERT INTO shelf_state (time, pantry_id, category_id, band, estimated_qty, sour
     (now() - interval '90 minutes', 'a1000000-0000-0000-0000-000000000004', 7, 'low',    12, 'prediction', 0.70),
     (now() - interval '90 minutes', 'a1000000-0000-0000-0000-000000000004', 8, 'out',     0, 'prediction', 0.55);
 
--- Pantry 5: Northside Family Pantry — the mockup pantry (plenty of diapers, low halal)
+-- Pantry 5: Benedict's Pantry (St. Benedict)
 INSERT INTO shelf_state (time, pantry_id, category_id, band, estimated_qty, source, confidence) VALUES
     (now() - interval '46 minutes', 'a1000000-0000-0000-0000-000000000005', 1, 'plenty', 40, 'volunteer_correction', 0.95),
     (now() - interval '46 minutes', 'a1000000-0000-0000-0000-000000000005', 2, 'low',    14, 'volunteer_correction', 0.90),
@@ -255,16 +255,16 @@ INSERT INTO shelf_state (time, pantry_id, category_id, band, estimated_qty, sour
     (now() - interval '46 minutes', 'a1000000-0000-0000-0000-000000000005', 7, 'plenty', 38, 'volunteer_correction', 0.95),
     (now() - interval '46 minutes', 'a1000000-0000-0000-0000-000000000005', 8, 'low',     9, 'volunteer_correction', 0.85);
 
--- Pantry 6: Riverside Community Table
+-- Pantry 6: Franciscan Center of Baltimore (Charles North / 21218)
 INSERT INTO shelf_state (time, pantry_id, category_id, band, estimated_qty, source, confidence) VALUES
-    (now() - interval '3 hours', 'a1000000-0000-0000-0000-000000000006', 1, 'plenty', 30, 'volunteer_correction', 0.75),
-    (now() - interval '3 hours', 'a1000000-0000-0000-0000-000000000006', 2, 'low',    10, 'volunteer_correction', 0.70),
-    (now() - interval '3 hours', 'a1000000-0000-0000-0000-000000000006', 3, 'plenty', 25, 'volunteer_correction', 0.75),
-    (now() - interval '3 hours', 'a1000000-0000-0000-0000-000000000006', 4, 'plenty', 35, 'volunteer_correction', 0.75),
-    (now() - interval '3 hours', 'a1000000-0000-0000-0000-000000000006', 5, 'low',     7, 'volunteer_correction', 0.70),
-    (now() - interval '3 hours', 'a1000000-0000-0000-0000-000000000006', 6, 'low',     5, 'volunteer_correction', 0.70),
-    (now() - interval '3 hours', 'a1000000-0000-0000-0000-000000000006', 7, 'plenty', 42, 'volunteer_correction', 0.75),
-    (now() - interval '3 hours', 'a1000000-0000-0000-0000-000000000006', 8, 'out',     0, 'volunteer_correction', 0.65);
+    (now() - interval '3 hours', 'a1000000-0000-0000-0000-000000000006', 1, 'plenty', 60, 'volunteer_correction', 0.85),
+    (now() - interval '3 hours', 'a1000000-0000-0000-0000-000000000006', 2, 'plenty', 45, 'volunteer_correction', 0.85),
+    (now() - interval '3 hours', 'a1000000-0000-0000-0000-000000000006', 3, 'plenty', 35, 'volunteer_correction', 0.85),
+    (now() - interval '3 hours', 'a1000000-0000-0000-0000-000000000006', 4, 'plenty', 50, 'volunteer_correction', 0.85),
+    (now() - interval '3 hours', 'a1000000-0000-0000-0000-000000000006', 5, 'low',    12, 'volunteer_correction', 0.80),
+    (now() - interval '3 hours', 'a1000000-0000-0000-0000-000000000006', 6, 'plenty', 20, 'volunteer_correction', 0.85),
+    (now() - interval '3 hours', 'a1000000-0000-0000-0000-000000000006', 7, 'plenty', 65, 'volunteer_correction', 0.85),
+    (now() - interval '3 hours', 'a1000000-0000-0000-0000-000000000006', 8, 'out',     0, 'volunteer_correction', 0.75);
 
 -- Pantry 7: Paul's Place
 INSERT INTO shelf_state (time, pantry_id, category_id, band, estimated_qty, source, confidence) VALUES
@@ -277,7 +277,7 @@ INSERT INTO shelf_state (time, pantry_id, category_id, band, estimated_qty, sour
     (now() - interval '30 minutes', 'a1000000-0000-0000-0000-000000000007', 7, 'plenty', 55, 'intake_photo', 0.95),
     (now() - interval '30 minutes', 'a1000000-0000-0000-0000-000000000007', 8, 'plenty', 20, 'intake_photo', 0.90);
 
--- Pantry 8: Waverly Community Pantry (in 21218 — important for demo)
+-- Pantry 8: The Door Inc. Food Pantry (Patterson Park)
 INSERT INTO shelf_state (time, pantry_id, category_id, band, estimated_qty, source, confidence) VALUES
     (now() - interval '55 minutes', 'a1000000-0000-0000-0000-000000000008', 1, 'low',    15, 'prediction', 0.75),
     (now() - interval '55 minutes', 'a1000000-0000-0000-0000-000000000008', 2, 'low',    10, 'prediction', 0.70),
@@ -288,53 +288,53 @@ INSERT INTO shelf_state (time, pantry_id, category_id, band, estimated_qty, sour
     (now() - interval '55 minutes', 'a1000000-0000-0000-0000-000000000008', 7, 'plenty', 35, 'prediction', 0.80),
     (now() - interval '55 minutes', 'a1000000-0000-0000-0000-000000000008', 8, 'low',     8, 'prediction', 0.70);
 
--- Pantry 9: Cherry Hill (limited stock, older data)
+-- Pantry 9: South Baltimore Emergency Relief (Federal Hill)
 INSERT INTO shelf_state (time, pantry_id, category_id, band, estimated_qty, source, confidence) VALUES
-    (now() - interval '5 hours', 'a1000000-0000-0000-0000-000000000009', 1, 'low',    10, 'manual', 0.50),
-    (now() - interval '5 hours', 'a1000000-0000-0000-0000-000000000009', 2, 'low',     8, 'manual', 0.50),
-    (now() - interval '5 hours', 'a1000000-0000-0000-0000-000000000009', 3, 'out',     2, 'manual', 0.45),
-    (now() - interval '5 hours', 'a1000000-0000-0000-0000-000000000009', 4, 'low',    12, 'manual', 0.50),
-    (now() - interval '5 hours', 'a1000000-0000-0000-0000-000000000009', 5, 'out',     0, 'manual', 0.45),
-    (now() - interval '5 hours', 'a1000000-0000-0000-0000-000000000009', 6, 'out',     0, 'manual', 0.45),
-    (now() - interval '5 hours', 'a1000000-0000-0000-0000-000000000009', 7, 'low',    15, 'manual', 0.50),
-    (now() - interval '5 hours', 'a1000000-0000-0000-0000-000000000009', 8, 'out',     0, 'manual', 0.40);
+    (now() - interval '2 hours', 'a1000000-0000-0000-0000-000000000009', 1, 'plenty', 35, 'volunteer_correction', 0.85),
+    (now() - interval '2 hours', 'a1000000-0000-0000-0000-000000000009', 2, 'low',    12, 'volunteer_correction', 0.80),
+    (now() - interval '2 hours', 'a1000000-0000-0000-0000-000000000009', 3, 'low',     8, 'volunteer_correction', 0.80),
+    (now() - interval '2 hours', 'a1000000-0000-0000-0000-000000000009', 4, 'plenty', 40, 'volunteer_correction', 0.85),
+    (now() - interval '2 hours', 'a1000000-0000-0000-0000-000000000009', 5, 'out',     0, 'volunteer_correction', 0.80),
+    (now() - interval '2 hours', 'a1000000-0000-0000-0000-000000000009', 6, 'low',     5, 'volunteer_correction', 0.80),
+    (now() - interval '2 hours', 'a1000000-0000-0000-0000-000000000009', 7, 'plenty', 45, 'volunteer_correction', 0.85),
+    (now() - interval '2 hours', 'a1000000-0000-0000-0000-000000000009', 8, 'out',     0, 'volunteer_correction', 0.75);
 
--- Pantry 10: Sandtown Community Pantry
+-- Pantry 10: Northside Family Pantry [Demo Sandbox] (Hampden evening hours)
 INSERT INTO shelf_state (time, pantry_id, category_id, band, estimated_qty, source, confidence) VALUES
-    (now() - interval '70 minutes', 'a1000000-0000-0000-0000-000000000010', 1, 'plenty', 28, 'volunteer_correction', 0.85),
-    (now() - interval '70 minutes', 'a1000000-0000-0000-0000-000000000010', 2, 'plenty', 22, 'volunteer_correction', 0.85),
-    (now() - interval '70 minutes', 'a1000000-0000-0000-0000-000000000010', 3, 'low',    10, 'volunteer_correction', 0.80),
-    (now() - interval '70 minutes', 'a1000000-0000-0000-0000-000000000010', 4, 'plenty', 32, 'volunteer_correction', 0.85),
-    (now() - interval '70 minutes', 'a1000000-0000-0000-0000-000000000010', 5, 'low',     5, 'volunteer_correction', 0.75),
-    (now() - interval '70 minutes', 'a1000000-0000-0000-0000-000000000010', 6, 'out',     1, 'volunteer_correction', 0.70),
-    (now() - interval '70 minutes', 'a1000000-0000-0000-0000-000000000010', 7, 'plenty', 40, 'volunteer_correction', 0.85),
-    (now() - interval '70 minutes', 'a1000000-0000-0000-0000-000000000010', 8, 'low',     7, 'volunteer_correction', 0.75);
+    (now() - interval '46 minutes', 'a1000000-0000-0000-0000-000000000010', 1, 'plenty', 40, 'volunteer_correction', 0.95),
+    (now() - interval '46 minutes', 'a1000000-0000-0000-0000-000000000010', 2, 'low',    14, 'volunteer_correction', 0.90),
+    (now() - interval '46 minutes', 'a1000000-0000-0000-0000-000000000010', 3, 'plenty', 30, 'volunteer_correction', 0.95),
+    (now() - interval '46 minutes', 'a1000000-0000-0000-0000-000000000010', 4, 'plenty', 35, 'volunteer_correction', 0.95),
+    (now() - interval '46 minutes', 'a1000000-0000-0000-0000-000000000010', 5, 'plenty', 22, 'volunteer_correction', 0.95),
+    (now() - interval '46 minutes', 'a1000000-0000-0000-0000-000000000010', 6, 'out',     2, 'volunteer_correction', 0.85),
+    (now() - interval '46 minutes', 'a1000000-0000-0000-0000-000000000010', 7, 'plenty', 38, 'volunteer_correction', 0.95),
+    (now() - interval '46 minutes', 'a1000000-0000-0000-0000-000000000010', 8, 'low',     9, 'volunteer_correction', 0.85);
 
 -- ============================================================
--- Seed some check-in history for Northside (pantry 5)
+-- Seed check-in history for Northside [Demo Sandbox] (pantry 10)
 -- to demo the predict-and-correct engine
 -- ============================================================
 INSERT INTO check_ins (time, pantry_id, household_size) VALUES
-    (now() - interval '4 hours',   'a1000000-0000-0000-0000-000000000005', 3),
-    (now() - interval '3.5 hours', 'a1000000-0000-0000-0000-000000000005', 2),
-    (now() - interval '3 hours',   'a1000000-0000-0000-0000-000000000005', 5),
-    (now() - interval '2.5 hours', 'a1000000-0000-0000-0000-000000000005', 1),
-    (now() - interval '2 hours',   'a1000000-0000-0000-0000-000000000005', 4),
-    (now() - interval '1.5 hours', 'a1000000-0000-0000-0000-000000000005', 3),
-    (now() - interval '1 hour',    'a1000000-0000-0000-0000-000000000005', 2),
-    (now() - interval '50 min',    'a1000000-0000-0000-0000-000000000005', 6),
-    (now() - interval '45 min',    'a1000000-0000-0000-0000-000000000005', 2),
-    (now() - interval '40 min',    'a1000000-0000-0000-0000-000000000005', 3),
-    (now() - interval '35 min',    'a1000000-0000-0000-0000-000000000005', 4),
-    (now() - interval '30 min',    'a1000000-0000-0000-0000-000000000005', 1),
-    (now() - interval '25 min',    'a1000000-0000-0000-0000-000000000005', 2),
-    (now() - interval '20 min',    'a1000000-0000-0000-0000-000000000005', 3),
-    (now() - interval '15 min',    'a1000000-0000-0000-0000-000000000005', 5),
-    (now() - interval '10 min',    'a1000000-0000-0000-0000-000000000005', 2),
-    (now() - interval '8 min',     'a1000000-0000-0000-0000-000000000005', 4),
-    (now() - interval '6 min',     'a1000000-0000-0000-0000-000000000005', 3),
-    (now() - interval '4 min',     'a1000000-0000-0000-0000-000000000005', 1),
-    (now() - interval '2 min',     'a1000000-0000-0000-0000-000000000005', 2),
-    (now() - interval '1 min',     'a1000000-0000-0000-0000-000000000005', 3),
-    (now() - interval '30 sec',    'a1000000-0000-0000-0000-000000000005', 2),
-    (now() - interval '15 sec',    'a1000000-0000-0000-0000-000000000005', 4);
+    (now() - interval '4 hours',   'a1000000-0000-0000-0000-000000000010', 3),
+    (now() - interval '3.5 hours', 'a1000000-0000-0000-0000-000000000010', 2),
+    (now() - interval '3 hours',   'a1000000-0000-0000-0000-000000000010', 5),
+    (now() - interval '2.5 hours', 'a1000000-0000-0000-0000-000000000010', 1),
+    (now() - interval '2 hours',   'a1000000-0000-0000-0000-000000000010', 4),
+    (now() - interval '1.5 hours', 'a1000000-0000-0000-0000-000000000010', 3),
+    (now() - interval '1 hour',    'a1000000-0000-0000-0000-000000000010', 2),
+    (now() - interval '50 min',    'a1000000-0000-0000-0000-000000000010', 6),
+    (now() - interval '45 min',    'a1000000-0000-0000-0000-000000000010', 2),
+    (now() - interval '40 min',    'a1000000-0000-0000-0000-000000000010', 3),
+    (now() - interval '35 min',    'a1000000-0000-0000-0000-000000000010', 4),
+    (now() - interval '30 min',    'a1000000-0000-0000-0000-000000000010', 1),
+    (now() - interval '25 min',    'a1000000-0000-0000-0000-000000000010', 2),
+    (now() - interval '20 min',    'a1000000-0000-0000-0000-000000000010', 3),
+    (now() - interval '15 min',    'a1000000-0000-0000-0000-000000000010', 5),
+    (now() - interval '10 min',    'a1000000-0000-0000-0000-000000000010', 2),
+    (now() - interval '8 min',     'a1000000-0000-0000-0000-000000000010', 4),
+    (now() - interval '6 min',     'a1000000-0000-0000-0000-000000000010', 3),
+    (now() - interval '4 min',     'a1000000-0000-0000-0000-000000000010', 1),
+    (now() - interval '2 min',     'a1000000-0000-0000-0000-000000000010', 2),
+    (now() - interval '1 min',     'a1000000-0000-0000-0000-000000000010', 3),
+    (now() - interval '30 sec',    'a1000000-0000-0000-0000-000000000010', 2),
+    (now() - interval '15 sec',    'a1000000-0000-0000-0000-000000000010', 4);
