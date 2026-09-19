@@ -2,14 +2,16 @@
 
 import React, { useState, useRef } from 'react';
 import { Users, Camera, CheckSquare, Mic, Plus, Minus, Check, ShieldCheck, Upload, Sparkles, Loader2, Image as ImageIcon, Video } from 'lucide-react';
+import { Pantry } from '@/lib/pantryData';
 import CameraViewfinder from '@/components/CameraViewfinder';
 
 interface VolunteerDashboardProps {
+  activePantry?: Pantry | null;
   onExit?: () => void;
   onUpdateInventory?: (category: string, band: 'plenty' | 'low' | 'out') => void;
 }
 
-export default function VolunteerDashboard({ onExit, onUpdateInventory }: VolunteerDashboardProps) {
+export default function VolunteerDashboard({ activePantry, onExit, onUpdateInventory }: VolunteerDashboardProps) {
   const [activeTab, setActiveTab] = useState<'checkin' | 'donations' | 'closing'>('checkin');
   const [familiesServed, setFamiliesServed] = useState(23);
   const [lastCheckinToast, setLastCheckinToast] = useState<string | null>(null);
@@ -106,19 +108,24 @@ export default function VolunteerDashboard({ onExit, onUpdateInventory }: Volunt
       <div className="bg-white px-5 py-4 border-b border-emerald-900/10 flex justify-between items-center">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-emerald-800 bg-emerald-100/60 px-2 py-0.5 rounded-full">
-              Volunteer Mode
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/80 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+              Pantry View
             </span>
-            <span className="text-xs text-slate-500 font-medium">Code: 4827</span>
+            <span className="text-xs text-slate-500 font-medium">Verified Operator Session</span>
           </div>
-          <h2 className="text-xl font-bold text-emerald-950 mt-0.5">Northside Family Pantry</h2>
+          <h2 className="text-xl font-bold text-emerald-950 mt-0.5">
+            {activePantry?.name || 'Northside Family Pantry'}
+          </h2>
+          {activePantry?.neighborhood && (
+            <span className="text-xs text-slate-400 font-medium">{activePantry.neighborhood}, Baltimore</span>
+          )}
         </div>
         {onExit && (
           <button
             onClick={onExit}
-            className="text-xs text-slate-600 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl font-medium transition"
+            className="text-xs text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer"
           >
-            Exit to Client View
+            ← Exit to Neighbor View
           </button>
         )}
       </div>

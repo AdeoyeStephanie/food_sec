@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { BALTIMORE_PANTRIES, Pantry } from '@/lib/pantryData';
 import PantryDetailSheet from '@/components/PantryDetailSheet';
 import VolunteerDashboard from '@/components/VolunteerDashboard';
+import PantryLoginModal from '@/components/PantryLoginModal';
 import {
   Search,
   Mic,
@@ -17,7 +18,8 @@ import {
   Languages,
   SlidersHorizontal,
   Clock,
-  HeartHandshake
+  HeartHandshake,
+  Lock
 } from 'lucide-react';
 
 // Dynamic import for Leaflet map to prevent SSR issues
@@ -38,6 +40,8 @@ export default function Home() {
   const [language, setLanguage] = useState<'en' | 'es'>('en');
   const [selectedPantry, setSelectedPantry] = useState<Pantry | null>(null);
   const [isVolunteerMode, setIsVolunteerMode] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [authenticatedPantry, setAuthenticatedPantry] = useState<Pantry | null>(null);
   const [isListening, setIsListening] = useState(false);
 
   // Filter chips
@@ -158,6 +162,7 @@ export default function Home() {
     return (
       <main className="min-h-screen bg-[#e9f1ed] p-3 md:p-8">
         <VolunteerDashboard
+          activePantry={authenticatedPantry}
           onExit={() => setIsVolunteerMode(false)}
           onUpdateInventory={handleUpdateInventory}
         />
@@ -189,14 +194,14 @@ export default function Home() {
         </div>
 
         <div className="flex items-center gap-2.5">
-          {/* Switch View Toggle (Demo & Operations) */}
+          {/* Secure Pantry View Access */}
           <button
-            onClick={() => setIsVolunteerMode(true)}
-            className="flex items-center gap-1.5 text-xs font-semibold text-emerald-900 bg-emerald-100/90 hover:bg-emerald-200 border border-emerald-300 px-3.5 py-1.5 rounded-full transition shadow-xs cursor-pointer active:scale-95"
-            title="Switch to Pantry Volunteer Operations View"
+            onClick={() => setShowLoginModal(true)}
+            className="flex items-center gap-1.5 text-xs font-semibold text-emerald-950 bg-emerald-100/90 hover:bg-emerald-200 border border-emerald-300 px-3.5 py-1.5 rounded-full transition shadow-xs cursor-pointer active:scale-95"
+            title="Secure Staff & Operator Login"
           >
-            <HeartHandshake className="w-4 h-4 text-emerald-700" />
-            <span>Switch to Volunteer View</span>
+            <Lock className="w-3.5 h-3.5 text-emerald-800" />
+            <span>Pantry View</span>
           </button>
 
           {/* Language Switch */}
@@ -465,6 +470,17 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* Secure Pantry View Login Modal */}
+      <PantryLoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        onSuccess={(pantry) => {
+          setAuthenticatedPantry(pantry);
+          setIsVolunteerMode(true);
+          setShowLoginModal(false);
+        }}
+      />
     </main>
   );
 }
