@@ -6,6 +6,7 @@ import { BALTIMORE_PANTRIES, Pantry } from '@/lib/pantryData';
 import PantryDetailSheet from '@/components/PantryDetailSheet';
 import VolunteerDashboard from '@/components/VolunteerDashboard';
 import PantryLoginModal from '@/components/PantryLoginModal';
+import { Language, TRANSLATIONS } from '@/lib/translations';
 import {
   Search,
   Mic,
@@ -37,7 +38,8 @@ export default function Home() {
   const [pantriesList, setPantriesList] = useState<Pantry[]>(BALTIMORE_PANTRIES);
   const [hasSearched, setHasSearched] = useState(false);
   const [query, setQuery] = useState('');
-  const [language, setLanguage] = useState<'en' | 'es'>('en');
+  const [language, setLanguage] = useState<Language>('en');
+  const t = TRANSLATIONS[language] || TRANSLATIONS.en;
   const [selectedPantry, setSelectedPantry] = useState<Pantry | null>(null);
   const [isVolunteerMode, setIsVolunteerMode] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -226,9 +228,9 @@ export default function Home() {
           </div>
           <div>
             <h1 className="font-extrabold text-base md:text-lg tracking-tight text-emerald-950 leading-none">
-              Find Food Baltimore
+              {t.appName}
             </h1>
-            <span className="text-[11px] text-slate-500 font-medium">Live Shelf Stock &amp; Pantries</span>
+            <span className="text-[11px] text-slate-500 font-medium">{t.appSubtitle}</span>
           </div>
         </div>
 
@@ -240,7 +242,7 @@ export default function Home() {
             title="Secure Staff & Operator Login"
           >
             <Lock className="w-3.5 h-3.5 text-emerald-800" />
-            <span>Pantry View</span>
+            <span>{t.pantryView}</span>
           </button>
 
           {/* Language Switch */}
@@ -271,17 +273,17 @@ export default function Home() {
           {/* Main Hero Question */}
           <div className="flex flex-col gap-2.5">
             <h2 className="text-3xl md:text-4xl font-extrabold text-emerald-950 tracking-tight">
-              What do you need today?
+              {t.heroTitle}
             </h2>
             <p className="text-slate-600 text-sm md:text-base leading-relaxed">
-              Say it however you would to a friend. We&apos;ll find pantries near you that have it right now.
+              {t.heroSubtitle}
             </p>
           </div>
 
           {/* Search Box */}
           <div className="flex flex-col gap-3">
             <label htmlFor="search-input" className="font-bold text-sm text-emerald-950">
-              Tell us what you need
+              {t.searchLabel}
             </label>
             <div className="relative">
               <input
@@ -289,8 +291,8 @@ export default function Home() {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleExecuteSearch(query || 'diapers near Hampden after 6pm')}
-                placeholder="diapers near Hampden after 6pm"
+                onKeyDown={(e) => e.key === 'Enter' && handleExecuteSearch(query || t.searchPlaceholder)}
+                placeholder={t.searchPlaceholder}
                 className="w-full bg-white text-slate-800 text-base placeholder:text-slate-400 border-2 border-slate-200 focus:border-[#064e3b] rounded-2xl py-4 pl-4 pr-12 outline-none transition shadow-sm"
               />
               <button
@@ -301,35 +303,35 @@ export default function Home() {
                     ? 'bg-rose-500 text-white animate-pulse'
                     : 'text-slate-400 hover:text-emerald-900 hover:bg-slate-100'
                 }`}
-                title="Voice search"
+                title={language === 'es' ? 'Búsqueda por voz' : 'Voice search'}
               >
                 <Mic className="w-5 h-5" />
               </button>
             </div>
 
             <button
-              onClick={() => handleExecuteSearch(query || 'diapers near Hampden after 6pm')}
-              className="w-full bg-[#064e3b] hover:bg-[#043d2e] active:scale-[0.99] text-white font-bold text-base py-4 rounded-2xl transition shadow-md flex items-center justify-center gap-2"
+              onClick={() => handleExecuteSearch(query || t.searchPlaceholder)}
+              className="w-full bg-[#064e3b] hover:bg-[#043d2e] active:scale-[0.99] text-white font-bold text-base py-4 rounded-2xl transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
             >
               <Search className="w-5 h-5" />
-              Find food
+              {t.findFoodBtn}
             </button>
           </div>
 
           {/* Preset Chips */}
           <div className="flex flex-col gap-2.5">
-            <span className="text-xs text-slate-500 font-semibold">Or try one of these</span>
+            <span className="text-xs text-slate-500 font-semibold">{t.presetTitle}</span>
             <div className="flex flex-wrap gap-2">
               {[
-                { label: 'Baby formula near me', q: 'baby formula near me' },
-                { label: 'Open tonight', q: 'open tonight after 6pm' },
-                { label: 'No ID needed', q: 'pantries with no ID needed' },
-                { label: 'Fresh produce', q: 'fresh produce available' },
+                { label: t.presets.formula, q: language === 'es' ? 'formula para bebe' : 'baby formula near me' },
+                { label: t.presets.tonight, q: language === 'es' ? 'abierto esta noche' : 'open tonight after 6pm' },
+                { label: t.presets.noId, q: language === 'es' ? 'sin identificacion' : 'pantries with no ID needed' },
+                { label: t.presets.produce, q: language === 'es' ? 'frutas y verduras' : 'fresh produce available' },
               ].map((chip) => (
                 <button
                   key={chip.label}
                   onClick={() => handleExecuteSearch(chip.q)}
-                  className="bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-500 text-slate-800 text-xs font-medium px-4 py-2.5 rounded-full transition shadow-xs active:scale-95"
+                  className="bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-500 text-slate-800 text-xs font-medium px-4 py-2.5 rounded-full transition shadow-xs active:scale-95 cursor-pointer"
                 >
                   {chip.label}
                 </button>
@@ -343,16 +345,16 @@ export default function Home() {
               <PhoneCall className="w-6 h-6 text-emerald-400" />
             </div>
             <div>
-              <h3 className="font-bold text-sm text-white">No data? Just call.</h3>
+              <h3 className="font-bold text-sm text-white">{t.hotlineTitle}</h3>
               <p className="text-xs text-slate-300 mt-0.5 font-medium">
-                (410) 555-FOOD, any time, English or Spanish
+                {t.hotlineSubtitle}
               </p>
             </div>
           </div>
 
           {/* Dignity Guarantee */}
           <p className="text-xs text-center text-slate-500 font-medium">
-            No account needed. We don&apos;t save what you type.
+            {t.dignityNotice}
           </p>
         </div>
       ) : (
@@ -389,10 +391,10 @@ export default function Home() {
               {/* Header with Result Count */}
               <div className="flex justify-between items-center">
                 <h3 className="font-bold text-sm text-emerald-950">
-                  {filteredPantries.length} matches open today
+                  {filteredPantries.length} {t.matchesOpenToday}
                 </h3>
                 <span className="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-semibold">
-                  Sample data
+                  {t.sampleDataBadge}
                 </span>
               </div>
 
@@ -420,7 +422,7 @@ export default function Home() {
                               {pantry.name}
                             </h4>
                             <p className="text-xs text-slate-500">
-                              {pantry.distance_miles} miles, about {pantry.walk_minutes} minutes walking
+                              {pantry.distance_miles} miles, ~{pantry.walk_minutes} {t.walkingDistance}
                             </p>
                           </div>
                         </div>
@@ -445,7 +447,7 @@ export default function Home() {
                           >
                             <span>{item.category_name}</span>
                             <span className="capitalize text-[11px]">
-                              {item.band === 'plenty' ? 'Plenty' : item.band === 'low' ? 'Low' : 'Out'}
+                              {item.band === 'plenty' ? t.plenty : item.band === 'low' ? t.low : t.out}
                             </span>
                           </div>
                         ))}
@@ -455,7 +457,7 @@ export default function Home() {
                       <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between">
                         <span className="text-[11px] text-slate-400 flex items-center gap-1">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                          Updated 40 min ago
+                          {t.updatedAgo}
                         </span>
                         <div className="flex items-center gap-2">
                           <button
@@ -463,9 +465,9 @@ export default function Home() {
                               e.stopPropagation();
                               setSelectedPantry(pantry);
                             }}
-                            className="text-xs font-bold text-slate-700 hover:text-emerald-900 px-2.5 py-1 bg-slate-100 rounded-lg hover:bg-slate-200 transition"
+                            className="text-xs font-bold text-slate-700 hover:text-emerald-900 px-2.5 py-1 bg-slate-100 rounded-lg hover:bg-slate-200 transition cursor-pointer"
                           >
-                            Details
+                            {t.details}
                           </button>
                           <a
                             href={`https://www.google.com/maps/dir/?api=1&destination=${pantry.lat},${pantry.lng}`}
@@ -475,7 +477,7 @@ export default function Home() {
                             className="text-xs font-bold text-white px-2.5 py-1 bg-[#064e3b] rounded-lg hover:bg-[#043d2e] transition flex items-center gap-1"
                           >
                             <Navigation className="w-3 h-3" />
-                            Directions
+                            {t.directions}
                           </a>
                         </div>
                       </div>
@@ -489,9 +491,9 @@ export default function Home() {
                       📍
                     </div>
                     <div>
-                      <p className="font-bold text-sm text-slate-800">No pantries found in this exact search</p>
+                      <p className="font-bold text-sm text-slate-800">{t.emptyTitle}</p>
                       <p className="text-xs text-slate-500 mt-1 max-w-xs">
-                        Try clearing filters, searching by neighborhood (e.g. Hampden, Old Goucher, Essex), or exploring all 52 Baltimore pantries.
+                        {t.emptyDesc}
                       </p>
                     </div>
                     <button
@@ -501,7 +503,7 @@ export default function Home() {
                       }}
                       className="text-xs font-bold text-emerald-900 bg-emerald-100 hover:bg-emerald-200 px-4 py-2 rounded-xl transition cursor-pointer"
                     >
-                      Show All 52 Pantries
+                      {t.showAllBtn}
                     </button>
                   </div>
                 )}
@@ -525,6 +527,7 @@ export default function Home() {
               <div className="w-full md:w-[420px] lg:w-[450px] h-full p-3 md:p-4 shrink-0 overflow-y-auto z-20">
                 <PantryDetailSheet
                   pantry={selectedPantry}
+                  language={language}
                   onClose={() => setSelectedPantry(null)}
                 />
               </div>
