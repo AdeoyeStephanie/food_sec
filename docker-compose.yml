@@ -1,0 +1,22 @@
+services:
+  db:
+    image: timescale/timescaledb-ha:pg16-latest
+    container_name: pantrypulse-db
+    environment:
+      POSTGRES_DB: pantrypulse
+      POSTGRES_USER: pantry
+      POSTGRES_PASSWORD: pantry123
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./db/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pantry -d pantrypulse"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  pgdata:
