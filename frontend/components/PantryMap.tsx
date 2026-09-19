@@ -6,10 +6,11 @@ import { Pantry } from '@/lib/pantryData';
 interface PantryMapProps {
   pantries: Pantry[];
   selectedPantry: Pantry | null;
+  hoveredPantryId?: string | null;
   onSelectPantry: (pantry: Pantry) => void;
 }
 
-export default function PantryMap({ pantries, selectedPantry, onSelectPantry }: PantryMapProps) {
+export default function PantryMap({ pantries, selectedPantry, hoveredPantryId, onSelectPantry }: PantryMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
@@ -65,6 +66,8 @@ export default function PantryMap({ pantries, selectedPantry, onSelectPantry }: 
         });
 
         const isSelected = selectedPantry?.id === pantry.id;
+        const isHovered = hoveredPantryId === pantry.id;
+        const isFocused = isSelected || isHovered;
 
         const iconHtml = `
           <div style="
@@ -73,10 +76,10 @@ export default function PantryMap({ pantries, selectedPantry, onSelectPantry }: 
             background: white;
             padding: 4px 8px;
             border-radius: 9999px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.22);
-            border: 2px solid ${isSelected ? '#064e3b' : '#ffffff'};
-            transform: ${isSelected ? 'scale(1.18)' : 'scale(1)'};
-            transition: transform 0.2s ease;
+            box-shadow: ${isFocused ? '0 0 0 3px rgba(6,78,59,0.3), 0 6px 16px rgba(0,0,0,0.3)' : '0 3px 10px rgba(0,0,0,0.22)'};
+            border: ${isFocused ? '2.5px solid #064e3b' : '2px solid #ffffff'};
+            transform: ${isFocused ? 'scale(1.22)' : 'scale(1)'};
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
             cursor: pointer;
             gap: 5px;
           ">
@@ -102,14 +105,18 @@ export default function PantryMap({ pantries, selectedPantry, onSelectPantry }: 
         const customIcon = L.divIcon({
           html: iconHtml,
           className: 'custom-pantry-pin',
-          iconSize: [46, 28],
-          iconAnchor: [23, 14],
+          iconSize: [48, 28],
+          iconAnchor: [24, 14],
         });
 
-        const marker = L.marker([pantry.lat, pantry.lng], { icon: customIcon }).addTo(map);
+        const marker = L.marker([pantry.lat, pantry.lng], { icon: customIcon, zIndexOffset: isFocused ? 1000 : 0 }).addTo(map);
         marker.on('click', () => {
           onSelectPantry(pantry);
           map.setView([pantry.lat, pantry.lng], 14, { animate: true });
+          const el = document.getElementById(`pantry-card-${pantry.id}`);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
         });
 
         markersRef.current.push(marker);
@@ -131,7 +138,7 @@ export default function PantryMap({ pantries, selectedPantry, onSelectPantry }: 
         mapInstanceRef.current = null;
       }
     };
-  }, [pantries, onSelectPantry]);
+  }, [pantries, onSelectPantry, selectedPantry, hoveredPantryId]);
 
   // If selectedPantry changes, center map
   useEffect(() => {

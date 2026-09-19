@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Pantry } from '@/lib/pantryData';
+import { Pantry, getUrgencyIndicator } from '@/lib/pantryData';
 import { Language, TRANSLATIONS } from '@/lib/translations';
-import { Navigation, Phone, CheckCircle2, ShoppingBag, Clock, Languages, ShieldCheck, ThumbsUp, ThumbsDown, X, Bus, Accessibility, Sparkles } from 'lucide-react';
+import { Navigation, Phone, CheckCircle2, ShoppingBag, Clock, Languages, ShieldCheck, ThumbsUp, ThumbsDown, X, Bus, Accessibility, Sparkles, Share2, Check } from 'lucide-react';
 
 interface PantryDetailSheetProps {
   pantry: Pantry;
@@ -13,7 +13,28 @@ interface PantryDetailSheetProps {
 
 export default function PantryDetailSheet({ pantry, language = 'en', onClose }: PantryDetailSheetProps) {
   const [feedbackSent, setFeedbackSent] = useState<string | null>(null);
+  const [copiedShare, setCopiedShare] = useState(false);
   const t = TRANSLATIONS[language] || TRANSLATIONS.en;
+  const urgency = getUrgencyIndicator(pantry);
+
+  const handleShare = async () => {
+    const shareText = `${pantry.name}\n📍 ${pantry.address}\n⏰ ${pantry.hours_text}\n📞 ${pantry.phone}`;
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({
+          title: pantry.name,
+          text: shareText,
+          url: window.location.href,
+        });
+      } catch {
+        // User cancelled share
+      }
+    } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      await navigator.clipboard.writeText(shareText);
+      setCopiedShare(true);
+      setTimeout(() => setCopiedShare(false), 2200);
+    }
+  };
 
   const getBandStyles = (band: 'plenty' | 'low' | 'out') => {
     switch (band) {
@@ -49,20 +70,24 @@ export default function PantryDetailSheet({ pantry, language = 'en', onClose }: 
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <div className="inline-block bg-slate-200/70 text-slate-700 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-2">
-            {t.sampleDataBadge}
+          {/* Urgency Pill & Sample Data Badge */}
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
+            <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full shadow-xs ${urgency.badgeClass}`}>
+              <span className={`w-2 h-2 rounded-full ${urgency.dotClass}`}></span>
+              {urgency.label}
+            </span>
+            <span className="bg-slate-200/80 text-slate-700 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+              {t.sampleDataBadge}
+            </span>
           </div>
+
           <h2 className="text-2xl font-bold tracking-tight text-emerald-950">{pantry.name}</h2>
-          <p className="text-sm text-slate-600">{pantry.address}</p>
-          <div className="mt-1 font-semibold text-emerald-800 text-sm flex items-center gap-1.5">
-            <span className="inline-block w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
-            {pantry.hours_text}
-          </div>
+          <p className="text-sm text-slate-600 font-medium">{pantry.address}</p>
         </div>
         {onClose && (
           <button
             onClick={onClose}
-            className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 rounded-full transition cursor-pointer"
+            className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-200/70 rounded-full transition cursor-pointer"
             aria-label="Close sheet"
           >
             <X className="w-5 h-5" />
@@ -70,31 +95,47 @@ export default function PantryDetailSheet({ pantry, language = 'en', onClose }: 
         )}
       </div>
 
-      {/* Action Buttons: Directions & Phone */}
-      <div className="grid grid-cols-2 gap-3">
+      {/* Action Buttons: Directions, Phone, Share */}
+      <div className="grid grid-cols-3 gap-2">
         <a
           href={`https://www.google.com/maps/dir/?api=1&destination=${pantry.lat},${pantry.lng}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-[#064e3b] hover:bg-[#043d2e] active:scale-[0.98] text-white font-bold text-sm py-3 px-4 rounded-2xl flex items-center justify-center gap-2 shadow-sm transition"
+          className="bg-[#064e3b] hover:bg-[#043d2e] active:scale-[0.98] text-white font-bold text-xs md:text-sm py-2.5 px-3 rounded-2xl flex items-center justify-center gap-1.5 shadow-sm transition"
         >
-          <Navigation className="w-4 h-4" />
-          {t.directions}
+          <Navigation className="w-4 h-4 shrink-0" />
+          <span>{t.directions}</span>
         </a>
         <a
           href={`tel:${pantry.phone}`}
-          className="bg-white hover:bg-slate-50 active:scale-[0.98] border border-slate-300 text-slate-800 font-bold text-sm py-3 px-4 rounded-2xl flex items-center justify-center gap-2 shadow-xs transition"
+          className="bg-white hover:bg-slate-50 active:scale-[0.98] border border-slate-300 text-slate-800 font-bold text-xs md:text-sm py-2.5 px-3 rounded-2xl flex items-center justify-center gap-1.5 shadow-xs transition"
         >
-          <Phone className="w-4 h-4 text-emerald-700" />
-          {t.callPantry}
+          <Phone className="w-4 h-4 text-emerald-700 shrink-0" />
+          <span>{t.callPantry}</span>
         </a>
+        <button
+          onClick={handleShare}
+          className="bg-white hover:bg-slate-50 active:scale-[0.98] border border-slate-300 text-slate-800 font-bold text-xs md:text-sm py-2.5 px-3 rounded-2xl flex items-center justify-center gap-1.5 shadow-xs transition cursor-pointer"
+        >
+          {copiedShare ? (
+            <>
+              <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span className="text-emerald-700">Copied!</span>
+            </>
+          ) : (
+            <>
+              <Share2 className="w-4 h-4 text-emerald-700 shrink-0" />
+              <span>Share</span>
+            </>
+          )}
+        </button>
       </div>
 
       {/* Category Stock Level Section matching Page 2 Detail Sheet */}
       <div className="flex flex-col gap-3">
         <div className="flex justify-between items-center">
           <h3 className="text-sm font-bold text-emerald-950">{t.liveShelfStock}</h3>
-          <span className="text-[11px] text-slate-400">85% {t.confidence}</span>
+          <span className="text-[11px] text-slate-600 font-semibold">85% {t.confidence}</span>
         </div>
 
         <div className="flex flex-col gap-2">
