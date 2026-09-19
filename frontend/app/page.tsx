@@ -6,6 +6,7 @@ import { BALTIMORE_PANTRIES, Pantry } from '@/lib/pantryData';
 import PantryDetailSheet from '@/components/PantryDetailSheet';
 import VolunteerDashboard from '@/components/VolunteerDashboard';
 import PantryLoginModal from '@/components/PantryLoginModal';
+import HotlineModal from '@/components/HotlineModal';
 import { Language, TRANSLATIONS } from '@/lib/translations';
 import {
   Search,
@@ -20,7 +21,9 @@ import {
   SlidersHorizontal,
   Clock,
   HeartHandshake,
-  Lock
+  Lock,
+  Map as MapIcon,
+  List as ListIcon
 } from 'lucide-react';
 
 // Dynamic import for Leaflet map to prevent SSR issues
@@ -48,6 +51,10 @@ export default function Home() {
 
   // Filter chips
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
+
+  // Hotline Modal & Mobile View Toggle
+  const [showHotlineModal, setShowHotlineModal] = useState(false);
+  const [mobileTab, setMobileTab] = useState<'list' | 'map'>('list');
 
   const handleRegisterNewPantry = (newPantry: Pantry) => {
     setPantriesList((prev) => [newPantry, ...prev]);
@@ -342,12 +349,25 @@ export default function Home() {
           </div>
 
           {/* Hotline Card */}
-          <div className="bg-[#1e293b] text-white rounded-3xl p-5 shadow-lg flex items-center gap-4 border border-slate-800">
-            <div className="w-12 h-12 rounded-2xl bg-slate-700/80 flex items-center justify-center shrink-0">
-              <PhoneCall className="w-6 h-6 text-emerald-400" />
+          <div
+            onClick={() => setShowHotlineModal(true)}
+            className="bg-[#1e293b] hover:bg-[#15202e] text-white rounded-3xl p-5 shadow-lg flex items-center gap-4 border border-slate-800 hover:border-emerald-500/50 transition cursor-pointer group active:scale-[0.99]"
+            role="button"
+            tabIndex={0}
+            title={language === 'es' ? 'Haga clic para simular llamada de voz' : 'Click to test interactive voice AI hotline'}
+          >
+            <div className="w-12 h-12 rounded-2xl bg-slate-700/80 group-hover:bg-emerald-600/30 flex items-center justify-center shrink-0 transition">
+              <PhoneCall className="w-6 h-6 text-emerald-400 group-hover:scale-110 transition-transform" />
             </div>
-            <div>
-              <h3 className="font-bold text-sm text-white">{t.hotlineTitle}</h3>
+            <div className="flex-1">
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-sm text-white group-hover:text-emerald-300 transition">
+                  {t.hotlineTitle}
+                </h3>
+                <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-semibold px-2 py-0.5 rounded-full border border-emerald-500/30">
+                  {language === 'es' ? 'Simular Voz' : 'Live Voice Demo'}
+                </span>
+              </div>
               <p className="text-xs text-slate-300 mt-0.5 font-medium">
                 {t.hotlineSubtitle}
               </p>
@@ -361,9 +381,9 @@ export default function Home() {
         </div>
       ) : (
         /* VIEW 2: MAP & RESULTS VIEW (Page 3 in Mockups) */
-        <div className="flex-1 flex flex-col md:flex-row h-[calc(100vh-65px)] overflow-hidden">
+        <div className="flex-1 flex flex-col md:flex-row h-[calc(100vh-65px)] overflow-hidden relative">
           {/* Left Column: Search summary & Pantry list */}
-          <div className="w-full md:w-5/12 lg:w-4/12 h-full flex flex-col border-r border-emerald-900/10 bg-white overflow-y-auto">
+          <div className={`w-full md:w-5/12 lg:w-4/12 h-full flex flex-col border-r border-emerald-900/10 bg-white overflow-y-auto ${mobileTab === 'list' ? 'flex' : 'hidden md:flex'}`}>
             {/* Top Query Re-Search Bar */}
             <div className="p-4 border-b border-slate-100 flex items-center gap-2 sticky top-0 bg-white z-10">
               <button
@@ -540,7 +560,7 @@ export default function Home() {
           </div>
 
           {/* Right Column: Interactive Map & Detail Panel */}
-          <div className="flex-1 relative h-full flex flex-col md:flex-row bg-[#f8faf9]">
+          <div className={`flex-1 relative h-full flex flex-col md:flex-row bg-[#f8faf9] ${mobileTab === 'map' ? 'flex' : 'hidden md:flex'}`}>
             {/* Map Container */}
             <div className="flex-1 h-full min-h-[350px]">
               <PantryMap
@@ -550,9 +570,9 @@ export default function Home() {
               />
             </div>
 
-            {/* Slide-over Detail Sheet (shown on desktop beside map, or as a sheet on mobile) */}
+            {/* Slide-over Detail Sheet (shown on desktop beside map) */}
             {selectedPantry && (
-              <div className="w-full md:w-[420px] lg:w-[450px] h-full p-3 md:p-4 shrink-0 overflow-y-auto z-20">
+              <div className="hidden md:block w-[400px] lg:w-[440px] h-full p-4 shrink-0 overflow-y-auto z-20 border-l border-slate-200">
                 <PantryDetailSheet
                   pantry={selectedPantry}
                   language={language}
@@ -561,8 +581,65 @@ export default function Home() {
               </div>
             )}
           </div>
+
+          {/* Floating Mobile Toggle Button [List / Map] */}
+          <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-30 bg-slate-900/95 backdrop-blur-md text-white rounded-full p-1 shadow-2xl flex items-center border border-slate-700/80">
+            <button
+              onClick={() => setMobileTab('list')}
+              className={`flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-full transition cursor-pointer ${
+                mobileTab === 'list'
+                  ? 'bg-[#064e3b] text-white shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <ListIcon className="w-3.5 h-3.5" />
+              <span>{language === 'es' ? 'Lista' : 'List'}</span>
+              <span className="text-[10px] opacity-75">({filteredPantries.length})</span>
+            </button>
+            <button
+              onClick={() => setMobileTab('map')}
+              className={`flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-full transition cursor-pointer ${
+                mobileTab === 'map'
+                  ? 'bg-[#064e3b] text-white shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <MapIcon className="w-3.5 h-3.5" />
+              <span>{language === 'es' ? 'Mapa' : 'Map'}</span>
+            </button>
+          </div>
+
+          {/* Mobile Sheet Modal Overlay when a pantry is selected */}
+          {selectedPantry && (
+            <div
+              className="md:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-xs p-3 flex flex-col justify-end animate-in fade-in duration-200"
+              onClick={() => setSelectedPantry(null)}
+            >
+              <div
+                className="w-full max-h-[85vh] overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <PantryDetailSheet
+                  pantry={selectedPantry}
+                  language={language}
+                  onClose={() => setSelectedPantry(null)}
+                />
+              </div>
+            </div>
+          )}
         </div>
       )}
+
+      {/* Voice AI Hotline Simulator Modal */}
+      <HotlineModal
+        isOpen={showHotlineModal}
+        language={language}
+        onClose={() => setShowHotlineModal(false)}
+        onSelectPantryQuery={(simulatedQuery) => {
+          handleExecuteSearch(simulatedQuery);
+          setShowHotlineModal(false);
+        }}
+      />
 
       {/* Secure Pantry View Login Modal */}
       <PantryLoginModal

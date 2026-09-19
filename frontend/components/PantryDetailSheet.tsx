@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Pantry } from '@/lib/pantryData';
 import { Language, TRANSLATIONS } from '@/lib/translations';
-import { Navigation, Phone, CheckCircle2, ShoppingBag, Clock, Languages, ShieldCheck, ThumbsUp, ThumbsDown, X } from 'lucide-react';
+import { Navigation, Phone, CheckCircle2, ShoppingBag, Clock, Languages, ShieldCheck, ThumbsUp, ThumbsDown, X, Bus, Accessibility } from 'lucide-react';
 
 interface PantryDetailSheetProps {
   pantry: Pantry;
@@ -188,6 +188,32 @@ export default function PantryDetailSheet({ pantry, language = 'en', onClose }: 
             <p className="text-xs text-slate-600">
               {language === 'es' ? 'Un familiar o vecino puede recoger alimentos por usted con una nota simple.' : 'Someone can pick up for you with a short note.'}
             </p>
+          </div>
+        </div>
+
+        {/* MTA Transit Lines & Accessibility */}
+        <div className="flex items-start gap-3 border-t border-slate-100 pt-3">
+          <Bus className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
+          <div>
+            <h4 className="text-sm font-semibold text-slate-900">
+              {language === 'es' ? 'Transporte Público MTA' : 'Baltimore MTA Transit Lines'}
+            </h4>
+            <p className="text-xs text-slate-600">
+              {pantry.neighborhood.includes('Hampden') 
+                ? 'CityLink Silver, Bus 21 (stops right at 36th St)'
+                : pantry.neighborhood.includes('Goucher') || pantry.neighborhood.includes('Charles')
+                ? 'CityLink Red & Bus 51 (North Charles St corridor)'
+                : 'MTA CityLink & LocalLink connection within 2 blocks.'}
+            </p>
+            <div className="flex items-center gap-2 mt-2">
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-800 bg-emerald-100/70 px-2 py-0.5 rounded-md">
+                <Accessibility className="w-3 h-3 text-emerald-700" />
+                {language === 'es' ? 'Acceso en silla de ruedas' : 'Wheelchair Accessible'}
+              </span>
+              <span className="inline-flex items-center text-[11px] font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md">
+                {language === 'es' ? 'Acepta cochecitos de bebé' : 'Stroller Friendly'}
+              </span>
+            </div>
           </div>
         </div>
       </div>
