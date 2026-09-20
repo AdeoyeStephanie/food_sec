@@ -890,21 +890,21 @@ export default function VolunteerDashboard({
               <h4 className="font-bold text-sm text-emerald-950 mb-1">Did something just run out?</h4>
               <p className="text-xs text-slate-500 mb-3">1-tap immediately notifies neighbors on the map.</p>
               <div className="flex flex-wrap gap-2">
-                {['Produce', 'Protein', 'Dairy', 'Grains', 'Diapers', 'Hygiene'].map((cat) => {
-                  const isOut = (currentPantry.shelf_items || []).some(
-                    (it) => it.category_name.toLowerCase() === cat.toLowerCase() && it.band === 'out'
-                  );
+                {(currentPantry.shelf_items || []).map((item) => {
+                  const cat = item.category_name;
+                  const isOut = item.band === 'out';
                   return (
                     <button
                       key={cat}
                       onClick={() => toggleRunOut(cat)}
-                      className={`text-xs px-3.5 py-2 rounded-xl font-semibold border transition cursor-pointer active:scale-95 ${
+                      className={`text-xs px-3.5 py-2 rounded-xl font-semibold border transition cursor-pointer active:scale-95 flex items-center gap-1.5 ${
                         isOut
                           ? 'bg-rose-600 border-rose-700 text-white shadow-xs'
                           : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                       }`}
                     >
-                      {cat} {isOut && '• Out'}
+                      <span>{item.category_emoji}</span>
+                      <span>{cat} {isOut && '• Out'}</span>
                     </button>
                   );
                 })}
