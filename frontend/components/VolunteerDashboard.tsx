@@ -278,8 +278,18 @@ export default function VolunteerDashboard({
       setTimeout(() => setLastCheckinToast(null), 3500);
     }
 
-    // Persist the check-in to Supabase and FastAPI backend for cross-device sync
+    // Persist the check-in and depleted shelf state to Supabase and FastAPI backend for cross-device sync
     logCheckinToSupabase(currentPantry.id, size);
+    updatedItems.forEach((it) => {
+      const catId = catIdByName[it.category_name.toLowerCase()] || DEFAULT_CAT_IDS[it.category_name.toLowerCase()] || 1;
+      updateShelfInSupabase(
+        currentPantry.id,
+        catId,
+        it.band,
+        it.estimated_qty,
+        it.confidence
+      );
+    });
     postCheckin(currentPantry.id, size).catch((err) => {
       console.warn('Check-in not persisted to backend:', err);
     });
