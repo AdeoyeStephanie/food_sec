@@ -98,6 +98,10 @@ export default function Home() {
       if (snapshot === lastSnapshotRef.current) return;
       lastSnapshotRef.current = snapshot;
       setPantriesList(list);
+      // Re-sync the open detail sheet: selectedPantry is a separate snapshot, so
+      // without this the sheet keeps showing stale shelf stock until a refresh.
+      // Functional form avoids the stale closure over selectedPantry.
+      setSelectedPantry((prev) => (prev ? list.find((p) => p.id === prev.id) ?? prev : prev));
       if (broadcast) saveAndBroadcastPantries(list);
     };
 
@@ -135,8 +139,7 @@ export default function Home() {
     const handleSync = (e: Event) => {
       const detail = (e as CustomEvent<Pantry[]>).detail;
       if (detail && Array.isArray(detail)) {
-        lastSnapshotRef.current = JSON.stringify(detail);
-        setPantriesList(detail);
+        applyPantries(detail, false);
       }
     };
 
@@ -145,8 +148,7 @@ export default function Home() {
         try {
           const parsed = JSON.parse(e.newValue);
           if (Array.isArray(parsed)) {
-            lastSnapshotRef.current = e.newValue;
-            setPantriesList(parsed);
+            applyPantries(parsed, false);
           }
         } catch {}
       }
