@@ -531,7 +531,7 @@ export default function Home() {
           }}
           className="cursor-pointer flex items-center gap-2.5 select-none"
         >
-          <BrandLogo variant="community-bowl" size={32} showText={false} />
+          <BrandLogo size={32} showText={false} />
           <div>
             <h1 className="font-extrabold text-base md:text-lg tracking-tight text-emerald-950 leading-none">
               {t.appName}
