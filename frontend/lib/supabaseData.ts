@@ -9,6 +9,25 @@ export interface SupabaseCategory {
   is_default?: boolean;
 }
 
+interface GeoRecord {
+  lat?: number;
+  lng?: number;
+  dist?: number;
+  walk?: number;
+  tags?: string[];
+  demo?: boolean;
+  model?: 'client_choice' | 'pre_packed' | 'list';
+}
+
+interface ShelfRow {
+  pantry_id: string;
+  category_id: number;
+  band?: 'plenty' | 'low' | 'out';
+  estimated_qty?: number;
+  confidence?: number;
+  time?: string;
+}
+
 /**
  * Fetch all categories from Supabase
  */
@@ -41,7 +60,7 @@ export async function fetchPantriesFromSupabase(): Promise<Pantry[]> {
     (catRes.data || []).forEach((c) => categoriesMap.set(c.id, c));
 
     // Map latest shelf item per pantry and category
-    const latestShelfByPantry = new Map<string, Map<number, any>>();
+    const latestShelfByPantry = new Map<string, Map<number, ShelfRow>>();
     (shelfRes.data || []).forEach((row) => {
       if (!latestShelfByPantry.has(row.pantry_id)) {
         latestShelfByPantry.set(row.pantry_id, new Map());
@@ -71,7 +90,7 @@ export async function fetchPantriesFromSupabase(): Promise<Pantry[]> {
       }
 
       // Accurate coordinates, tags, and distances lookup
-      const geo = (geoLookup as Record<string, any>)[row.id] || {};
+      const geo = (geoLookup as Record<string, GeoRecord>)[row.id] || {};
       const lat = typeof geo.lat === 'number' ? geo.lat : 39.2904;
       const lng = typeof geo.lng === 'number' ? geo.lng : -76.6122;
 
@@ -92,7 +111,7 @@ export async function fetchPantriesFromSupabase(): Promise<Pantry[]> {
         allows_walkins: row.allows_walkins ?? true,
         languages: row.languages || ['English'],
         notes: row.notes || '',
-        distribution_model: (row.distribution_model || geo.model || 'client_choice') as any,
+        distribution_model: (row.distribution_model || geo.model || 'client_choice') as 'client_choice' | 'pre_packed' | 'list',
         phone: row.phone || '(410) 737-8282',
         specialty_tags: geo.tags || [],
         shelf_items,

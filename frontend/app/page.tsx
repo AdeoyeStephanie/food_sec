@@ -67,6 +67,7 @@ export default function Home() {
     if (typeof window !== 'undefined') {
       const savedSearched = localStorage.getItem('PULSE_HAS_SEARCHED');
       if (savedSearched === 'true') {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setHasSearched(true);
       }
     }
@@ -76,7 +77,6 @@ export default function Home() {
     // the synchronous setState here is intentional.
     const stored = getStoredPantries([]);
     if (stored.length > 0) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPantriesList(stored);
       setIsLoading(false);
     }

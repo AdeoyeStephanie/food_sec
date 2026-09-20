@@ -23,7 +23,7 @@ import {
   Tablet,
   Trash2
 } from 'lucide-react';
-import { Pantry, ShelfItem } from '@/lib/pantryData';
+import { Pantry } from '@/lib/pantryData';
 import CameraViewfinder from '@/components/CameraViewfinder';
 import BrandLogo from '@/components/BrandLogo';
 import {
@@ -44,7 +44,7 @@ import {
   CorrectionItem
 } from '@/lib/api';
 import { aggregateDonations, canonicalCategory } from '@/lib/inventory';
-import { logCheckinToSupabase, updateShelfInSupabase } from '@/lib/supabaseData';
+import { logCheckinToSupabase } from '@/lib/supabaseData';
 
 interface VolunteerDashboardProps {
   activePantry?: Pantry | null;
