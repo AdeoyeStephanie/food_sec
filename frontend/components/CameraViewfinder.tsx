@@ -100,11 +100,11 @@ export default function CameraViewfinder({ onCapture, onClose }: CameraViewfinde
   };
 
   return (
-    <div className="relative w-full bg-black rounded-3xl overflow-hidden shadow-2xl flex flex-col items-center border-2 border-emerald-500/50">
+    <div className="relative w-full bg-black rounded-2xl overflow-hidden shadow-md flex flex-col items-center border-2 border-emerald-500/50">
       {/* Top Overlay controls */}
       <div className="absolute top-3 left-3 right-3 z-20 flex justify-between items-center px-1">
         <div className="bg-black/60 backdrop-blur-md text-white text-[11px] font-semibold px-3 py-1 rounded-full flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
           Live Viewfinder
         </div>
         <div className="flex gap-2">
@@ -174,7 +174,7 @@ export default function CameraViewfinder({ onCapture, onClose }: CameraViewfinde
         <div className="w-full bg-slate-900/95 px-6 py-4 flex items-center justify-center gap-4 z-20">
           <button
             onClick={handleSnap}
-            className="flex items-center gap-2 bg-[#10b981] hover:bg-[#059669] active:scale-95 text-slate-950 font-extrabold text-sm px-6 py-3 rounded-full shadow-lg transition"
+            className="flex items-center gap-2 bg-[#2e7d32] hover:bg-[#059669] active:scale-95 text-slate-950 font-extrabold text-sm px-6 py-3 rounded-full shadow-lg transition"
           >
             <Camera className="w-5 h-5 text-slate-950" />
             Snap Photo &amp; Sort

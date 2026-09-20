@@ -1,28 +1,93 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Warm off-white, not clinical pure white; near-black ink for AA contrast. */
+  --background: #faf9f6;
+  --foreground: #1a1a1a;
+  color-scheme: light;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  /* Inter for body/UI, DM Sans for display/headings. */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-dm), var(--font-inter), ui-sans-serif, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/*
+ * Brand palette, applied by overriding Tailwind's built-in scales so every
+ * existing utility class re-colors at once. Direction: ONE green hue (brand +
+ * "plenty"), warm earth brown, and calmer, AA-friendly status colors.
+ */
+@theme {
+  /* Single green hue — brand chrome and the "plenty" status share it. */
+  --color-emerald-50: #eef5ee;
+  --color-emerald-100: #d9e9d9;
+  --color-emerald-200: #bcd9bd;
+  --color-emerald-300: #93c29a;
+  --color-emerald-400: #5fa369;
+  --color-emerald-500: #3c8a49;
+  --color-emerald-600: #2e7d32;
+  --color-emerald-700: #256628;
+  --color-emerald-800: #1e5322;
+  --color-emerald-900: #16401b;
+  --color-emerald-950: #0e2c13;
+
+  /* "Open tonight" indigo folded into the green family so it stops competing. */
+  --color-indigo-50: #eef5ee;
+  --color-indigo-100: #d9e9d9;
+  --color-indigo-200: #bcd9bd;
+  --color-indigo-300: #93c29a;
+  --color-indigo-600: #2e7d32;
+  --color-indigo-800: #1e5322;
+  --color-indigo-900: #16401b;
+
+  /* Earth brown — warm secondary accent (folded onto amber's darker end too). */
+  --color-amber-50: #f8f1e4;
+  --color-amber-100: #f1e2c6;
+  --color-amber-200: #e4c795;
+  --color-amber-300: #d3a866;
+  --color-amber-400: #bd8a3f;
+  --color-amber-500: #a4712a;
+  --color-amber-600: #8a5c20;
+  --color-amber-700: #6f4a1b;
+  --color-amber-800: #593c17;
+  --color-amber-900: #452f13;
+
+  /* "Out" — calmer brick red instead of a hot pink-red. */
+  --color-rose-50: #fbeae7;
+  --color-rose-100: #f6d3cc;
+  --color-rose-200: #eda99d;
+  --color-rose-300: #e07e6c;
+  --color-rose-400: #d15c46;
+  --color-rose-500: #c0392b;
+  --color-rose-600: #a82f23;
+  --color-rose-700: #8a251c;
+  --color-rose-800: #6e1d16;
+  --color-rose-900: #571711;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-dm), var(--font-inter), ui-sans-serif, sans-serif;
+}
+
+/* Visible keyboard focus for accessibility. */
+:focus-visible {
+  outline: 2px solid var(--color-emerald-600);
+  outline-offset: 2px;
 }
 
 /* Ensure Leaflet stays strictly inside its own container and never bleeds over modals or dashboards */
@@ -43,4 +108,3 @@ body {
 .leaflet-control {
   z-index: 3 !important;
 }
-

@@ -31,7 +31,7 @@ export default function BrandLogo({ size = 32, showText = true, className = '' }
           <div className="flex items-center font-black tracking-tight text-base md:text-lg text-[#2E7D32]">
             Pantree
           </div>
-          <span className="text-[10px] uppercase font-extrabold tracking-widest text-slate-500 mt-0.5">
+          <span className="text-[10px] uppercase font-extrabold tracking-widest text-slate-600 mt-0.5">
             Baltimore
           </span>
         </div>

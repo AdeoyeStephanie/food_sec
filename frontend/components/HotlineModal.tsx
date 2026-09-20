@@ -61,13 +61,13 @@ export default function HotlineModal({ isOpen, language, onClose, onSelectPantry
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 animate-in fade-in duration-200">
       <div 
-        className="bg-slate-900 text-white rounded-3xl max-w-md w-full p-6 md:p-8 shadow-2xl border border-slate-700 flex flex-col gap-6 relative"
+        className="bg-slate-900 text-white rounded-2xl max-w-md w-full p-6 md:p-8 shadow-md border border-slate-700 flex flex-col gap-6 relative"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition cursor-pointer"
+          className="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-600 hover:text-white transition cursor-pointer"
         >
           <X className="w-4 h-4" />
         </button>
@@ -90,7 +90,7 @@ export default function HotlineModal({ isOpen, language, onClose, onSelectPantry
             <h3 className="text-2xl font-black text-white mt-0.5">
               (410) 737-8282
             </h3>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-600 mt-0.5">
               Baltimore Multilingual Voice AI Hotline • No Data Needed
             </p>
           </div>
@@ -127,7 +127,7 @@ export default function HotlineModal({ isOpen, language, onClose, onSelectPantry
         {/* Simulated Caller Options */}
         {callState === 'connected' && step === 0 && (
           <div className="flex flex-col gap-2">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider text-center">
+            <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider text-center">
               {language === 'es' ? 'Simular lo que el vecino responde:' : 'Simulate caller saying:'}
             </span>
             <div className="grid grid-cols-1 gap-2">

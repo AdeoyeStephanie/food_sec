@@ -108,13 +108,13 @@ export default function VolunteerPage() {
       </div>
 
       {/* Login Card */}
-      <div className="max-w-md mx-auto w-full bg-white rounded-3xl p-6 md:p-8 shadow-2xl border border-emerald-900/10 flex flex-col gap-6">
+      <div className="max-w-md mx-auto w-full bg-white rounded-2xl p-6 md:p-8 shadow-md border border-emerald-900/10 flex flex-col gap-6">
         <div className="flex flex-col items-center text-center gap-2">
           <div className="w-13 h-13 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-900 shadow-inner">
             <Lock className="w-6 h-6 text-emerald-800" />
           </div>
           <h2 className="text-2xl font-black text-emerald-950 tracking-tight">Pantry View Login</h2>
-          <p className="text-xs text-slate-500 max-w-xs leading-relaxed">
+          <p className="text-xs text-slate-600 max-w-xs leading-relaxed">
             Staff &amp; Operator Access for live inventory intake, household check-in, and TEFAP compliance.
           </p>
         </div>
@@ -144,13 +144,13 @@ export default function VolunteerPage() {
                   </option>
                 ))}
               </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-600">
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
                   <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
                 </svg>
               </div>
             </div>
-            <p className="text-[11px] text-slate-400 mt-1 truncate">
+            <p className="text-[11px] text-slate-600 mt-1 truncate">
               {currentPantry?.address || (pantriesList.length === 0 ? 'Connecting to live registry...' : '')}
             </p>
           </div>
@@ -187,7 +187,7 @@ export default function VolunteerPage() {
           <button
             type="submit"
             disabled={isSubmitting || pin.length < 4}
-            className="w-full mt-1 bg-[#064e3b] hover:bg-[#043d2e] active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none text-white font-bold text-sm py-3.5 rounded-2xl transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full mt-1 bg-[#1e5322] hover:bg-[#043d2e] active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none text-white font-bold text-sm py-3.5 rounded-2xl transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
           >
             {isSubmitting ? (
               <span className="inline-block animate-spin mr-1">⏳</span>
@@ -198,7 +198,7 @@ export default function VolunteerPage() {
           </button>
         </form>
 
-        <div className="border-t border-slate-100 pt-3 flex items-center justify-between text-xs text-slate-500">
+        <div className="border-t border-slate-100 pt-3 flex items-center justify-between text-xs text-slate-600">
           <span>Active Location:</span>
           <span className="font-semibold text-emerald-950 truncate max-w-[200px]">
             {currentPantry?.name || (pantriesList.length === 0 ? 'Loading...' : 'Select Location')}
@@ -207,7 +207,7 @@ export default function VolunteerPage() {
       </div>
 
       {/* Footer */}
-      <div className="text-center text-xs text-slate-400 py-4 flex items-center justify-center gap-1.5">
+      <div className="text-center text-xs text-slate-600 py-4 flex items-center justify-center gap-1.5">
         <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
         <span>Pantree Operating Network • Baltimore City</span>
       </div>

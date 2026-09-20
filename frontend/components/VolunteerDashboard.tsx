@@ -621,7 +621,7 @@ export default function VolunteerDashboard({
   };
 
   return (
-    <div className="bg-[#f2f6f4] min-h-[85vh] text-slate-800 rounded-3xl border border-emerald-900/10 shadow-xl flex flex-col justify-between overflow-hidden max-w-2xl mx-auto">
+    <div className="bg-[#f2f6f4] min-h-[85vh] text-slate-800 rounded-2xl border border-emerald-900/10 shadow-md flex flex-col justify-between overflow-hidden max-w-2xl mx-auto">
       {/* Top Header */}
       <div className="bg-white px-5 py-4 border-b border-emerald-900/10 flex justify-between items-center">
         <div>
@@ -629,13 +629,13 @@ export default function VolunteerDashboard({
             <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/80 border border-emerald-200 px-2.5 py-0.5 rounded-full">
               Pantry View
             </span>
-            <span className="text-xs text-slate-500 font-medium">Verified Operator Session</span>
+            <span className="text-xs text-slate-600 font-medium">Verified Operator Session</span>
           </div>
           <h2 className="text-xl font-bold text-emerald-950 mt-0.5">
             {currentPantry?.name || 'Hampden Family Center'}
           </h2>
           {currentPantry?.neighborhood && (
-            <span className="text-xs text-slate-400 font-medium">{currentPantry.neighborhood}, Baltimore</span>
+            <span className="text-xs text-slate-600 font-medium">{currentPantry.neighborhood}, Baltimore</span>
           )}
         </div>
         <div className="flex items-center gap-2">
@@ -664,7 +664,7 @@ export default function VolunteerDashboard({
               className="flex items-center gap-1.5 text-xs text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer"
               title="Unlock manager settings and TEFAP reports"
             >
-              <Lock className="w-3.5 h-3.5 text-slate-500" />
+              <Lock className="w-3.5 h-3.5 text-slate-600" />
               <span>Manager</span>
             </button>
           )}
@@ -694,7 +694,7 @@ export default function VolunteerDashboard({
         {activeTab === 'checkin' && (
           <div className="flex flex-col gap-6">
             {/* Counter Card */}
-            <div className="bg-[#064e3b] text-white rounded-3xl p-5 shadow-sm flex items-center justify-between">
+            <div className="bg-[#1e5322] text-white rounded-2xl p-5 shadow-sm flex items-center justify-between">
               <div>
                 <p className="text-xs text-emerald-200 font-medium">Families served today</p>
                 <p className="text-4xl font-extrabold tracking-tight mt-1">{familiesServed}</p>
@@ -712,7 +712,7 @@ export default function VolunteerDashboard({
                   Predict Engine Active
                 </span>
               </div>
-              <p className="text-xs text-slate-500 mb-3">No names or paperwork required. Just the family size.</p>
+              <p className="text-xs text-slate-600 mb-3">No names or paperwork required. Just the family size.</p>
               <div className="grid grid-cols-4 gap-3">
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((size) => (
                   <button
@@ -721,7 +721,7 @@ export default function VolunteerDashboard({
                     className="bg-white hover:bg-emerald-50 active:bg-emerald-100 border-2 border-slate-200 hover:border-emerald-600 rounded-2xl py-4 flex flex-col items-center justify-center font-bold text-2xl text-slate-800 shadow-sm transition active:scale-95 cursor-pointer"
                   >
                     <span>{size === 8 ? '8+' : size}</span>
-                    <span className="text-[10px] text-slate-400 font-normal">people</span>
+                    <span className="text-[10px] text-slate-600 font-normal">people</span>
                   </button>
                 ))}
               </div>
@@ -734,7 +734,7 @@ export default function VolunteerDashboard({
                   <TrendingDown className="w-4 h-4 text-emerald-700" />
                   Live Shelf Stock (Auto-depleting)
                 </h4>
-                <span className="text-[11px] text-slate-400">
+                <span className="text-[11px] text-slate-600">
                   Updates neighbor map live
                 </span>
               </div>
@@ -753,7 +753,7 @@ export default function VolunteerDashboard({
                           <span>{item.category_name}</span>
                         </span>
                         <div className="flex items-center gap-2">
-                          <span className="text-[11px] text-slate-500 font-medium">
+                          <span className="text-[11px] text-slate-600 font-medium">
                             {item.band === 'out' ? '0 lbs left' : `~${qty} lbs`}
                           </span>
                           <span
@@ -790,7 +790,7 @@ export default function VolunteerDashboard({
             {/* Quick 1-Tap Run Out Flags */}
             <div className="bg-white rounded-2xl p-4 border border-emerald-900/10">
               <h4 className="font-bold text-sm text-emerald-950 mb-1">Did something just run out?</h4>
-              <p className="text-xs text-slate-500 mb-3">1-tap immediately notifies neighbors on the map.</p>
+              <p className="text-xs text-slate-600 mb-3">1-tap immediately notifies neighbors on the map.</p>
               <div className="flex flex-wrap gap-2">
                 {(currentPantry.shelf_items || []).map((item) => {
                   const cat = item.category_name;
@@ -826,7 +826,7 @@ export default function VolunteerDashboard({
                   Gemini Vision
                 </span>
               </div>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-600">
                 Snap photos of incoming delivery piles or small donations. AI recognizes the mixed stuff and groups by category—no scales needed.
               </p>
             </div>
@@ -881,7 +881,7 @@ export default function VolunteerDashboard({
                 onClose={() => setShowLiveCamera(false)}
               />
             ) : (
-              <div className="bg-slate-900 text-white rounded-3xl p-5 flex flex-col items-center justify-center relative overflow-hidden min-h-[170px] border border-slate-700">
+              <div className="bg-slate-900 text-white rounded-2xl p-5 flex flex-col items-center justify-center relative overflow-hidden min-h-[170px] border border-slate-700">
                 {isScanning ? (
                   <div className="flex flex-col items-center gap-2 py-4">
                     <Loader2 className="w-8 h-8 text-emerald-400 animate-spin" />
@@ -900,7 +900,7 @@ export default function VolunteerDashboard({
                           ? 'Point at incoming delivery pallets, crates, or stacked boxes'
                           : 'Point at donated grocery bags or boxes'}
                       </p>
-                      <p className="text-[11px] text-slate-400">Privacy-guaranteed: photos processed in-memory &bull; No scales or weighing required</p>
+                      <p className="text-[11px] text-slate-600">Privacy-guaranteed: photos processed in-memory &bull; No scales or weighing required</p>
                     </div>
 
                     <div className="flex items-center gap-2 mt-1">
@@ -936,21 +936,21 @@ export default function VolunteerDashboard({
                     className="bg-white hover:bg-emerald-50 border border-slate-200 p-2.5 rounded-xl text-xs font-semibold text-slate-700 text-left transition flex flex-col justify-between cursor-pointer shadow-xs"
                   >
                     <span className="font-bold text-emerald-950">🚚 Mixed Food Bank Drop</span>
-                    <span className="text-[10px] text-slate-500 mt-0.5">Produce crates, canned flats, rice sacks</span>
+                    <span className="text-[10px] text-slate-600 mt-0.5">Produce crates, canned flats, rice sacks</span>
                   </button>
                   <button
                     onClick={() => handleScanDonation('farm_produce_crates')}
                     className="bg-white hover:bg-emerald-50 border border-slate-200 p-2.5 rounded-xl text-xs font-semibold text-slate-700 text-left transition flex flex-col justify-between cursor-pointer shadow-xs"
                   >
                     <span className="font-bold text-emerald-950">🌾 Local Farm Delivery</span>
-                    <span className="text-[10px] text-slate-500 mt-0.5">Vegetable crates, apples &amp; dairy</span>
+                    <span className="text-[10px] text-slate-600 mt-0.5">Vegetable crates, apples &amp; dairy</span>
                   </button>
                   <button
                     onClick={() => handleScanDonation('emergency_relief_load')}
                     className="bg-white hover:bg-emerald-50 border border-slate-200 p-2.5 rounded-xl text-xs font-semibold text-slate-700 text-left transition flex flex-col justify-between cursor-pointer shadow-xs"
                   >
                     <span className="font-bold text-emerald-950">📦 Emergency Relief Van</span>
-                    <span className="text-[10px] text-slate-500 mt-0.5">Protein cases, pasta &amp; diaper boxes</span>
+                    <span className="text-[10px] text-slate-600 mt-0.5">Protein cases, pasta &amp; diaper boxes</span>
                   </button>
                 </div>
               ) : (
@@ -974,16 +974,16 @@ export default function VolunteerDashboard({
             </div>
 
             {/* Editable Intake Review & Manual Top-Up */}
-            <div className="bg-white rounded-3xl p-4 border border-emerald-900/10 flex flex-col gap-4 shadow-xs">
+            <div className="bg-white rounded-2xl p-4 border border-emerald-900/10 flex flex-col gap-4 shadow-xs">
               <div className="flex justify-between items-center border-b border-slate-100 pb-2.5">
                 <div>
                   <h4 className="font-bold text-sm text-emerald-950">Intake Batch Review</h4>
-                  <p className="text-[11px] text-slate-400">Scanned items or manual additions ready for shelves</p>
+                  <p className="text-[11px] text-slate-600">Scanned items or manual additions ready for shelves</p>
                 </div>
                 {Object.keys(donationCounts).length > 0 && (
                   <button
                     onClick={() => setDonationCounts({})}
-                    className="text-[11px] text-slate-400 hover:text-rose-600 transition"
+                    className="text-[11px] text-slate-600 hover:text-rose-600 transition"
                   >
                     Clear All
                   </button>
@@ -1058,7 +1058,7 @@ export default function VolunteerDashboard({
               {/* Current Intake Items List */}
               <div className="flex flex-col gap-2">
                 {Object.keys(donationCounts).length === 0 ? (
-                  <div className="text-center py-6 text-slate-400 text-xs">
+                  <div className="text-center py-6 text-slate-600 text-xs">
                     No items in current batch. Use the camera, tap a quick top-up above, or type an item.
                   </div>
                 ) : (
@@ -1084,7 +1084,7 @@ export default function VolunteerDashboard({
                                 handleRemoveItem(item);
                               }
                             }}
-                            className="p-1 text-slate-500 hover:text-slate-800 transition cursor-pointer"
+                            className="p-1 text-slate-600 hover:text-slate-800 transition cursor-pointer"
                           >
                             <Minus className="w-3 h-3" />
                           </button>
@@ -1097,7 +1097,7 @@ export default function VolunteerDashboard({
                                 [item]: { count: count + 1, category },
                               });
                             }}
-                            className="p-1 text-slate-500 hover:text-slate-800 transition cursor-pointer"
+                            className="p-1 text-slate-600 hover:text-slate-800 transition cursor-pointer"
                           >
                             <Plus className="w-3 h-3" />
                           </button>
@@ -1105,7 +1105,7 @@ export default function VolunteerDashboard({
                         <button
                           type="button"
                           onClick={() => handleRemoveItem(item)}
-                          className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition cursor-pointer"
+                          className="p-1.5 text-slate-600 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition cursor-pointer"
                           title="Remove item"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -1119,7 +1119,7 @@ export default function VolunteerDashboard({
 
             <button
               onClick={handleApplyDonations}
-              className="bg-[#064e3b] text-white py-3.5 rounded-2xl font-bold text-sm hover:bg-[#043d2e] shadow-sm transition active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
+              className="bg-[#1e5322] text-white py-3.5 rounded-2xl font-bold text-sm hover:bg-[#043d2e] shadow-sm transition active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
             >
               <PackageCheck className="w-4 h-4" />
               <span>{donationsAddedNotice ? '✓ Restocked to Shelves!' : 'Add to Shelves (Auto-Restock)'}</span>
@@ -1140,17 +1140,17 @@ export default function VolunteerDashboard({
                   Kalman Gain Blending
                 </span>
               </div>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-slate-600 mt-1">
                 End of shift: verify what&apos;s left. Blends your visual inspection with predicted depletion via Kalman gain and adapts per-category consumption multipliers for future shifts.
               </p>
             </div>
 
-            <div className="bg-white rounded-3xl p-4 border border-emerald-900/10 flex flex-col gap-4 shadow-xs">
+            <div className="bg-white rounded-2xl p-4 border border-emerald-900/10 flex flex-col gap-4 shadow-xs">
               {Object.entries(closingGuesses).map(([cat, currentBand]) => (
                 <div key={cat} className="flex flex-col gap-1.5 pb-3 border-b border-slate-100 last:border-0">
                   <div className="flex justify-between items-center">
                     <span className="font-bold text-sm text-slate-900">{cat}</span>
-                    <span className="text-[11px] text-slate-400 capitalize">Model estimate: {currentBand}</span>
+                    <span className="text-[11px] text-slate-600 capitalize">Model estimate: {currentBand}</span>
                   </div>
 
                   <div className="grid grid-cols-3 gap-2">
@@ -1183,7 +1183,7 @@ export default function VolunteerDashboard({
 
             {/* Live Kalman Gain & Learned Parameters Feedback */}
             {closingMetrics && closingMetrics.length > 0 && (
-              <div className="bg-emerald-50/80 border border-emerald-200 rounded-3xl p-4 flex flex-col gap-3 animate-in fade-in">
+              <div className="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-4 flex flex-col gap-3 animate-in fade-in">
                 <div className="flex items-center justify-between border-b border-emerald-200/80 pb-2">
                   <div className="flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-emerald-700" />
@@ -1200,7 +1200,7 @@ export default function VolunteerDashboard({
                         <span>{m.categoryName}</span>
                         <span className="text-emerald-700 font-mono">K={m.kalmanGain}</span>
                       </div>
-                      <div className="flex justify-between text-[10px] text-slate-500">
+                      <div className="flex justify-between text-[10px] text-slate-600">
                         <span>Pred: {Math.round(m.predictedQtyLbs)} lbs → Blended: {Math.round(m.blendedQtyLbs)} lbs</span>
                         <span className="font-semibold text-emerald-900">
                           Rate: {m.learnedMultiplier} lbs/person
@@ -1214,7 +1214,7 @@ export default function VolunteerDashboard({
 
             <button
               onClick={handleSaveClosingCheck}
-              className="bg-[#064e3b] text-white py-3.5 rounded-2xl font-bold text-sm hover:bg-[#043d2e] shadow-sm transition active:scale-[0.98] cursor-pointer"
+              className="bg-[#1e5322] text-white py-3.5 rounded-2xl font-bold text-sm hover:bg-[#043d2e] shadow-sm transition active:scale-[0.98] cursor-pointer"
             >
               {closingSaved ? '✓ Blended with Kalman Gain (Confidence ~94%)' : 'Blend Closing Inspection & Update Multipliers'}
             </button>
@@ -1231,7 +1231,7 @@ export default function VolunteerDashboard({
                   USDA / Food Bank
                 </span>
               </div>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-600">
                 Automated monthly compliance metrics generated from fast check-in logs.
               </p>
             </div>
@@ -1239,19 +1239,19 @@ export default function VolunteerDashboard({
             {/* Metrics Overview Cards */}
             <div className="grid grid-cols-3 gap-2.5">
               <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs flex flex-col">
-                <span className="text-[11px] text-slate-500 font-semibold">Households</span>
+                <span className="text-[11px] text-slate-600 font-semibold">Households</span>
                 <span className="text-2xl font-extrabold text-emerald-950 mt-1">{familiesServed}</span>
                 <span className="text-[10px] text-emerald-700 font-medium">Logged today</span>
               </div>
               <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs flex flex-col">
-                <span className="text-[11px] text-slate-500 font-semibold">Individuals</span>
+                <span className="text-[11px] text-slate-600 font-semibold">Individuals</span>
                 <span className="text-2xl font-extrabold text-emerald-950 mt-1">
                   {Math.round(familiesServed * 3.4)}
                 </span>
                 <span className="text-[10px] text-emerald-700 font-medium">~3.4 per family</span>
               </div>
               <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs flex flex-col">
-                <span className="text-[11px] text-slate-500 font-semibold">Est. Pounds</span>
+                <span className="text-[11px] text-slate-600 font-semibold">Est. Pounds</span>
                 <span className="text-2xl font-extrabold text-emerald-950 mt-1">
                   {(familiesServed * 14.5).toFixed(0)}
                 </span>
@@ -1260,7 +1260,7 @@ export default function VolunteerDashboard({
             </div>
 
             {/* Download CSV Action Card */}
-            <div className="bg-emerald-950 text-white rounded-3xl p-5 flex flex-col gap-3 shadow-md">
+            <div className="bg-emerald-950 text-white rounded-2xl p-5 flex flex-col gap-3 shadow-md">
               <div>
                 <h4 className="font-bold text-base text-white">Export Monthly Compliance Summary</h4>
                 <p className="text-xs text-slate-300 mt-0.5">
@@ -1289,13 +1289,13 @@ export default function VolunteerDashboard({
                     <span className="font-medium text-slate-800">
                       Household of {log.householdSize}
                     </span>
-                    <span className="text-[11px] text-slate-400">
+                    <span className="text-[11px] text-slate-600">
                       {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
                 ))}
                 {checkInLogs.length === 0 && (
-                  <p className="text-xs text-slate-400 py-3 text-center">
+                  <p className="text-xs text-slate-600 py-3 text-center">
                     Tap numbers on the Check-in tab to see live records populate here.
                   </p>
                 )}
@@ -1314,16 +1314,16 @@ export default function VolunteerDashboard({
                   Live on Map
                 </span>
               </div>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-600">
                 Configure specialty diets, distribution models, and walk-in policies.
               </p>
             </div>
 
             {/* Specialty Offerings Grid */}
-            <div className="bg-white rounded-3xl p-5 border border-emerald-900/10 shadow-xs flex flex-col gap-4">
+            <div className="bg-white rounded-2xl p-5 border border-emerald-900/10 shadow-xs flex flex-col gap-4">
               <div>
                 <h4 className="font-bold text-sm text-emerald-950">Specialty Diets & Cultural Offerings</h4>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-600">
                   Tap to toggle which specialty items your pantry distributes. Enables targeted neighbor search.
                 </p>
               </div>
@@ -1358,7 +1358,7 @@ export default function VolunteerDashboard({
                         </span>
                       </div>
                       <span className="font-bold text-xs text-slate-900 mt-1">{spec.label}</span>
-                      <span className="text-[10px] text-slate-500 leading-tight">{spec.desc}</span>
+                      <span className="text-[10px] text-slate-600 leading-tight">{spec.desc}</span>
                     </button>
                   );
                 })}
@@ -1366,10 +1366,10 @@ export default function VolunteerDashboard({
             </div>
 
             {/* Distribution Model Card */}
-            <div className="bg-white rounded-3xl p-5 border border-emerald-900/10 shadow-xs flex flex-col gap-3">
+            <div className="bg-white rounded-2xl p-5 border border-emerald-900/10 shadow-xs flex flex-col gap-3">
               <div>
                 <h4 className="font-bold text-sm text-emerald-950">Distribution Style</h4>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-600">
                   Controls how neighbors receive food and how shelf math estimates depletion.
                 </p>
               </div>
@@ -1394,7 +1394,7 @@ export default function VolunteerDashboard({
                     >
                       <div>
                         <p className="text-xs font-bold text-slate-900">{m.label}</p>
-                        <p className="text-[11px] text-slate-500">{m.desc}</p>
+                        <p className="text-[11px] text-slate-600">{m.desc}</p>
                       </div>
                       <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
                         isSelected ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-slate-300'
@@ -1408,10 +1408,10 @@ export default function VolunteerDashboard({
             </div>
 
             {/* ID Policy Toggle */}
-            <div className="bg-white rounded-3xl p-5 border border-emerald-900/10 shadow-xs flex items-center justify-between">
+            <div className="bg-white rounded-2xl p-5 border border-emerald-900/10 shadow-xs flex items-center justify-between">
               <div>
                 <h4 className="font-bold text-sm text-emerald-950">ID Requirement Policy</h4>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-600">
                   {currentPantry.requires_id
                     ? 'Photo ID or proof of address required from clients'
                     : 'Zero ID, papers, or proof of income required (High-Dignity)'}
@@ -1438,7 +1438,7 @@ export default function VolunteerDashboard({
         <button
           onClick={() => handleTabClick('checkin')}
           className={`flex flex-col items-center gap-1 text-[11px] font-medium transition cursor-pointer ${
-            activeTab === 'checkin' ? 'text-emerald-800 font-bold scale-105' : 'text-slate-400 hover:text-slate-600'
+            activeTab === 'checkin' ? 'text-emerald-800 font-bold scale-105' : 'text-slate-600 hover:text-slate-600'
           }`}
         >
           <Users className="w-5 h-5" />
@@ -1448,7 +1448,7 @@ export default function VolunteerDashboard({
         <button
           onClick={() => handleTabClick('donations')}
           className={`flex flex-col items-center gap-1 text-[11px] font-medium transition cursor-pointer ${
-            activeTab === 'donations' ? 'text-emerald-800 font-bold scale-105' : 'text-slate-400 hover:text-slate-600'
+            activeTab === 'donations' ? 'text-emerald-800 font-bold scale-105' : 'text-slate-600 hover:text-slate-600'
           }`}
         >
           <Camera className="w-5 h-5" />
@@ -1458,7 +1458,7 @@ export default function VolunteerDashboard({
         <button
           onClick={() => handleTabClick('closing')}
           className={`flex flex-col items-center gap-1 text-[11px] font-medium transition cursor-pointer ${
-            activeTab === 'closing' ? 'text-emerald-800 font-bold scale-105' : 'text-slate-400 hover:text-slate-600'
+            activeTab === 'closing' ? 'text-emerald-800 font-bold scale-105' : 'text-slate-600 hover:text-slate-600'
           }`}
         >
           <CheckSquare className="w-5 h-5" />
@@ -1468,7 +1468,7 @@ export default function VolunteerDashboard({
         <button
           onClick={() => handleTabClick('reports')}
           className={`flex flex-col items-center gap-1 text-[11px] font-medium transition cursor-pointer relative ${
-            activeTab === 'reports' ? 'text-emerald-800 font-bold scale-105' : 'text-slate-400 hover:text-slate-600'
+            activeTab === 'reports' ? 'text-emerald-800 font-bold scale-105' : 'text-slate-600 hover:text-slate-600'
           }`}
         >
           <div className="relative">
@@ -1485,7 +1485,7 @@ export default function VolunteerDashboard({
         <button
           onClick={() => handleTabClick('settings')}
           className={`flex flex-col items-center gap-1 text-[11px] font-medium transition cursor-pointer relative ${
-            activeTab === 'settings' ? 'text-emerald-800 font-bold scale-105' : 'text-slate-400 hover:text-slate-600'
+            activeTab === 'settings' ? 'text-emerald-800 font-bold scale-105' : 'text-slate-600 hover:text-slate-600'
           }`}
         >
           <div className="relative">
@@ -1503,10 +1503,10 @@ export default function VolunteerDashboard({
       {/* Manager PIN Modal */}
       {showManagerPinModal && (
         <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl p-6 max-w-sm w-full border border-slate-200 shadow-2xl relative animate-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full border border-slate-200 shadow-md relative animate-in zoom-in-95 duration-150">
             <button
               onClick={() => setShowManagerPinModal(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-100 transition cursor-pointer"
+              className="absolute top-4 right-4 text-slate-600 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-100 transition cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -1517,7 +1517,7 @@ export default function VolunteerDashboard({
               </div>
               <div>
                 <h3 className="font-extrabold text-base text-slate-900">Manager Access Required</h3>
-                <p className="text-xs text-slate-500 font-medium">Compliance reports & pantry settings</p>
+                <p className="text-xs text-slate-600 font-medium">Compliance reports & pantry settings</p>
               </div>
             </div>
 

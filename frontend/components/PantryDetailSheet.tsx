@@ -48,7 +48,7 @@ export default function PantryDetailSheet({ pantry, language = 'en', onClose }: 
   };
 
   return (
-    <div className="bg-[#f4f7f5] text-slate-800 rounded-3xl p-5 md:p-6 shadow-xl border border-emerald-950/10 flex flex-col gap-5 overflow-y-auto max-h-[85vh] md:max-h-full">
+    <div className="bg-[#f4f7f5] text-slate-800 rounded-2xl p-5 md:p-6 shadow-md border border-emerald-950/10 flex flex-col gap-5 overflow-y-auto max-h-[85vh] md:max-h-full">
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
@@ -84,7 +84,7 @@ export default function PantryDetailSheet({ pantry, language = 'en', onClose }: 
           href={`https://www.google.com/maps/dir/?api=1&destination=${pantry.lat},${pantry.lng}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-[#064e3b] hover:bg-[#043d2e] active:scale-[0.98] text-white font-bold text-sm py-3 px-4 rounded-2xl flex items-center justify-center gap-2 shadow-sm transition"
+          className="bg-[#1e5322] hover:bg-[#043d2e] active:scale-[0.98] text-white font-bold text-sm py-3 px-4 rounded-2xl flex items-center justify-center gap-2 shadow-sm transition"
         >
           <Navigation className="w-4 h-4 shrink-0" />
           <span>{t.directions}</span>

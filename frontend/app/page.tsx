@@ -31,7 +31,7 @@ import {
 const PantryMap = dynamic(() => import('@/components/PantryMap'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full min-h-75 bg-slate-100 animate-pulse rounded-2xl flex items-center justify-center text-slate-400 text-sm">
+    <div className="w-full h-full min-h-75 bg-slate-100 animate-pulse rounded-2xl flex items-center justify-center text-slate-600 text-sm">
       Loading Baltimore Pantry Map...
     </div>
   ),
@@ -536,7 +536,7 @@ export default function Home() {
             <h1 className="font-extrabold text-base md:text-lg tracking-tight text-emerald-950 leading-none">
               {t.appName}
             </h1>
-            <span className="text-[11px] text-slate-500 font-medium">{t.appSubtitle}</span>
+            <span className="text-[11px] text-slate-600 font-medium">{t.appSubtitle}</span>
           </div>
         </div>
 
@@ -567,7 +567,7 @@ export default function Home() {
             <button
               onClick={() => setLanguage('en')}
               className={`px-3 py-1 rounded-full transition ${
-                language === 'en' ? 'bg-[#064e3b] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                language === 'en' ? 'bg-[#1e5322] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               English
@@ -575,7 +575,7 @@ export default function Home() {
             <button
               onClick={() => setLanguage('es')}
               className={`px-3 py-1 rounded-full transition ${
-                language === 'es' ? 'bg-[#064e3b] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                language === 'es' ? 'bg-[#1e5322] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Español
@@ -617,7 +617,7 @@ export default function Home() {
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleExecuteSearch(query)}
                 placeholder={t.searchPlaceholder}
-                className="w-full bg-white text-slate-800 text-base placeholder:text-slate-400 border-2 border-slate-200 focus:border-[#064e3b] rounded-2xl py-4 pl-4 pr-12 outline-none transition shadow-sm"
+                className="w-full bg-white text-slate-800 text-base placeholder:text-slate-600 border-2 border-slate-200 focus:border-[#1e5322] rounded-2xl py-4 pl-4 pr-12 outline-none transition shadow-sm"
               />
               <button
                 type="button"
@@ -625,7 +625,7 @@ export default function Home() {
                 className={`absolute right-3.5 top-3.5 p-2 rounded-xl transition ${
                   isListening
                     ? 'bg-rose-500 text-white animate-pulse'
-                    : 'text-slate-400 hover:text-emerald-900 hover:bg-slate-100'
+                    : 'text-slate-600 hover:text-emerald-900 hover:bg-slate-100'
                 }`}
                 title={language === 'es' ? 'Búsqueda por voz' : 'Voice search'}
               >
@@ -635,7 +635,7 @@ export default function Home() {
 
             <button
               onClick={() => handleExecuteSearch(query)}
-              className="w-full bg-[#064e3b] hover:bg-[#043d2e] active:scale-[0.99] text-white font-bold text-base py-4 rounded-2xl transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full bg-[#1e5322] hover:bg-[#043d2e] active:scale-[0.99] text-white font-bold text-base py-4 rounded-2xl transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
             >
               <Search className="w-5 h-5" />
               {t.findFoodBtn}
@@ -644,7 +644,7 @@ export default function Home() {
 
           {/* Preset Chips */}
           <div className="flex flex-col gap-2.5">
-            <span className="text-xs text-slate-500 font-semibold">{t.presetTitle}</span>
+            <span className="text-xs text-slate-600 font-semibold">{t.presetTitle}</span>
             <div className="flex flex-wrap gap-2">
               {[
                 { label: '📍 21218 (Central Baltimore)', q: '21218' },
@@ -668,7 +668,7 @@ export default function Home() {
           {/* Hotline Card */}
           <div
             onClick={() => setShowHotlineModal(true)}
-            className="bg-[#1e293b] hover:bg-[#15202e] text-white rounded-3xl p-5 shadow-lg flex items-center gap-4 border border-slate-800 hover:border-emerald-500/50 transition cursor-pointer group active:scale-[0.99]"
+            className="bg-[#1e293b] hover:bg-[#15202e] text-white rounded-2xl p-5 shadow-lg flex items-center gap-4 border border-slate-800 hover:border-emerald-500/50 transition cursor-pointer group active:scale-[0.99]"
             role="button"
             tabIndex={0}
             title={language === 'es' ? 'Haga clic para simular llamada de voz' : 'Click to test interactive voice AI hotline'}
@@ -692,7 +692,7 @@ export default function Home() {
           </div>
 
           {/* Dignity Guarantee */}
-          <p className="text-xs text-center text-slate-500 font-medium">
+          <p className="text-xs text-center text-slate-600 font-medium">
             {t.dignityNotice}
           </p>
         </div>
@@ -710,7 +710,7 @@ export default function Home() {
                     localStorage.removeItem('PULSE_HAS_SEARCHED');
                   }
                 }}
-                className="p-2 text-slate-500 hover:text-emerald-950 hover:bg-slate-100 rounded-xl transition"
+                className="p-2 text-slate-600 hover:text-emerald-950 hover:bg-slate-100 rounded-xl transition"
                 title="Back to search screen"
               >
                 <ArrowLeft className="w-5 h-5" />
@@ -769,7 +769,7 @@ export default function Home() {
                   <button
                     onClick={handleRefreshStock}
                     disabled={isRefreshing}
-                    className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-emerald-800 transition cursor-pointer"
+                    className="p-1 rounded-lg hover:bg-slate-100 text-slate-600 hover:text-emerald-800 transition cursor-pointer"
                     title="Refresh live stock"
                   >
                     <RotateCcw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-emerald-700' : ''}`} />
@@ -888,7 +888,7 @@ export default function Home() {
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="text-xs font-bold text-white px-3 py-1.5 bg-[#064e3b] rounded-xl hover:bg-[#043d2e] transition flex items-center gap-1"
+                            className="text-xs font-bold text-white px-3 py-1.5 bg-[#1e5322] rounded-xl hover:bg-[#043d2e] transition flex items-center gap-1"
                           >
                             <Navigation className="w-3 h-3" />
                             {t.directions}
@@ -901,7 +901,7 @@ export default function Home() {
 
                 {/* Compassionate Empty State */}
                 {filteredPantries.length === 0 && (
-                  <div className="bg-white border-2 border-emerald-900/10 rounded-3xl p-6 text-center flex flex-col items-center gap-4 shadow-sm animate-in fade-in duration-200">
+                  <div className="bg-white border-2 border-emerald-900/10 rounded-2xl p-6 text-center flex flex-col items-center gap-4 shadow-sm animate-in fade-in duration-200">
                     <div className="w-12 h-12 rounded-2xl bg-amber-100 border border-amber-200 flex items-center justify-center text-amber-900 font-bold text-xl">
                       🌾
                     </div>
@@ -941,7 +941,7 @@ export default function Home() {
                       }}
                       className="text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 px-4 py-2 rounded-xl transition flex items-center gap-1.5 cursor-pointer mt-1"
                     >
-                      <RotateCcw className="w-3.5 h-3.5 text-slate-500" />
+                      <RotateCcw className="w-3.5 h-3.5 text-slate-600" />
                       <span>{t.showAllBtn}</span>
                     </button>
                   </div>
@@ -976,13 +976,13 @@ export default function Home() {
           </div>
 
           {/* Floating Mobile Toggle Button [List / Map] */}
-          <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-30 bg-slate-900/95 backdrop-blur-md text-white rounded-full p-1 shadow-2xl flex items-center border border-slate-700/80">
+          <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-30 bg-slate-900/95 backdrop-blur-md text-white rounded-full p-1 shadow-md flex items-center border border-slate-700/80">
             <button
               onClick={() => setMobileTab('list')}
               className={`flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-full transition cursor-pointer ${
                 mobileTab === 'list'
-                  ? 'bg-[#064e3b] text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-[#1e5322] text-white shadow-sm'
+                  : 'text-slate-600 hover:text-white'
               }`}
             >
               <ListIcon className="w-3.5 h-3.5" />
@@ -993,8 +993,8 @@ export default function Home() {
               onClick={() => setMobileTab('map')}
               className={`flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-full transition cursor-pointer ${
                 mobileTab === 'map'
-                  ? 'bg-[#064e3b] text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-[#1e5322] text-white shadow-sm'
+                  : 'text-slate-600 hover:text-white'
               }`}
             >
               <MapIcon className="w-3.5 h-3.5" />

@@ -145,13 +145,13 @@ export default function PantryLoginModal({ isOpen, pantries = [], onClose, onSuc
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 animate-in fade-in duration-200">
       <div 
-        className="bg-white rounded-3xl max-w-lg w-full p-6 md:p-8 shadow-2xl border border-emerald-950/15 flex flex-col gap-5 relative max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-2xl max-w-lg w-full p-6 md:p-8 shadow-md border border-emerald-950/15 flex flex-col gap-5 relative max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 transition cursor-pointer"
+          className="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 hover:text-slate-800 transition cursor-pointer"
           aria-label="Close"
         >
           <X className="w-4 h-4" />
@@ -168,7 +168,7 @@ export default function PantryLoginModal({ isOpen, pantries = [], onClose, onSuc
             className={`flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
               activeMode === 'login'
                 ? 'bg-white text-emerald-950 shadow-xs'
-                : 'text-slate-500 hover:text-slate-800'
+                : 'text-slate-600 hover:text-slate-800'
             }`}
           >
             <Lock className="w-3.5 h-3.5" />
@@ -182,8 +182,8 @@ export default function PantryLoginModal({ isOpen, pantries = [], onClose, onSuc
             }}
             className={`flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
               activeMode === 'register'
-                ? 'bg-[#064e3b] text-white shadow-xs'
-                : 'text-slate-500 hover:text-slate-800'
+                ? 'bg-[#1e5322] text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-800'
             }`}
           >
             <PlusCircle className="w-3.5 h-3.5" />
@@ -201,7 +201,7 @@ export default function PantryLoginModal({ isOpen, pantries = [], onClose, onSuc
               <h3 className="text-2xl font-black text-emerald-950 tracking-tight">
                 Pantry View Login
               </h3>
-              <p className="text-xs text-slate-500 max-w-xs leading-relaxed">
+              <p className="text-xs text-slate-600 max-w-xs leading-relaxed">
                 Staff &amp; Operator Access for live inventory intake, household check-in, and TEFAP reporting.
               </p>
             </div>
@@ -228,13 +228,13 @@ export default function PantryLoginModal({ isOpen, pantries = [], onClose, onSuc
                       </option>
                     ))}
                   </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-600">
                     <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
                       <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
                     </svg>
                   </div>
                 </div>
-                <p className="text-[11px] text-slate-400 mt-1 truncate">
+                <p className="text-[11px] text-slate-600 mt-1 truncate">
                   {currentPantry.address}
                 </p>
               </div>
@@ -271,7 +271,7 @@ export default function PantryLoginModal({ isOpen, pantries = [], onClose, onSuc
               <button
                 type="submit"
                 disabled={isSubmitting || pin.length < 4}
-                className="w-full mt-1 bg-[#064e3b] hover:bg-[#043d2e] active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none text-white font-bold text-sm py-3.5 rounded-2xl transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full mt-1 bg-[#1e5322] hover:bg-[#043d2e] active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none text-white font-bold text-sm py-3.5 rounded-2xl transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
               >
                 {isSubmitting ? (
                   <span className="inline-block animate-spin mr-1">⏳</span>
@@ -292,7 +292,7 @@ export default function PantryLoginModal({ isOpen, pantries = [], onClose, onSuc
               <h3 className="text-2xl font-black text-emerald-950 tracking-tight">
                 Register Your Pantry
               </h3>
-              <p className="text-xs text-slate-500 max-w-sm leading-relaxed">
+              <p className="text-xs text-slate-600 max-w-sm leading-relaxed">
                 Join the Baltimore Pantree network in 60 seconds. Instantly start tracking shelf stock and receiving client lookups.
               </p>
             </div>
@@ -380,7 +380,7 @@ export default function PantryLoginModal({ isOpen, pantries = [], onClose, onSuc
                     <KeyRound className="w-3.5 h-3.5 text-emerald-700" />
                     Create Your 4-Digit Operator PIN *
                   </span>
-                  <span className="text-[11px] font-normal text-slate-400">Share with staff</span>
+                  <span className="text-[11px] font-normal text-slate-600">Share with staff</span>
                 </label>
                 <input
                   type="password"
@@ -420,7 +420,7 @@ export default function PantryLoginModal({ isOpen, pantries = [], onClose, onSuc
         )}
 
         {/* Security Assurance footer */}
-        <div className="border-t border-slate-100 pt-2.5 flex items-center justify-center gap-1.5 text-[11px] text-slate-400">
+        <div className="border-t border-slate-100 pt-2.5 flex items-center justify-center gap-1.5 text-[11px] text-slate-600">
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
           <span>PostGIS Geocoded • TEFAP audit compliant</span>
         </div>

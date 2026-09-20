@@ -36,7 +36,7 @@ function createPantryPinIcon(
       padding: 4px 8px;
       border-radius: 9999px;
       box-shadow: ${isFocused ? '0 0 0 3px rgba(6,78,59,0.35), 0 6px 16px rgba(0,0,0,0.35)' : '0 3px 10px rgba(0,0,0,0.22)'};
-      border: ${isFocused ? '2.5px solid #064e3b' : '2px solid #ffffff'};
+      border: ${isFocused ? '2.5px solid #1e5322' : '2px solid #ffffff'};
       transform: ${isFocused ? 'scale(1.22)' : 'scale(1)'};
       transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
       cursor: pointer;
@@ -45,7 +45,7 @@ function createPantryPinIcon(
       <span style="
         font-weight: 800;
         font-size: 12px;
-        color: #064e3b;
+        color: #1e5322;
         line-height: 1;
       ">${idx + 1}</span>
       <div style="display: flex; gap: 2.5px; align-items: flex-end; height: 12px;">
