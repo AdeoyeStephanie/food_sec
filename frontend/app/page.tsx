@@ -41,6 +41,11 @@ export default function Home() {
   // Live clock so open/closed badges recompute as time passes.
   const now = useNow();
 
+  // Polling bookkeeping: last-applied data snapshot (skip identical responses)
+  // and an in-flight guard (don't stack overlapping fetches).
+  const lastSnapshotRef = React.useRef<string>('');
+  const isFetchingRef = React.useRef<boolean>(false);
+
   // Navigation & Search State
   const [pantriesList, setPantriesList] = useState<Pantry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -70,6 +75,7 @@ export default function Home() {
     if (typeof window !== 'undefined') {
       const savedSearched = localStorage.getItem('PULSE_HAS_SEARCHED');
       if (savedSearched === 'true') {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setHasSearched(true);
       }
     }
@@ -79,25 +85,57 @@ export default function Home() {
     // the synchronous setState here is intentional.
     const stored = getStoredPantries([]);
     if (stored.length > 0) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+      lastSnapshotRef.current = JSON.stringify(stored);
       setPantriesList(stored);
       setIsLoading(false);
     }
 
-    // Dynamic single source of truth: fetch directly from backend API
-    fetchPantries()
-      .then((list) => {
-        if (list.length > 0) {
-          setPantriesList(list);
-          saveAndBroadcastPantries(list);
-        }
-      })
-      .catch((err) => console.warn('Backend pantries fetch notice:', err))
-      .finally(() => setIsLoading(false));
+    // Apply a freshly fetched list only when it actually differs from what's on
+    // screen, so identical poll responses don't trigger needless re-renders.
+    const applyPantries = (list: Pantry[], broadcast: boolean) => {
+      if (!Array.isArray(list) || list.length === 0) return;
+      const snapshot = JSON.stringify(list);
+      if (snapshot === lastSnapshotRef.current) return;
+      lastSnapshotRef.current = snapshot;
+      setPantriesList(list);
+      if (broadcast) saveAndBroadcastPantries(list);
+    };
+
+    // Single fetch from the backend; guarded so overlapping ticks (e.g. during a
+    // Render cold start) don't stack up concurrent requests.
+    const fetchOnce = async () => {
+      if (isFetchingRef.current) return;
+      isFetchingRef.current = true;
+      try {
+        const list = await fetchPantries();
+        applyPantries(list, true);
+      } catch (err) {
+        console.warn('Backend pantries fetch notice:', err);
+      } finally {
+        isFetchingRef.current = false;
+        setIsLoading(false);
+      }
+    };
+
+    // Initial load, then poll every 3s for near-live cross-device sync.
+    fetchOnce();
+    const pollId = window.setInterval(() => {
+      // Pause polling while the tab is hidden (backgrounded / phone locked) to
+      // avoid pinging Render for a screen no one is looking at.
+      if (document.hidden) return;
+      fetchOnce();
+    }, 3000);
+
+    // When the tab becomes visible again, refresh immediately instead of waiting
+    // out the remaining interval.
+    const handleVisibility = () => {
+      if (!document.hidden) fetchOnce();
+    };
 
     const handleSync = (e: Event) => {
       const detail = (e as CustomEvent<Pantry[]>).detail;
       if (detail && Array.isArray(detail)) {
+        lastSnapshotRef.current = JSON.stringify(detail);
         setPantriesList(detail);
       }
     };
@@ -107,6 +145,7 @@ export default function Home() {
         try {
           const parsed = JSON.parse(e.newValue);
           if (Array.isArray(parsed)) {
+            lastSnapshotRef.current = e.newValue;
             setPantriesList(parsed);
           }
         } catch {}
@@ -115,9 +154,12 @@ export default function Home() {
 
     window.addEventListener('inventory-sync', handleSync);
     window.addEventListener('storage', handleStorage);
+    document.addEventListener('visibilitychange', handleVisibility);
     return () => {
+      window.clearInterval(pollId);
       window.removeEventListener('inventory-sync', handleSync);
       window.removeEventListener('storage', handleStorage);
+      document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, []);
 
