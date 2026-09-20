@@ -81,15 +81,31 @@ export default function Home() {
       setIsLoading(false);
     }
 
-    // Dynamic single source of truth: fetch directly from backend API
-    fetchPantries()
+    // Dynamic single source of truth: fetch directly from Supabase Cloud
+    fetchPantriesFromSupabase()
       .then((list) => {
         if (list.length > 0) {
           setPantriesList(list);
           saveAndBroadcastPantries(list);
+        } else {
+          // Fallback to local API if offline
+          fetchPantries().then((fallbackList) => {
+            if (fallbackList.length > 0) {
+              setPantriesList(fallbackList);
+              saveAndBroadcastPantries(fallbackList);
+            }
+          });
         }
       })
-      .catch((err) => console.warn('Backend pantries fetch notice:', err))
+      .catch((err) => {
+        console.warn('Supabase fetch notice, trying local fallback:', err);
+        fetchPantries().then((fallbackList) => {
+          if (fallbackList.length > 0) {
+            setPantriesList(fallbackList);
+            saveAndBroadcastPantries(fallbackList);
+          }
+        });
+      })
       .finally(() => setIsLoading(false));
 
     const handleSync = (e: Event) => {

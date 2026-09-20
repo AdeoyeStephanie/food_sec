@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient';
 import { Pantry, ShelfItem } from './pantryData';
+import geoLookup from './pantryGeoLookup.json';
 
 export interface SupabaseCategory {
   id: number;
@@ -69,9 +70,10 @@ export async function fetchPantriesFromSupabase(): Promise<Pantry[]> {
         });
       }
 
-      // Default coordinates fallback if postgis parsing isn't directly unwrapped
-      const lat = 39.2904 + (Math.random() - 0.5) * 0.04;
-      const lng = -76.6122 + (Math.random() - 0.5) * 0.04;
+      // Accurate coordinates, tags, and distances lookup
+      const geo = (geoLookup as Record<string, any>)[row.id] || {};
+      const lat = typeof geo.lat === 'number' ? geo.lat : 39.2904;
+      const lng = typeof geo.lng === 'number' ? geo.lng : -76.6122;
 
       return {
         id: row.id,
@@ -80,8 +82,8 @@ export async function fetchPantriesFromSupabase(): Promise<Pantry[]> {
         neighborhood: row.neighborhood || 'Baltimore',
         lat,
         lng,
-        distance_miles: 0.8,
-        walk_minutes: 15,
+        distance_miles: geo.dist ?? 0.8,
+        walk_minutes: geo.walk ?? 15,
         hours_text: typeof row.hours === 'string' ? row.hours : 'Open today 9:00 AM – 4:00 PM',
         open_today: true,
         open_tonight: false,
@@ -90,10 +92,11 @@ export async function fetchPantriesFromSupabase(): Promise<Pantry[]> {
         allows_walkins: row.allows_walkins ?? true,
         languages: row.languages || ['English'],
         notes: row.notes || '',
-        distribution_model: row.distribution_model || 'client_choice',
+        distribution_model: (row.distribution_model || geo.model || 'client_choice') as any,
         phone: row.phone || '(410) 737-8282',
-        specialty_tags: [],
+        specialty_tags: geo.tags || [],
         shelf_items,
+        is_demo: geo.demo ?? false,
       };
     });
   } catch (err) {
