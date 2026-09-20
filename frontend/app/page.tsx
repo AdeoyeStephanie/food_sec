@@ -13,6 +13,7 @@ import { getStoredPantries, saveAndBroadcastPantries } from '@/lib/inventorySync
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { fetchPantries } from '@/lib/api';
 import { fetchPantriesFromSupabase, subscribeToShelfRealtime } from '@/lib/supabaseData';
+import { formatRelativeTime } from '@/lib/realTimeSchedule';
 import {
   Search,
   Mic,
@@ -54,6 +55,7 @@ export default function Home() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [authenticatedPantry, setAuthenticatedPantry] = useState<Pantry | null>(null);
   const [isListening, setIsListening] = useState(false);
+  const [currentTime, setCurrentTime] = useState<number>(Date.now());
 
   // Filter chips
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
@@ -141,9 +143,37 @@ export default function Home() {
       });
     });
 
+    // Automated background polling every 10 seconds:
+    // Guarantees live updates continuously even if WebSockets are closed or behind strict proxies
+    const autoSyncInterval = setInterval(async () => {
+      try {
+        const freshList = await fetchPantriesFromSupabase();
+        if (freshList && freshList.length > 0) {
+          setPantriesList((prev) => {
+            const hasChanged =
+              JSON.stringify(freshList.map((p) => ({ id: p.id, s: p.shelf_items }))) !==
+              JSON.stringify(prev.map((p) => ({ id: p.id, s: p.shelf_items })));
+            if (hasChanged) {
+              saveAndBroadcastPantries(freshList);
+              return freshList;
+            }
+            return prev;
+          });
+        }
+      } catch {}
+    }, 10000);
+
+    // Real-time clock tick every 25 seconds:
+    // Automatically increments "Updated Xm ago" and re-evaluates closing times & open/closed status
+    const clockInterval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 25000);
+
     return () => {
       window.removeEventListener('inventory-sync', handleSync);
       window.removeEventListener('storage', handleStorage);
+      clearInterval(autoSyncInterval);
+      clearInterval(clockInterval);
       unsubscribeRealtime();
     };
   }, []);
@@ -522,6 +552,18 @@ export default function Home() {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Real-time Live Sync Indicator */}
+          <div
+            className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-950 bg-emerald-100/90 border border-emerald-300 px-2.5 py-1 rounded-full shadow-2xs select-none"
+            title="Automatic real-time sync with Baltimore live stock"
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
+            </span>
+            <span className="hidden sm:inline">Live</span>
+          </div>
+
           {/* Real-time Refresh Stock Button */}
           <button
             onClick={handleRefreshStock}
@@ -783,7 +825,7 @@ export default function Home() {
                   {filteredPantries.map((pantry, idx) => {
                   const isSelected = selectedPantry?.id === pantry.id;
                   const isHovered = hoveredPantryId === pantry.id;
-                  const urgency = getUrgencyIndicator(pantry);
+                  const urgency = getUrgencyIndicator(pantry, language);
 
                   return (
                     <div
@@ -818,13 +860,13 @@ export default function Home() {
                         {/* Live Urgency Status Pill */}
                         <span className={`shrink-0 text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-2xs ${urgency.badgeClass}`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${urgency.dotClass}`}></span>
-                          <span>{urgency.status === 'open_tonight' ? 'Tonight' : urgency.status === 'closing_soon' ? 'Closes Soon' : urgency.status === 'open' ? 'Open Today' : 'Closed'}</span>
+                          <span>{urgency.status === 'open_tonight' ? (language === 'es' ? 'Esta Noche' : 'Tonight') : urgency.status === 'closing_soon' ? (language === 'es' ? 'Cierra Pronto' : 'Closes Soon') : urgency.status === 'open' ? (language === 'es' ? 'Abierto' : 'Open') : (language === 'es' ? 'Cerrado' : 'Closed')}</span>
                         </span>
                       </div>
 
-                      <div className="mt-2 text-xs font-semibold text-emerald-900 flex items-center gap-1.5">
+                      <div className="mt-2 text-xs font-semibold text-emerald-900 flex items-center gap-1.5" title={urgency.label}>
                         <Clock className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-                        <span>{pantry.hours_text}</span>
+                        <span>{pantry.open_hours_display || pantry.hours_text}</span>
                       </div>
 
                       {/* Prominent category badges */}
@@ -850,9 +892,9 @@ export default function Home() {
 
                       {/* Card Footer */}
                       <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between">
-                        <span className="text-[11px] text-slate-600 font-semibold flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                          {t.updatedAgo}
+                        <span className="text-[11px] text-slate-600 font-semibold flex items-center gap-1.5" title="Synchronized with real time">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                          <span>{formatRelativeTime(pantry.updated_at ?? pantry.shelf_items?.[0]?.updated_at ?? pantry.shelf_items?.[0]?.minutes_ago, language, currentTime)}</span>
                         </span>
                         <div className="flex items-center gap-2">
                           <button

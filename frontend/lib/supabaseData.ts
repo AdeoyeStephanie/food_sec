@@ -1,6 +1,7 @@
 import { supabase } from './supabaseClient';
 import { Pantry, ShelfItem } from './pantryData';
 import geoLookup from './pantryGeoLookup.json';
+import { evaluateRealTimeSchedule } from './realTimeSchedule';
 
 export interface SupabaseCategory {
   id: number;
@@ -75,9 +76,13 @@ export async function fetchPantriesFromSupabase(): Promise<Pantry[]> {
       const pShelfMap = latestShelfByPantry.get(row.id);
       const shelf_items: ShelfItem[] = [];
 
+      let latestItemTimestamp: string | undefined = undefined;
       if (pShelfMap) {
         pShelfMap.forEach((sRow, catId) => {
           const cat = categoriesMap.get(catId);
+          if (sRow.time && (!latestItemTimestamp || new Date(sRow.time) > new Date(latestItemTimestamp))) {
+            latestItemTimestamp = sRow.time;
+          }
           shelf_items.push({
             category_name: cat?.name || 'General',
             category_emoji: cat?.emoji || '📦',
@@ -85,6 +90,7 @@ export async function fetchPantriesFromSupabase(): Promise<Pantry[]> {
             minutes_ago: sRow.time ? Math.max(0, Math.floor((Date.now() - new Date(sRow.time).getTime()) / 60000)) : 10,
             confidence: sRow.confidence ?? 0.95,
             estimated_qty: sRow.estimated_qty,
+            updated_at: sRow.time,
           });
         });
       }
@@ -93,6 +99,16 @@ export async function fetchPantriesFromSupabase(): Promise<Pantry[]> {
       const geo = (geoLookup as Record<string, GeoRecord>)[row.id] || {};
       const lat = typeof geo.lat === 'number' ? geo.lat : 39.2904;
       const lng = typeof geo.lng === 'number' ? geo.lng : -76.6122;
+
+      // Extract real pantry hours from JSONB or string
+      const hours_text = typeof row.hours === 'string'
+        ? row.hours
+        : (row.hours && typeof row.hours.hours === 'string')
+        ? row.hours.hours
+        : 'Open Mon-Fri 9:00 AM – 4:00 PM';
+
+      const isDemo = row.id === 'demo-hub-0001' || geo.demo || false;
+      const schedule = evaluateRealTimeSchedule(hours_text, isDemo);
 
       return {
         id: row.id,
@@ -103,10 +119,10 @@ export async function fetchPantriesFromSupabase(): Promise<Pantry[]> {
         lng,
         distance_miles: geo.dist ?? 0.8,
         walk_minutes: geo.walk ?? 15,
-        hours_text: typeof row.hours === 'string' ? row.hours : 'Open today 9:00 AM – 4:00 PM',
-        open_today: true,
-        open_tonight: false,
-        open_hours_display: '9:00 AM – 4:00 PM',
+        hours_text,
+        open_today: schedule.isOpenToday,
+        open_tonight: schedule.isOpenTonight,
+        open_hours_display: schedule.todayHoursDisplay,
         requires_id: row.requires_id ?? false,
         allows_walkins: row.allows_walkins ?? true,
         languages: row.languages || ['English'],
@@ -115,7 +131,8 @@ export async function fetchPantriesFromSupabase(): Promise<Pantry[]> {
         phone: row.phone || '(410) 737-8282',
         specialty_tags: geo.tags || [],
         shelf_items,
-        is_demo: geo.demo ?? false,
+        is_demo: isDemo,
+        updated_at: latestItemTimestamp,
       };
     });
   } catch (err) {

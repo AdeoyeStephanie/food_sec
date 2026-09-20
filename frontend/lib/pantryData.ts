@@ -1,3 +1,5 @@
+import { evaluateRealTimeSchedule } from './realTimeSchedule';
+
 export interface ShelfItem {
   category_name: string;
   category_emoji: string;
@@ -6,6 +8,7 @@ export interface ShelfItem {
   confidence: number;
   estimated_qty?: number;
   capacity?: number;
+  updated_at?: string;
 }
 
 export interface Pantry {
@@ -30,6 +33,7 @@ export interface Pantry {
   phone: string;
   specialty_tags?: string[];
   is_demo?: boolean;
+  updated_at?: string;
 }
 
 export interface UrgencyInfo {
@@ -39,43 +43,13 @@ export interface UrgencyInfo {
   dotClass: string;
 }
 
-export function getUrgencyIndicator(pantry: Pantry): UrgencyInfo {
-  // Check if open tonight
-  if (pantry.open_tonight) {
-    return {
-      status: 'open_tonight',
-      label: '🌙 Open Tonight · 5:00 PM – 8:00 PM',
-      badgeClass: 'bg-indigo-50 text-indigo-900 border border-indigo-200',
-      dotClass: 'bg-indigo-600 animate-pulse',
-    };
-  }
-
-  // Check if open today
-  if (pantry.open_today) {
-    const hours = (pantry.hours_text || '').toLowerCase();
-    if (hours.includes('1pm') || hours.includes('1:00 pm') || hours.includes('12pm')) {
-      return {
-        status: 'closing_soon',
-        label: '⚠️ Closes Soon · Check Hours',
-        badgeClass: 'bg-amber-50 text-amber-900 border border-amber-300',
-        dotClass: 'bg-amber-600 animate-ping',
-      };
-    }
-
-    return {
-      status: 'open',
-      label: '🟢 Open Today · Walk-ins Welcome',
-      badgeClass: 'bg-emerald-50 text-emerald-900 border border-emerald-300',
-      dotClass: 'bg-emerald-600 animate-pulse',
-    };
-  }
-
-  // Closed today
+export function getUrgencyIndicator(pantry: Pantry, language: 'en' | 'es' = 'en'): UrgencyInfo {
+  const schedule = evaluateRealTimeSchedule(pantry.hours_text, pantry.is_demo, language);
   return {
-    status: 'closed',
-    label: pantry.hours_text ? `Closed Today · ${pantry.hours_text}` : 'Closed Today',
-    badgeClass: 'bg-slate-100 text-slate-700 border border-slate-200',
-    dotClass: 'bg-slate-400',
+    status: schedule.status,
+    label: schedule.label,
+    badgeClass: schedule.badgeClass,
+    dotClass: schedule.dotClass,
   };
 }
 

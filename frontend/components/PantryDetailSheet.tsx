@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Pantry, getUrgencyIndicator } from '@/lib/pantryData';
+import { formatRelativeTime } from '@/lib/realTimeSchedule';
 import { Language, TRANSLATIONS } from '@/lib/translations';
 import { Navigation, Phone, CheckCircle2, ShoppingBag, Clock, Languages, ShieldCheck, ThumbsUp, ThumbsDown, X, Bus, Accessibility, Sparkles } from 'lucide-react';
 
@@ -14,7 +15,7 @@ interface PantryDetailSheetProps {
 export default function PantryDetailSheet({ pantry, language = 'en', onClose }: PantryDetailSheetProps) {
   const [feedbackSent, setFeedbackSent] = useState<string | null>(null);
   const t = TRANSLATIONS[language] || TRANSLATIONS.en;
-  const urgency = getUrgencyIndicator(pantry);
+  const urgency = getUrgencyIndicator(pantry, language);
 
   const getBandStyles = (band: 'plenty' | 'low' | 'out') => {
     switch (band) {
@@ -113,9 +114,14 @@ export default function PantryDetailSheet({ pantry, language = 'en', onClose }: 
               >
                 <div className="flex items-center gap-2.5">
                   <span className="text-lg">{item.category_emoji}</span>
-                  <span className="text-sm font-medium text-slate-800">
-                    {item.category_name}
-                  </span>
+                  <div>
+                    <span className="text-sm font-medium text-slate-800 block">
+                      {item.category_name}
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-medium">
+                      {formatRelativeTime(item.updated_at ?? item.minutes_ago, language)}
+                    </span>
+                  </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className={`text-xs capitalize ${styles.textColor}`}>

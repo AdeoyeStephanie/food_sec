@@ -1,6 +1,7 @@
 // Thin typed client for the FastAPI backend.
 // Base URL comes from NEXT_PUBLIC_API_BASE (see .env.local); defaults to local dev.
 import { Pantry } from './pantryData';
+import { evaluateRealTimeSchedule } from './realTimeSchedule';
 
 export const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8000';
@@ -76,21 +77,19 @@ function to12h(t: string): string {
  * Map a backend pantry onto the frontend Pantry type.
  */
 export function normalizePantry(b: BackendPantry): Pantry {
-  let open_today = b.open_today ?? true;
-  let open_tonight = b.open_tonight ?? false;
-  let open_hours_display = b.open_hours_display || '9:00 AM – 5:00 PM';
-  let hours_text = b.hours_text || (open_today ? `Open today ${open_hours_display}` : 'Closed today');
-
+  let hours_text = b.hours_text || 'Open Mon-Fri 9:00 AM – 5:00 PM';
   if (b.hours && typeof b.hours === 'object') {
     const todayKey = DAY_KEYS[new Date().getDay()];
     const today = (b.hours as Record<string, { open: string; close: string }>)[todayKey];
-    open_today = !!today;
-    open_hours_display = today
-      ? `${to12h(today.open)} – ${to12h(today.close)}`
-      : 'Closed today';
-    open_tonight = !!today && parseInt(today.close.split(':')[0], 10) >= 17;
-    hours_text = today ? `Open today ${open_hours_display}` : 'Closed today';
+    if (today) {
+      hours_text = `Open today ${to12h(today.open)} – ${to12h(today.close)}`;
+    }
   }
+
+  const schedule = evaluateRealTimeSchedule(hours_text, b.is_demo ?? false);
+  const open_today = schedule.isOpenToday;
+  const open_tonight = schedule.isOpenTonight;
+  const open_hours_display = schedule.todayHoursDisplay;
 
   return {
     id: b.id,
