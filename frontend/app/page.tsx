@@ -115,6 +115,8 @@ export default function Home() {
       const detail = (e as CustomEvent<Pantry[]>).detail;
       if (detail && Array.isArray(detail)) {
         setPantriesList(detail);
+        setSelectedPantry((curr) => (curr ? detail.find((p) => p.id === curr.id) || curr : null));
+        setAuthenticatedPantry((curr) => (curr ? detail.find((p) => p.id === curr.id) || curr : null));
       }
     };
 
@@ -124,6 +126,8 @@ export default function Home() {
           const parsed = JSON.parse(e.newValue);
           if (Array.isArray(parsed)) {
             setPantriesList(parsed);
+            setSelectedPantry((curr) => (curr ? parsed.find((p) => p.id === curr.id) || curr : null));
+            setAuthenticatedPantry((curr) => (curr ? parsed.find((p) => p.id === curr.id) || curr : null));
           }
         } catch {}
       }
@@ -137,6 +141,8 @@ export default function Home() {
         broadcastChannel.onmessage = (event) => {
           if (event.data && Array.isArray(event.data)) {
             setPantriesList(event.data);
+            setSelectedPantry((curr) => (curr ? event.data.find((p: Pantry) => p.id === curr.id) || curr : null));
+            setAuthenticatedPantry((curr) => (curr ? event.data.find((p: Pantry) => p.id === curr.id) || curr : null));
           }
         };
       } catch {}
@@ -148,6 +154,8 @@ export default function Home() {
       fetchPantriesFromSupabase().then((list) => {
         if (list.length > 0) {
           setPantriesList(list);
+          setSelectedPantry((curr) => (curr ? list.find((p) => p.id === curr.id) || curr : null));
+          setAuthenticatedPantry((curr) => (curr ? list.find((p) => p.id === curr.id) || curr : null));
           saveAndBroadcastPantries(list);
         }
       });
@@ -164,6 +172,8 @@ export default function Home() {
               JSON.stringify(freshList.map((p) => ({ id: p.id, s: p.shelf_items }))) !==
               JSON.stringify(prev.map((p) => ({ id: p.id, s: p.shelf_items })));
             if (hasChanged) {
+              setSelectedPantry((curr) => (curr ? freshList.find((p) => p.id === curr.id) || curr : null));
+              setAuthenticatedPantry((curr) => (curr ? freshList.find((p) => p.id === curr.id) || curr : null));
               saveAndBroadcastPantries(freshList);
               return freshList;
             }
@@ -882,25 +892,31 @@ export default function Home() {
                         <span>{pantry.open_hours_display || pantry.hours_text}</span>
                       </div>
 
-                      {/* Prominent category badges */}
+                      {/* Prominent dynamic category badges */}
                       <div className="grid grid-cols-2 gap-2 mt-3">
-                        {pantry.shelf_items.slice(3, 5).map((item, i) => (
-                          <div
-                            key={i}
-                            className={`px-2.5 py-1 rounded-xl text-xs flex items-center justify-between font-semibold ${
-                              item.band === 'plenty'
-                                ? 'bg-emerald-100/80 text-emerald-900 border border-emerald-200/60'
-                                : item.band === 'low'
-                                ? 'bg-amber-100/80 text-amber-900 border border-amber-200/60'
-                                : 'bg-rose-100/80 text-rose-900 border border-rose-200/60'
-                            }`}
-                          >
-                            <span>{item.category_name}</span>
-                            <span className="capitalize text-[11px] font-bold">
-                              {item.band === 'plenty' ? t.plenty : item.band === 'low' ? t.low : t.out}
-                            </span>
-                          </div>
-                        ))}
+                        {(() => {
+                          const items = [...(pantry.shelf_items || [])].sort((a, b) => {
+                            const score = (band: string) => (band === 'out' ? 0 : band === 'low' ? 1 : 2);
+                            return score(a.band) - score(b.band);
+                          });
+                          return items.slice(0, 4).map((item, i) => (
+                            <div
+                              key={i}
+                              className={`px-2.5 py-1 rounded-xl text-xs flex items-center justify-between font-semibold ${
+                                item.band === 'plenty'
+                                  ? 'bg-emerald-100/80 text-emerald-900 border border-emerald-200/60'
+                                  : item.band === 'low'
+                                  ? 'bg-amber-100/80 text-amber-900 border border-amber-200/60'
+                                  : 'bg-rose-100/80 text-rose-900 border border-rose-200/60'
+                              }`}
+                            >
+                              <span className="truncate">{item.category_name}</span>
+                              <span className="capitalize text-[11px] font-bold shrink-0 ml-1">
+                                {item.band === 'plenty' ? t.plenty : item.band === 'low' ? t.low : t.out}
+                              </span>
+                            </div>
+                          ));
+                        })()}
                       </div>
 
                       {/* Card Footer */}
