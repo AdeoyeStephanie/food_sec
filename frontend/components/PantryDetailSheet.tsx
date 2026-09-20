@@ -48,7 +48,7 @@ export default function PantryDetailSheet({ pantry, language = 'en', onClose }: 
   };
 
   return (
-    <div className="bg-[#f4f7f5] text-slate-800 rounded-2xl p-5 md:p-6 shadow-md border border-emerald-950/10 flex flex-col gap-5 overflow-y-auto max-h-[85vh] md:max-h-full">
+    <div className="bg-white text-slate-800 rounded-2xl p-5 md:p-6 shadow-md border border-emerald-950/10 flex flex-col gap-5 overflow-y-auto max-h-[85vh] md:max-h-full">
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>

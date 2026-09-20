@@ -24,7 +24,9 @@ import {
   Lock,
   RotateCcw,
   Map as MapIcon,
-  List as ListIcon
+  List as ListIcon,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 // Dynamic import for Leaflet map to prevent SSR issues
@@ -53,7 +55,11 @@ export default function Home() {
   const [refreshToast, setRefreshToast] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
   const [query, setQuery] = useState('');
-  const [language, setLanguage] = useState<Language>('en');
+  // Spanish switching is disabled for now (English-only); language stays 'en'
+  // so translation lookups keep resolving. Re-enable by restoring setLanguage
+  // and the language toggle in the header.
+  const [language] = useState<Language>('en');
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const t = TRANSLATIONS[language] || TRANSLATIONS.en;
   const [selectedPantry, setSelectedPantry] = useState<Pantry | null>(null);
   const [hoveredPantryId, setHoveredPantryId] = useState<string | null>(null);
@@ -164,6 +170,24 @@ export default function Home() {
       document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, []);
+
+  // Restore saved theme on mount (kept out of the initializer to avoid an
+  // SSR/client hydration mismatch; a brief light->dark flip on load is fine).
+  React.useEffect(() => {
+    try {
+      const saved = localStorage.getItem('PANTREE_THEME');
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      if (saved === 'dark' || saved === 'light') setTheme(saved);
+    } catch {}
+  }, []);
+
+  // Apply and persist the theme.
+  React.useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    try {
+      localStorage.setItem('PANTREE_THEME', theme);
+    } catch {}
+  }, [theme]);
 
   const handleRegisterNewPantry = (newPantry: Pantry) => {
     setPantriesList((prev) => {
@@ -505,7 +529,7 @@ export default function Home() {
 
   if (isVolunteerMode) {
     return (
-      <main className="min-h-screen bg-[#e9f1ed] p-3 md:p-8">
+      <main className="min-h-screen bg-emerald-50 p-3 md:p-8">
         <VolunteerDashboard
           activePantry={authenticatedPantry}
           onExit={() => setIsVolunteerMode(false)}
@@ -517,7 +541,7 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f3f7f5] text-slate-900 flex flex-col justify-between">
+    <main className="min-h-screen bg-white text-slate-900 flex flex-col justify-between">
       {/* Top Header */}
       <header className="bg-white/80 backdrop-blur-md border-b border-emerald-950/10 sticky top-0 z-30 px-4 md:px-8 py-3.5 flex justify-between items-center">
         <div
@@ -562,7 +586,7 @@ export default function Home() {
             <span>{t.pantryView}</span>
           </button>
 
-          {/* Language Switch */}
+          {/* Language Switch — disabled (English-only for now).
           <div className="bg-slate-100 p-0.5 rounded-full flex text-xs font-semibold">
             <button
               onClick={() => setLanguage('en')}
@@ -581,6 +605,17 @@ export default function Home() {
               Español
             </button>
           </div>
+          */}
+
+          {/* Dark mode toggle */}
+          <button
+            onClick={() => setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))}
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition cursor-pointer active:scale-95"
+            title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            aria-label="Toggle dark mode"
+          >
+            {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
         </div>
       </header>
 
@@ -755,7 +790,7 @@ export default function Home() {
             {/* Scrollable Results List */}
             <div className="p-4 flex flex-col gap-4">
               {/* AI Conversational Summary Bubble matching Page 3 */}
-              <div className="bg-[#f0fdf4] border border-emerald-300/60 rounded-2xl p-3.5 text-xs text-emerald-900 flex items-start gap-2.5 shadow-xs">
+              <div className="bg-emerald-50 border border-emerald-300/60 rounded-2xl p-3.5 text-xs text-emerald-900 flex items-start gap-2.5 shadow-xs">
                 <Sparkles className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                 <div>{conversationalSummary}</div>
               </div>
@@ -952,7 +987,7 @@ export default function Home() {
           </div>
 
           {/* Right Column: Interactive Map & Detail Panel */}
-          <div className={`flex-1 relative h-full flex flex-col md:flex-row bg-[#f8faf9] ${mobileTab === 'map' ? 'flex' : 'hidden md:flex'}`}>
+          <div className={`flex-1 relative h-full flex flex-col md:flex-row bg-white ${mobileTab === 'map' ? 'flex' : 'hidden md:flex'}`}>
             {/* Map Container */}
             <div className="flex-1 h-full min-h-87.5">
               <PantryMap

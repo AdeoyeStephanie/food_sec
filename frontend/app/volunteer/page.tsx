@@ -76,7 +76,7 @@ export default function VolunteerPage() {
 
   if (isAuthenticated && authenticatedPantry) {
     return (
-      <main className="min-h-screen bg-[#e9f1ed] p-3 md:p-8">
+      <main className="min-h-screen bg-emerald-50 p-3 md:p-8">
         <VolunteerDashboard
           activePantry={authenticatedPantry}
           onExit={() => {
@@ -91,7 +91,7 @@ export default function VolunteerPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f2f6f4] flex flex-col justify-between p-4 md:p-8">
+    <main className="min-h-screen bg-white flex flex-col justify-between p-4 md:p-8">
       {/* Top Bar */}
       <div className="max-w-md mx-auto w-full flex justify-between items-center py-2">
         <Link

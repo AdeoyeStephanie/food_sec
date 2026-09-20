@@ -69,6 +69,81 @@
   --color-rose-900: #571711;
 }
 
+/*
+ * Dark mode. Utilities resolve to CSS variables, so redefining the neutral and
+ * status ramps here inverts the whole app without touching component classes.
+ * Each ramp is reversed (light shade <-> dark shade) so "light surface" classes
+ * (bg-white, bg-slate-50) become dark and "dark text" classes (text-slate-900,
+ * text-emerald-950) become light. Uses :root[data-theme] for cascade priority.
+ */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #0f1109;
+  --foreground: #ecebe3;
+
+  /* Cards/buttons that used bg-white become a lifted dark surface. */
+  --color-white: #191c14;
+
+  /* Neutral ramp, reversed (warm-tinted). */
+  --color-slate-50: #191c14;
+  --color-slate-100: #1f2218;
+  --color-slate-200: #2a2e22;
+  --color-slate-300: #3c4132;
+  --color-slate-400: #5b6150;
+  --color-slate-500: #7d8371;
+  --color-slate-600: #9aa08c;
+  --color-slate-700: #bcc1af;
+  --color-slate-800: #d6d9cc;
+  --color-slate-900: #ecebe3;
+  --color-slate-950: #f6f5ef;
+
+  /* Green ramp, reversed — dark green surfaces, light green text/accents. */
+  --color-emerald-50: #0e2c13;
+  --color-emerald-100: #16401b;
+  --color-emerald-200: #1e5322;
+  --color-emerald-300: #256628;
+  --color-emerald-400: #3c8a49;
+  --color-emerald-500: #4fa65a;
+  --color-emerald-600: #5fb86a;
+  --color-emerald-700: #93c29a;
+  --color-emerald-800: #bcd9bd;
+  --color-emerald-900: #d9e9d9;
+  --color-emerald-950: #eef5ee;
+
+  /* Open-tonight (indigo folded into green), reversed. */
+  --color-indigo-50: #0e2c13;
+  --color-indigo-100: #16401b;
+  --color-indigo-200: #1e5322;
+  --color-indigo-300: #256628;
+  --color-indigo-600: #5fb86a;
+  --color-indigo-800: #bcd9bd;
+  --color-indigo-900: #d9e9d9;
+
+  /* Low / earth-amber, reversed. */
+  --color-amber-50: #452f13;
+  --color-amber-100: #593c17;
+  --color-amber-200: #6f4a1b;
+  --color-amber-300: #8a5c20;
+  --color-amber-400: #a4712a;
+  --color-amber-500: #bd8a3f;
+  --color-amber-600: #d3a866;
+  --color-amber-700: #e4c795;
+  --color-amber-800: #f1e2c6;
+  --color-amber-900: #f8f1e4;
+
+  /* Out / brick-red, reversed. */
+  --color-rose-50: #571711;
+  --color-rose-100: #6e1d16;
+  --color-rose-200: #8a251c;
+  --color-rose-300: #a82f23;
+  --color-rose-400: #c0392b;
+  --color-rose-500: #d15c46;
+  --color-rose-600: #e07e6c;
+  --color-rose-700: #eda99d;
+  --color-rose-800: #f6d3cc;
+  --color-rose-900: #fbeae7;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

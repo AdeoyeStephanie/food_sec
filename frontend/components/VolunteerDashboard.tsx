@@ -621,7 +621,7 @@ export default function VolunteerDashboard({
   };
 
   return (
-    <div className="bg-[#f2f6f4] min-h-[85vh] text-slate-800 rounded-2xl border border-emerald-900/10 shadow-md flex flex-col justify-between overflow-hidden max-w-2xl mx-auto">
+    <div className="bg-white min-h-[85vh] text-slate-800 rounded-2xl border border-emerald-900/10 shadow-md flex flex-col justify-between overflow-hidden max-w-2xl mx-auto">
       {/* Top Header */}
       <div className="bg-white px-5 py-4 border-b border-emerald-900/10 flex justify-between items-center">
         <div>
