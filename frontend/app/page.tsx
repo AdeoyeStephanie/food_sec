@@ -10,6 +10,7 @@ import HotlineModal from '@/components/HotlineModal';
 import BrandLogo from '@/components/BrandLogo';
 import { Language, TRANSLATIONS } from '@/lib/translations';
 import { getStoredPantries, saveAndBroadcastPantries } from '@/lib/inventorySync';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import { fetchPantries } from '@/lib/api';
 import { fetchPantriesFromSupabase, subscribeToShelfRealtime } from '@/lib/supabaseData';
 import {
@@ -391,17 +392,17 @@ export default function Home() {
   const handleRefreshStock = async () => {
     setIsRefreshing(true);
     try {
-      const list = await fetchPantries();
+      const list = await fetchPantriesFromSupabase();
       if (list.length > 0) {
         setPantriesList(list);
         saveAndBroadcastPantries(list);
         setSelectedPantry((prev) => (prev ? list.find((p) => p.id === prev.id) || list[0] : null));
       }
-      setRefreshToast('✓ Live stock refreshed from network');
+      setRefreshToast('✓ Live stock refreshed from cloud');
       setTimeout(() => setRefreshToast(null), 2500);
     } catch (err) {
       console.warn('Refresh error:', err);
-      setRefreshToast('⚠️ Server connection check');
+      setRefreshToast('⚠️ Network connection check');
       setTimeout(() => setRefreshToast(null), 2500);
     } finally {
       setIsRefreshing(false);
@@ -929,22 +930,26 @@ export default function Home() {
           <div className={`flex-1 relative h-full flex flex-col md:flex-row bg-[#f8faf9] ${mobileTab === 'map' ? 'flex' : 'hidden md:flex'}`}>
             {/* Map Container */}
             <div className="flex-1 h-full min-h-87.5">
-              <PantryMap
-                pantries={filteredPantries}
-                selectedPantry={selectedPantry}
-                hoveredPantryId={hoveredPantryId}
-                onSelectPantry={(p) => setSelectedPantry(p)}
-              />
+              <ErrorBoundary>
+                <PantryMap
+                  pantries={filteredPantries}
+                  selectedPantry={selectedPantry}
+                  hoveredPantryId={hoveredPantryId}
+                  onSelectPantry={(p) => setSelectedPantry(p)}
+                />
+              </ErrorBoundary>
             </div>
 
             {/* Slide-over Detail Sheet (shown on desktop beside map) */}
             {selectedPantry && (
               <div className="hidden md:block w-100 lg:w-110 h-full p-4 shrink-0 overflow-y-auto z-20 border-l border-slate-200">
-                <PantryDetailSheet
-                  pantry={selectedPantry}
-                  language={language}
-                  onClose={() => setSelectedPantry(null)}
-                />
+                <ErrorBoundary>
+                  <PantryDetailSheet
+                    pantry={selectedPantry}
+                    language={language}
+                    onClose={() => setSelectedPantry(null)}
+                  />
+                </ErrorBoundary>
               </div>
             )}
           </div>
@@ -986,11 +991,13 @@ export default function Home() {
                 className="w-full max-h-[85vh] overflow-y-auto"
                 onClick={(e) => e.stopPropagation()}
               >
-                <PantryDetailSheet
-                  pantry={selectedPantry}
-                  language={language}
-                  onClose={() => setSelectedPantry(null)}
-                />
+                <ErrorBoundary>
+                  <PantryDetailSheet
+                    pantry={selectedPantry}
+                    language={language}
+                    onClose={() => setSelectedPantry(null)}
+                  />
+                </ErrorBoundary>
               </div>
             </div>
           )}

@@ -83,8 +83,7 @@ export default function PantryMap({
   const prevPantriesKeyRef = useRef<string>('');
   const initialFitDoneRef = useRef<boolean>(false);
   const onSelectPantryRef = useRef(onSelectPantry);
-  // Keep the latest callback in a ref (updated in an effect, not during render)
-  // so marker click handlers always call the current onSelectPantry.
+
   useEffect(() => {
     onSelectPantryRef.current = onSelectPantry;
   }, [onSelectPantry]);
@@ -97,7 +96,6 @@ export default function PantryMap({
 
     let isMounted = true;
     let resizeObserver: ResizeObserver | null = null;
-    // Capture the markers map for the cleanup closure (ref identity is stable).
     const markersMap = markersMapRef.current;
 
     import('leaflet').then((leaflet) => {
@@ -105,47 +103,56 @@ export default function PantryMap({
       const L = leaflet.default || leaflet;
       leafletRef.current = L;
 
-      // Guard against double init in React strict mode
+      // Guard against double init in React strict mode or HMR
       if (mapInstanceRef.current) return;
 
-      const initialLat = selectedPantry ? selectedPantry.lat : 39.3150;
-      const initialLng = selectedPantry ? selectedPantry.lng : -76.6200;
-
-      const map = L.map(mapContainerRef.current, {
-        center: [initialLat, initialLng],
-        zoom: 12,
-        zoomControl: false,
-      });
-
-      // 100% Free OpenStreetMap standard tile layer (Requires NO API key or token)
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      }).addTo(map);
-
-      L.control.zoom({ position: 'bottomright' }).addTo(map);
-
-      // Layer group for pins
-      markersGroupRef.current = L.layerGroup().addTo(map);
-      mapInstanceRef.current = map;
-
-      // Handle layout changes (e.g. desktop slide-over drawer opening/closing)
-      if (typeof ResizeObserver !== 'undefined' && mapContainerRef.current) {
-        resizeObserver = new ResizeObserver(() => {
-          if (mapInstanceRef.current) {
-            mapInstanceRef.current.invalidateSize({ pan: false });
-          }
-        });
-        resizeObserver.observe(mapContainerRef.current);
+      const container = mapContainerRef.current;
+      if ((container as any)._leaflet_id) {
+        delete (container as any)._leaflet_id;
       }
 
-      setTimeout(() => {
-        if (mapInstanceRef.current) {
-          mapInstanceRef.current.invalidateSize();
-        }
-      }, 150);
+      try {
+        const initialLat = selectedPantry && Number.isFinite(selectedPantry.lat) ? selectedPantry.lat : 39.3150;
+        const initialLng = selectedPantry && Number.isFinite(selectedPantry.lng) ? selectedPantry.lng : -76.6200;
 
-      setMapReady(true);
+        const map = L.map(container, {
+          center: [initialLat, initialLng],
+          zoom: 12,
+          zoomControl: false,
+        });
+
+        // 100% Free OpenStreetMap standard tile layer
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        }).addTo(map);
+
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+        // Layer group for pins
+        markersGroupRef.current = L.layerGroup().addTo(map);
+        mapInstanceRef.current = map;
+
+        // Handle layout changes & mobile visibility toggles
+        if (typeof ResizeObserver !== 'undefined' && container) {
+          resizeObserver = new ResizeObserver(() => {
+            if (mapInstanceRef.current && container.offsetWidth > 0 && container.offsetHeight > 0) {
+              mapInstanceRef.current.invalidateSize({ pan: false });
+            }
+          });
+          resizeObserver.observe(container);
+        }
+
+        setTimeout(() => {
+          if (mapInstanceRef.current && container.offsetWidth > 0) {
+            mapInstanceRef.current.invalidateSize();
+          }
+        }, 200);
+
+        setMapReady(true);
+      } catch (err) {
+        console.warn('Leaflet initialization deferred or skipped:', err);
+      }
     });
 
     return () => {
@@ -154,7 +161,11 @@ export default function PantryMap({
         resizeObserver.disconnect();
       }
       if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
+        try {
+          mapInstanceRef.current.remove();
+        } catch {
+          // ignore cleanup errors
+        }
         mapInstanceRef.current = null;
       }
       leafletRef.current = null;
@@ -162,8 +173,6 @@ export default function PantryMap({
       markersMap.clear();
       setMapReady(false);
     };
-    // Runs ONCE on mount; selectedPantry is only read to pick an initial center,
-    // so it's intentionally excluded to avoid re-initializing the whole map.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -178,7 +187,11 @@ export default function PantryMap({
     markersGroup.clearLayers();
     markersMapRef.current.clear();
 
-    pantries.forEach((pantry, idx) => {
+    const validPantries = pantries.filter(
+      (p) => p && Number.isFinite(p.lat) && Number.isFinite(p.lng)
+    );
+
+    validPantries.forEach((pantry, idx) => {
       const isSelected = selectedPantry?.id === pantry.id;
       const isHovered = hoveredPantryId === pantry.id;
       const isFocused = isSelected || isHovered;
@@ -191,7 +204,13 @@ export default function PantryMap({
 
       marker.on('click', () => {
         onSelectPantryRef.current(pantry);
-        map.panTo([pantry.lat, pantry.lng], { animate: true, duration: 0.4 });
+        try {
+          if (mapContainerRef.current && mapContainerRef.current.offsetWidth > 0) {
+            map.panTo([pantry.lat, pantry.lng], { animate: true, duration: 0.4 });
+          }
+        } catch {
+          // ignore pan errors if container hidden
+        }
         const el = document.getElementById(`pantry-card-${pantry.id}`);
         if (el) {
           el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -201,22 +220,30 @@ export default function PantryMap({
       markersMapRef.current.set(pantry.id, { marker, pantry, index: idx });
     });
 
-    // Fit bounds ONLY when the set of pantries changes, and only if no pantry is currently selected
-    const pantriesKey = pantries.map((p) => p.id).join(',');
+    // Fit bounds ONLY when container has visible size and pantries change
+    const pantriesKey = validPantries.map((p) => p.id).join(',');
     if (pantriesKey !== prevPantriesKeyRef.current) {
       prevPantriesKeyRef.current = pantriesKey;
-      if (pantries.length > 0 && !selectedPantry) {
-        const bounds = L.latLngBounds(pantries.map((p) => [p.lat, p.lng]));
-        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 14, animate: initialFitDoneRef.current });
-        initialFitDoneRef.current = true;
+      if (
+        validPantries.length > 0 &&
+        !selectedPantry &&
+        mapContainerRef.current &&
+        mapContainerRef.current.offsetWidth > 0 &&
+        mapContainerRef.current.offsetHeight > 0
+      ) {
+        try {
+          const bounds = L.latLngBounds(validPantries.map((p) => [p.lat, p.lng]));
+          map.fitBounds(bounds, { padding: [50, 50], maxZoom: 14, animate: initialFitDoneRef.current });
+          initialFitDoneRef.current = true;
+        } catch (err) {
+          console.warn('fitBounds error ignored:', err);
+        }
       }
     }
-    // Rebuilds markers only when the pantry set changes. Selection/hover styling
-    // is handled by effect 3 without rebuilding, so those are excluded here.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapReady, pantries]);
 
-  // 3. Highlight markers on hover or selection change without recreating markers or touching viewport
+  // 3. Highlight markers on hover or selection change without recreating markers
   useEffect(() => {
     if (!mapReady || !leafletRef.current) return;
     const L = leafletRef.current;
@@ -234,27 +261,32 @@ export default function PantryMap({
   // 4. Smoothly pan / fly to selected pantry when selected
   useEffect(() => {
     if (!mapReady || !mapInstanceRef.current || !selectedPantry) return;
+    if (!Number.isFinite(selectedPantry.lat) || !Number.isFinite(selectedPantry.lng)) return;
+    if (!mapContainerRef.current || mapContainerRef.current.offsetWidth === 0 || mapContainerRef.current.offsetHeight === 0) return;
 
-    const map = mapInstanceRef.current;
-    const currentCenter = map.getCenter();
-    const dist = Math.hypot(currentCenter.lat - selectedPantry.lat, currentCenter.lng - selectedPantry.lng);
+    try {
+      const map = mapInstanceRef.current;
+      const currentCenter = map.getCenter();
+      if (!currentCenter || !Number.isFinite(currentCenter.lat) || !Number.isFinite(currentCenter.lng)) return;
 
-    if (dist < 0.0001) return;
+      const dist = Math.hypot(currentCenter.lat - selectedPantry.lat, currentCenter.lng - selectedPantry.lng);
+      if (dist < 0.0001) return;
 
-    const currentZoom = map.getZoom();
-    if (currentZoom < 13) {
-      map.flyTo([selectedPantry.lat, selectedPantry.lng], 13.5, { duration: 0.6, easeLinearity: 0.25 });
-    } else {
-      map.panTo([selectedPantry.lat, selectedPantry.lng], { animate: true, duration: 0.4 });
+      const currentZoom = map.getZoom();
+      if (currentZoom < 13) {
+        map.flyTo([selectedPantry.lat, selectedPantry.lng], 13.5, { duration: 0.6, easeLinearity: 0.25 });
+      } else {
+        map.panTo([selectedPantry.lat, selectedPantry.lng], { animate: true, duration: 0.4 });
+      }
+    } catch (err) {
+      console.warn('panTo/flyTo error ignored:', err);
     }
-    // Pans when the selected pantry's id changes; lat/lng are read from that same
-    // selection, so depending on the full object would only cause redundant pans.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapReady, selectedPantry?.id]);
 
   return (
     <div 
-      className="relative w-full h-full min-h-87.5 rounded-2xl overflow-hidden border border-emerald-900/10 shadow-inner z-0"
+      className="relative w-full h-full min-h-[350px] rounded-2xl overflow-hidden border border-emerald-900/10 shadow-inner z-0"
       style={{ isolation: 'isolate' }}
     >
       <div ref={mapContainerRef} className="w-full h-full absolute inset-0 z-0" />
