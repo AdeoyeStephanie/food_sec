@@ -252,10 +252,27 @@ export default function VolunteerDashboard({
     setLastCheckinToast(`Household of ${size} checked in! ${deductionsSummary}`);
     setTimeout(() => setLastCheckinToast(null), 3500);
 
-    // Persist the check-in to the FastAPI backend. Screen already updated above,
-    // so a network/FK failure just logs (static demo mode still works client-side).
+    // Persist the check-in count to the backend (TEFAP log). Screen already
+    // updated above, so a network/FK failure just logs.
     postCheckin(currentPantry.id, size).catch((err) => {
       console.warn('Check-in not persisted to backend:', err);
+    });
+
+    // Also persist the depleted shelf stock. record_checkin only logs the count
+    // and never touches stock, so without this the reduction lives only in this
+    // browser — polling would reload the old (higher) backend stock and the
+    // numbers would appear to bounce back up. Send the new levels as corrections
+    // (the same path the run-out toggle uses) so the decrease sticks and syncs.
+    const corrections: CorrectionItem[] = updatedItems.map((it) => ({
+      category_id: catIdByName[it.category_name.toLowerCase()],
+      category_name: it.category_name,
+      band: it.band,
+      estimated_qty: it.estimated_qty,
+      capacity: it.capacity,
+      confidence: it.confidence,
+    }));
+    postCorrection(currentPantry.id, corrections).catch((err) => {
+      console.warn('Depleted stock not persisted to backend:', err);
     });
   };
 
