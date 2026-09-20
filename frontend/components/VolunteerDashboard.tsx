@@ -20,12 +20,10 @@ import {
   Lock,
   Unlock,
   X,
-  Tablet,
   Trash2
 } from 'lucide-react';
 import { Pantry } from '@/lib/pantryData';
 import CameraViewfinder from '@/components/CameraViewfinder';
-import BrandLogo from '@/components/BrandLogo';
 import {
   calculateDepletedInventory,
   recordCheckIn,
@@ -67,9 +65,6 @@ export default function VolunteerDashboard({
   const [managerPinError, setManagerPinError] = useState<string | null>(null);
   const [targetAdminTab, setTargetAdminTab] = useState<'reports' | 'settings' | null>(null);
 
-  // Stand-In Tablet Kiosk Mode
-  const [isKioskMode, setIsKioskMode] = useState(false);
-  const [kioskConfirmed, setKioskConfirmed] = useState<{ size: number; tableNum: number } | null>(null);
 
   const DEFAULT_PANTRY_FALLBACK: Pantry = {
     id: 'pantry-demo-hub',
@@ -254,16 +249,8 @@ export default function VolunteerDashboard({
       onUpdateFullPantry(updatedPantry);
     }
 
-    if (isKioskMode) {
-      const tableNum = (size % 3) + 1;
-      setKioskConfirmed({ size, tableNum });
-      setTimeout(() => {
-        setKioskConfirmed(null);
-      }, 2500);
-    } else {
-      setLastCheckinToast(`Household of ${size} checked in! ${deductionsSummary}`);
-      setTimeout(() => setLastCheckinToast(null), 3500);
-    }
+    setLastCheckinToast(`Household of ${size} checked in! ${deductionsSummary}`);
+    setTimeout(() => setLastCheckinToast(null), 3500);
 
     // Persist the check-in to the FastAPI backend. Screen already updated above,
     // so a network/FK failure just logs (static demo mode still works client-side).
@@ -616,99 +603,6 @@ export default function VolunteerDashboard({
     setActiveTab(tab);
   };
 
-  // KIOSK MODE: Dedicated Stand-In Tablet View
-  if (isKioskMode) {
-    return (
-      <div className="fixed inset-0 z-50 bg-[#064e3b] text-white flex flex-col justify-between p-6 md:p-12 animate-in fade-in duration-200 select-none">
-        {/* Kiosk Top Bar */}
-        <div className="flex justify-between items-center border-b border-emerald-800/80 pb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-white p-1 flex items-center justify-center shadow-md">
-              <BrandLogo variant="community-bowl" size={30} showText={false} />
-            </div>
-            <div>
-              <h1 className="text-xl md:text-2xl font-black tracking-tight">{currentPantry.name}</h1>
-              <p className="text-xs text-emerald-200 font-medium">Welcome Center Check-In Kiosk • {currentPantry.neighborhood}</p>
-            </div>
-          </div>
-
-          <button
-            onClick={() => setIsKioskMode(false)}
-            className="flex items-center gap-1.5 text-xs font-semibold text-emerald-200 bg-emerald-900/60 hover:bg-emerald-900 border border-emerald-700 px-3.5 py-2 rounded-xl transition cursor-pointer"
-          >
-            <span>Exit Kiosk</span>
-          </button>
-        </div>
-
-        {/* Kiosk Center: Big Friendly Touch Pad or Reassurance Card */}
-        {kioskConfirmed ? (
-          <div className="max-w-xl mx-auto w-full bg-white text-slate-900 rounded-3xl p-8 md:p-12 shadow-2xl flex flex-col items-center justify-center gap-5 my-auto text-center animate-in zoom-in-95 duration-200">
-            <div className="w-20 h-20 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shadow-inner">
-              <Check className="w-12 h-12 stroke-[3]" />
-            </div>
-            <div>
-              <span className="text-xs font-bold uppercase tracking-widest text-emerald-800 bg-emerald-100/80 px-3 py-1 rounded-full border border-emerald-300">
-                Check-In Confirmed
-              </span>
-              <h2 className="text-3xl md:text-4xl font-black text-slate-900 mt-3">
-                Welcome to our pantry!
-              </h2>
-              <p className="text-base md:text-lg text-slate-600 font-medium mt-2">
-                Household of <strong className="text-emerald-950 font-bold">{kioskConfirmed.size === 8 ? '8+' : kioskConfirmed.size} {kioskConfirmed.size === 1 ? 'person' : 'people'}</strong> recorded.
-              </p>
-              <div className="mt-4 bg-[#064e3b] text-white rounded-2xl py-3.5 px-6 inline-block shadow-md">
-                <p className="text-xs text-emerald-300 font-medium">Please step inside to</p>
-                <p className="text-xl font-black">Welcome Table {kioskConfirmed.tableNum}</p>
-              </div>
-            </div>
-            <p className="text-xs text-slate-400 font-medium animate-pulse">
-              Resetting for the next neighbor...
-            </p>
-          </div>
-        ) : (
-          <div className="max-w-2xl mx-auto w-full flex flex-col items-center justify-center gap-6 my-auto text-center">
-            <div className="flex flex-col gap-2">
-              <span className="text-emerald-300 font-bold uppercase tracking-widest text-xs">
-                Welcome to our food pantry
-              </span>
-              <h2 className="text-3xl md:text-5xl font-black tracking-tight text-white">
-                How many in your household?
-              </h2>
-              <p className="text-sm md:text-base text-emerald-200/90 font-medium">
-                Tap your family size below. No name or ID required.
-              </p>
-            </div>
-
-            {/* Huge Touch Buttons */}
-            <div className="grid grid-cols-4 gap-4 w-full">
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((size) => (
-                <button
-                  key={size}
-                  onClick={() => handleHouseholdTap(size)}
-                  className="bg-white hover:bg-emerald-50 active:bg-emerald-100 text-slate-900 rounded-3xl py-6 md:py-8 flex flex-col items-center justify-center font-black text-3xl md:text-4xl shadow-xl transition active:scale-95 cursor-pointer border-2 border-transparent hover:border-emerald-400"
-                >
-                  <span>{size === 8 ? '8+' : size}</span>
-                  <span className="text-xs text-slate-500 font-bold mt-1">
-                    {size === 1 ? 'person' : 'people'}
-                  </span>
-                </button>
-              ))}
-            </div>
-
-            <p className="text-xs text-emerald-300/70 font-medium mt-2">
-              Total families checked in today: <strong className="text-white font-bold">{familiesServed}</strong>
-            </p>
-          </div>
-        )}
-
-        {/* Kiosk Footer */}
-        <div className="text-center text-xs text-emerald-300/60 font-medium border-t border-emerald-800/80 pt-4">
-          Community Food Access • Dignity &amp; Privacy Guaranteed
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="bg-[#f2f6f4] min-h-[85vh] text-slate-800 rounded-3xl border border-emerald-900/10 shadow-xl flex flex-col justify-between overflow-hidden max-w-2xl mx-auto">
       {/* Top Header */}
@@ -782,15 +676,6 @@ export default function VolunteerDashboard({
         {/* TAB 1: CHECK-IN & REAL-TIME PREDICT ENGINE */}
         {activeTab === 'checkin' && (
           <div className="flex flex-col gap-6">
-            {/* Tablet Kiosk Mode Launcher */}
-            <button
-              onClick={() => setIsKioskMode(true)}
-              className="flex items-center justify-center gap-2 bg-emerald-800/10 hover:bg-emerald-800/20 text-emerald-950 border border-emerald-800/20 rounded-2xl py-3 px-4 text-xs font-bold transition cursor-pointer shadow-xs"
-            >
-              <Tablet className="w-4 h-4 text-emerald-700" />
-              <span>Launch Stand-In Tablet Kiosk Mode (Welcome Desk Touchscreen)</span>
-            </button>
-
             {/* Counter Card */}
             <div className="bg-[#064e3b] text-white rounded-3xl p-5 shadow-sm flex items-center justify-between">
               <div>
