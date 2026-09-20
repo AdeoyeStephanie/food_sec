@@ -44,7 +44,19 @@ import {
   CorrectionItem
 } from '@/lib/api';
 import { aggregateDonations, canonicalCategory } from '@/lib/inventory';
-import { logCheckinToSupabase } from '@/lib/supabaseData';
+import { logCheckinToSupabase, updateShelfInSupabase } from '@/lib/supabaseData';
+
+const DEFAULT_CAT_IDS: Record<string, number> = {
+  produce: 1,
+  protein: 2,
+  dairy: 3,
+  grains: 4,
+  diapers: 5,
+  hygiene: 6,
+  'canned goods': 7,
+  'halal items': 8,
+  'halal': 8,
+};
 
 interface VolunteerDashboardProps {
   activePantry?: Pantry | null;
@@ -310,17 +322,23 @@ export default function VolunteerDashboard({
       onUpdateInventory(cat, newBand);
     }
 
-    // Persist this single-category correction to the backend.
-    const canon = canonicalCategory(cat, categories.map((c) => c.name));
-    if (canon) {
-      postCorrection(currentPantry.id, [
-        {
-          category_id: catIdByName[canon.toLowerCase()],
-          category_name: canon,
-          band: newBand,
-        },
-      ]).catch((err) => console.warn(`Run-out for ${cat} not persisted:`, err));
-    }
+    // Persist this single-category correction to Supabase & backend.
+    const canon = (canonicalCategory(cat, categories.map((c) => c.name)) || cat).toLowerCase();
+    const catId = catIdByName[canon] || DEFAULT_CAT_IDS[canon] || 1;
+    updateShelfInSupabase(
+      currentPantry.id,
+      catId,
+      newBand,
+      newBand === 'out' ? 0 : 40,
+      1.0
+    );
+    postCorrection(currentPantry.id, [
+      {
+        category_id: catId,
+        category_name: cat,
+        band: newBand,
+      },
+    ]).catch((err) => console.warn(`Run-out for ${cat} not persisted to local backend:`, err));
 
     setLastCheckinToast(
       newBand === 'out'
@@ -439,12 +457,20 @@ export default function VolunteerDashboard({
       if (onUpdateInventory) onUpdateInventory(name, band);
     });
 
-    // Persist as a volunteer correction. Screen already updated, so a failure
-    // (backend down, or unknown pantry) just logs. We send category_name too, so
-    // the backend can resolve/auto-add the category even without an id.
+    // Persist as a volunteer correction to Supabase & backend
     try {
+      Object.keys(qtyByCategory).forEach((name) => {
+        const catId = catIdByName[name.toLowerCase()] || DEFAULT_CAT_IDS[name.toLowerCase()] || 1;
+        updateShelfInSupabase(
+          currentPantry.id,
+          catId,
+          bandByCategory[name],
+          qtyByCategory[name],
+          0.95
+        );
+      });
       const corrections: CorrectionItem[] = Object.keys(qtyByCategory).map((name) => ({
-        category_id: catIdByName[name.toLowerCase()],
+        category_id: catIdByName[name.toLowerCase()] || DEFAULT_CAT_IDS[name.toLowerCase()] || 1,
         category_name: name,
         band: bandByCategory[name],
         estimated_qty: qtyByCategory[name],
@@ -492,6 +518,18 @@ export default function VolunteerDashboard({
     if (onUpdateFullPantry) {
       onUpdateFullPantry(updatedPantry);
     }
+
+    // Persist closing check updates to Supabase
+    updatedItems.forEach((it) => {
+      const catId = catIdByName[it.category_name.toLowerCase()] || DEFAULT_CAT_IDS[it.category_name.toLowerCase()] || 1;
+      updateShelfInSupabase(
+        currentPantry.id,
+        catId,
+        it.band,
+        it.estimated_qty,
+        it.confidence
+      );
+    });
 
     setLastCheckinToast(`✓ ${summary}`);
     setTimeout(() => {

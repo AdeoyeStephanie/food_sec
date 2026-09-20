@@ -129,8 +129,18 @@ export default function Home() {
       }
     };
 
-    window.addEventListener('inventory-sync', handleSync);
-    window.addEventListener('storage', handleStorage);
+    // Instant cross-tab sync via modern BroadcastChannel
+    let broadcastChannel: BroadcastChannel | null = null;
+    if (typeof BroadcastChannel !== 'undefined') {
+      try {
+        broadcastChannel = new BroadcastChannel('pantree_realtime_sync');
+        broadcastChannel.onmessage = (event) => {
+          if (event.data && Array.isArray(event.data)) {
+            setPantriesList(event.data);
+          }
+        };
+      } catch {}
+    }
 
     // Cross-device Supabase Realtime WebSocket listener:
     // When any volunteer updates stock on another phone, this triggers live without refresh!
@@ -143,8 +153,8 @@ export default function Home() {
       });
     });
 
-    // Automated background polling every 10 seconds:
-    // Guarantees live updates continuously even if WebSockets are closed or behind strict proxies
+    // Automated background polling every 5 seconds:
+    // Guarantees real-time updates continuously even if WebSockets are closed or behind strict proxies
     const autoSyncInterval = setInterval(async () => {
       try {
         const freshList = await fetchPantriesFromSupabase();
@@ -161,17 +171,20 @@ export default function Home() {
           });
         }
       } catch {}
-    }, 10000);
+    }, 5000);
 
-    // Real-time clock tick every 25 seconds:
+    // Real-time clock tick every 20 seconds:
     // Automatically increments "Updated Xm ago" and re-evaluates closing times & open/closed status
     const clockInterval = setInterval(() => {
       setCurrentTime(Date.now());
-    }, 25000);
+    }, 20000);
 
     return () => {
       window.removeEventListener('inventory-sync', handleSync);
       window.removeEventListener('storage', handleStorage);
+      if (broadcastChannel) {
+        broadcastChannel.close();
+      }
       clearInterval(autoSyncInterval);
       clearInterval(clockInterval);
       unsubscribeRealtime();
@@ -561,7 +574,7 @@ export default function Home() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
             </span>
-            <span className="hidden sm:inline">Live</span>
+            <span className="hidden sm:inline">{language === 'es' ? 'Tiempo Real' : 'Realtime'}</span>
           </div>
 
           {/* Real-time Refresh Stock Button */}
@@ -705,7 +718,7 @@ export default function Home() {
                   {t.hotlineTitle}
                 </h3>
                 <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-semibold px-2 py-0.5 rounded-full border border-emerald-500/30">
-                  {language === 'es' ? 'Simular Voz' : 'Live Voice Demo'}
+                  {language === 'es' ? 'Asistente de Voz' : 'Voice Assistant'}
                 </span>
               </div>
               <p className="text-xs text-slate-300 mt-0.5 font-medium">

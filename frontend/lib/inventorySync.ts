@@ -304,6 +304,11 @@ export function saveAndBroadcastPantries(pantries: Pantry[]) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(pantries));
     window.dispatchEvent(new CustomEvent('inventory-sync', { detail: pantries }));
+    if (typeof BroadcastChannel !== 'undefined') {
+      const channel = new BroadcastChannel('pantree_realtime_sync');
+      channel.postMessage(pantries);
+      channel.close();
+    }
   } catch (err) {
     console.warn('Could not persist pantries to localStorage:', err);
   }

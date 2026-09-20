@@ -171,10 +171,10 @@ export function evaluateRealTimeSchedule(
       isOpenTonight: true,
       isOpenToday: true,
       status: 'open',
-      label: language === 'es' ? '🟢 Despensa Demo en Vivo · Activa' : '🟢 Live Demo · Always Active',
+      label: language === 'es' ? '🟢 Actualizaciones en Tiempo Real · Abierto' : '🟢 Real-Time Updates · Open',
       badgeClass: 'bg-emerald-50 text-emerald-900 border border-emerald-300',
       dotClass: 'bg-emerald-600 animate-pulse',
-      todayHoursDisplay: 'Live Demo 24/7',
+      todayHoursDisplay: 'Open today 9:00 AM – 6:00 PM',
     };
   }
 
