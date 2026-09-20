@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Pantry, getUrgencyIndicator } from '@/lib/pantryData';
+import { useNow } from '@/lib/useNow';
 import { Language, TRANSLATIONS } from '@/lib/translations';
 import { Navigation, Phone, CheckCircle2, ShoppingBag, Clock, Languages, ShieldCheck, ThumbsUp, ThumbsDown, X, Bus, Accessibility, Sparkles } from 'lucide-react';
 
@@ -14,7 +15,8 @@ interface PantryDetailSheetProps {
 export default function PantryDetailSheet({ pantry, language = 'en', onClose }: PantryDetailSheetProps) {
   const [feedbackSent, setFeedbackSent] = useState<string | null>(null);
   const t = TRANSLATIONS[language] || TRANSLATIONS.en;
-  const urgency = getUrgencyIndicator(pantry);
+  const now = useNow();
+  const urgency = getUrgencyIndicator(pantry, now);
 
   const getBandStyles = (band: 'plenty' | 'low' | 'out') => {
     switch (band) {

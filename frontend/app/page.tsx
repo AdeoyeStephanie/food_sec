@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { Pantry, getUrgencyIndicator } from '@/lib/pantryData';
+import { useNow } from '@/lib/useNow';
 import PantryDetailSheet from '@/components/PantryDetailSheet';
 import VolunteerDashboard from '@/components/VolunteerDashboard';
 import PantryLoginModal from '@/components/PantryLoginModal';
@@ -37,6 +38,9 @@ const PantryMap = dynamic(() => import('@/components/PantryMap'), {
 });
 
 export default function Home() {
+  // Live clock so open/closed badges recompute as time passes.
+  const now = useNow();
+
   // Navigation & Search State
   const [pantriesList, setPantriesList] = useState<Pantry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -746,7 +750,7 @@ export default function Home() {
                   {filteredPantries.map((pantry, idx) => {
                   const isSelected = selectedPantry?.id === pantry.id;
                   const isHovered = hoveredPantryId === pantry.id;
-                  const urgency = getUrgencyIndicator(pantry);
+                  const urgency = getUrgencyIndicator(pantry, now);
 
                   return (
                     <div
