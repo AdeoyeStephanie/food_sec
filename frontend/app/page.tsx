@@ -414,11 +414,17 @@ export default function Home() {
     return filterPantriesIntelligently(pantriesList, query, activeFilter);
   }, [query, activeFilter, pantriesList]);
 
-  // Ensure first matching pantry is selected on results view. Syncs the current
-  // selection to the available options; the guard prevents a re-render loop.
+  // Cleanly close pantry detail sheet and ensure user returns to the list view
+  const handleClosePantryDetail = () => {
+    setSelectedPantry(null);
+    setMobileTab('list');
+  };
+
+  // Reconcile selected pantry if active filters exclude the currently selected item.
+  // Guard prevents forcing a selection when the user explicitly closes the detail view.
   React.useEffect(() => {
     if (hasSearched && filteredPantries.length > 0) {
-      if (!selectedPantry || !filteredPantries.some((p) => p.id === selectedPantry.id)) {
+      if (selectedPantry && !filteredPantries.some((p) => p.id === selectedPantry.id)) {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setSelectedPantry(filteredPantries[0]);
       }
@@ -947,7 +953,7 @@ export default function Home() {
                   <PantryDetailSheet
                     pantry={selectedPantry}
                     language={language}
-                    onClose={() => setSelectedPantry(null)}
+                    onClose={handleClosePantryDetail}
                   />
                 </ErrorBoundary>
               </div>
@@ -985,7 +991,7 @@ export default function Home() {
           {selectedPantry && (
             <div
               className="md:hidden fixed inset-0 z-80 bg-black/60 backdrop-blur-xs p-3 flex flex-col justify-end animate-in fade-in duration-200"
-              onClick={() => setSelectedPantry(null)}
+              onClick={handleClosePantryDetail}
             >
               <div
                 className="w-full max-h-[85vh] overflow-y-auto"
@@ -995,7 +1001,7 @@ export default function Home() {
                   <PantryDetailSheet
                     pantry={selectedPantry}
                     language={language}
-                    onClose={() => setSelectedPantry(null)}
+                    onClose={handleClosePantryDetail}
                   />
                 </ErrorBoundary>
               </div>

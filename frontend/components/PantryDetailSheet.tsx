@@ -67,8 +67,9 @@ export default function PantryDetailSheet({ pantry, language = 'en', onClose }: 
         {onClose && (
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-200/70 rounded-full transition cursor-pointer"
-            aria-label="Close sheet"
+            className="p-2 -mr-1 -mt-1 text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-200 shadow-2xs rounded-full transition cursor-pointer flex items-center justify-center shrink-0"
+            aria-label="Close and return to pantry list"
+            title="Return to pantry list"
           >
             <X className="w-5 h-5" />
           </button>
