@@ -23,7 +23,7 @@ import {
   Tablet,
   Trash2
 } from 'lucide-react';
-import { Pantry, ShelfItem } from '@/lib/pantryData';
+import { Pantry } from '@/lib/pantryData';
 import CameraViewfinder from '@/components/CameraViewfinder';
 import BrandLogo from '@/components/BrandLogo';
 import {
