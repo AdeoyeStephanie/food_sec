@@ -133,3 +133,30 @@ export async function updateShelfInSupabase(
   });
   if (error) console.error('Supabase shelf update error:', error);
 }
+
+/**
+ * Subscribe to realtime updates across all devices via Supabase WebSockets
+ */
+export function subscribeToShelfRealtime(onUpdate: () => void) {
+  const channel = supabase
+    .channel('pantree-realtime-shelf')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'shelf_state' },
+      () => {
+        onUpdate();
+      }
+    )
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'check_ins' },
+      () => {
+        onUpdate();
+      }
+    )
+    .subscribe();
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}

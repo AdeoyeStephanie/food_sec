@@ -11,6 +11,7 @@ import BrandLogo from '@/components/BrandLogo';
 import { Language, TRANSLATIONS } from '@/lib/translations';
 import { getStoredPantries, saveAndBroadcastPantries } from '@/lib/inventorySync';
 import { fetchPantries } from '@/lib/api';
+import { fetchPantriesFromSupabase, subscribeToShelfRealtime } from '@/lib/supabaseData';
 import {
   Search,
   Mic,
@@ -111,9 +112,22 @@ export default function Home() {
 
     window.addEventListener('inventory-sync', handleSync);
     window.addEventListener('storage', handleStorage);
+
+    // Cross-device Supabase Realtime WebSocket listener:
+    // When any volunteer updates stock on another phone, this triggers live without refresh!
+    const unsubscribeRealtime = subscribeToShelfRealtime(() => {
+      fetchPantriesFromSupabase().then((list) => {
+        if (list.length > 0) {
+          setPantriesList(list);
+          saveAndBroadcastPantries(list);
+        }
+      });
+    });
+
     return () => {
       window.removeEventListener('inventory-sync', handleSync);
       window.removeEventListener('storage', handleStorage);
+      unsubscribeRealtime();
     };
   }, []);
 

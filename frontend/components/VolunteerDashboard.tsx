@@ -44,6 +44,7 @@ import {
   CorrectionItem
 } from '@/lib/api';
 import { aggregateDonations, canonicalCategory } from '@/lib/inventory';
+import { logCheckinToSupabase, updateShelfInSupabase } from '@/lib/supabaseData';
 
 interface VolunteerDashboardProps {
   activePantry?: Pantry | null;
@@ -265,8 +266,8 @@ export default function VolunteerDashboard({
       setTimeout(() => setLastCheckinToast(null), 3500);
     }
 
-    // Persist the check-in to the FastAPI backend. Screen already updated above,
-    // so a network/FK failure just logs (static demo mode still works client-side).
+    // Persist the check-in to Supabase and FastAPI backend for cross-device sync
+    logCheckinToSupabase(currentPantry.id, size);
     postCheckin(currentPantry.id, size).catch((err) => {
       console.warn('Check-in not persisted to backend:', err);
     });
